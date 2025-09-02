@@ -51,16 +51,21 @@ func (Beans *BeansServices) FindById(ctx context.Context, id int) (repository.Be
 	return bean, nil
 }
 
-func (Beans *BeansServices) Update(ctx context.Context, id int, nw repository.BeansModel) error {
+func updateBeanPayload(req RequestUpdateBean, ltsBean repository.BeansModel) repository.BeansModel {
+
+	ltsBean.Name = req.Name
+
+	return ltsBean
+}
+
+func (Beans *BeansServices) Update(ctx context.Context, id int, req RequestUpdateBean) error {
 
 	bean, err := Beans.FindById(ctx, id)
 	if err != nil {
 		return err
 	}
 
-	bean.Name = nw.Name
-
-	err = Beans.Repository.Beans.Update(ctx, bean)
+	err = Beans.Repository.Beans.Update(ctx, updateBeanPayload(req, bean))
 	if err != nil {
 		return err
 	}

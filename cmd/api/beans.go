@@ -4,7 +4,6 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/faizisyellow/indocoffee/internal/repository"
 	"github.com/faizisyellow/indocoffee/internal/service"
 	"github.com/go-chi/chi/v5"
 )
@@ -88,10 +87,7 @@ func (app *Application) UpdateBeansHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	var updateBean repository.BeansModel
-	updateBean.Name = req.Name
-
-	err = app.Services.BeansService.Update(r.Context(), id, updateBean)
+	err = app.Services.BeansService.Update(r.Context(), id, req)
 	if err != nil {
 		ResponseServerError(w, r, err, http.StatusInternalServerError)
 		return

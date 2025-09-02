@@ -29,7 +29,7 @@ type Service struct {
 		Create(ctx context.Context, req RequestCreateBean) (string, error)
 		FindAll(ctx context.Context) ([]repository.BeansModel, error)
 		FindById(ctx context.Context, id int) (repository.BeansModel, error)
-		Update(ctx context.Context, id int, nw repository.BeansModel) error
+		Update(ctx context.Context, id int, req RequestUpdateBean) error
 		Delete(ctx context.Context, id int) error
 		Remove(ctx context.Context, id int) error
 	}
