@@ -10,6 +10,15 @@ definitions:
       token:
         type: string
     type: object
+  repository.BeansModel:
+    properties:
+      id:
+        type: integer
+      is_delete:
+        type: boolean
+      name:
+        type: string
+    type: object
   repository.UserModel:
     properties:
       created_at:
@@ -55,6 +64,24 @@ definitions:
     properties:
       token:
         type: string
+    type: object
+  service.RequestCreateBean:
+    properties:
+      name:
+        maxLength: 18
+        minLength: 3
+        type: string
+    required:
+    - name
+    type: object
+  service.RequestUpdateBean:
+    properties:
+      name:
+        maxLength: 18
+        minLength: 3
+        type: string
+    required:
+    - name
     type: object
 host: localhost:8080
 info:
@@ -255,6 +282,232 @@ paths:
       summary: Sign Up Account
       tags:
       - Auth
+  /beans:
+    get:
+      description: Get All coffee beans
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/repository.BeansModel'
+                  type: array
+                error:
+                  type: object
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+      summary: Get coffee beans
+      tags:
+      - Beans
+    post:
+      consumes:
+      - application/json
+      description: Create new coffee bean
+      parameters:
+      - description: Payload create new bean
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/service.RequestCreateBean'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: string
+                error:
+                  type: object
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+      summary: Add Coffee bean
+      tags:
+      - Beans
+  /beans/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete coffee bean by ID
+      parameters:
+      - description: Id coffee bean
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+      summary: Delete coffee bean
+      tags:
+      - Beans
+    get:
+      description: Get coffee bean by ID
+      parameters:
+      - description: Id coffee bean
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  $ref: '#/definitions/repository.BeansModel'
+                error:
+                  type: object
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+      summary: Get coffee bean
+      tags:
+      - Beans
+    patch:
+      consumes:
+      - application/json
+      description: Update coffee bean by ID
+      parameters:
+      - description: Id coffee bean
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Payload Update bean
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/service.RequestUpdateBean'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: string
+                error:
+                  type: object
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+      summary: Update coffee bean
+      tags:
+      - Beans
   /users/delete:
     delete:
       consumes:
