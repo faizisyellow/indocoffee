@@ -1,0 +1,99 @@
+package main
+
+import (
+	"fmt"
+	"net"
+	"os"
+	"time"
+
+	_ "github.com/faizisyellow/indocoffee/docs"
+	"github.com/faizisyellow/indocoffee/internal/auth"
+	"github.com/faizisyellow/indocoffee/internal/db"
+	"github.com/faizisyellow/indocoffee/internal/logger"
+	"github.com/faizisyellow/indocoffee/internal/repository"
+	"github.com/faizisyellow/indocoffee/internal/service"
+	"github.com/joho/godotenv"
+	"go.uber.org/zap"
+)
+
+//	@title			Falcon Rest API Generator
+//	@version		1.0
+//	@description	Rest API Documentation.
+//	@termsOfService	http://swagger.io/terms/
+
+//	@contact.name	API Support
+//	@contact.url	http://www.swagger.io/support
+//	@contact.email	support@swagger.io
+
+//	@license.name	Apache 2.0
+//	@license.url	http://www.apache.org/licenses/LICENSE-2.0.html
+
+//	@securityDefinitions.apiKey	JWT
+//	@in							header
+//	@name						Authorization
+
+// @schemes	http https
+// @host		localhost:8080
+// @BasePath	/v1
+func main() {
+
+	err := godotenv.Load()
+	if err != nil {
+		logger.Logger.Fatalw("error loading .env file", zap.Error(err))
+	}
+
+	dbConfig := DBConf{
+		Addr:            os.Getenv("DB_ADDR"),
+		MaxOpenConn:     30,
+		MaxIdleConn:     30,
+		MaxLifeTime:     "4m",
+		MaxIdleLifeTime: "4m",
+	}
+
+	dbs, err := db.New(
+		dbConfig.Addr,
+		dbConfig.MaxOpenConn,
+		dbConfig.MaxIdleConn,
+		dbConfig.MaxIdleLifeTime,
+		dbConfig.MaxLifeTime,
+	)
+	if err != nil {
+		logger.Logger.Fatalw("error connecting to database", zap.Error(err))
+	}
+
+	defer dbs.Close()
+	logger.Logger.Infow("database connection pool has established")
+
+	repository := repository.New(dbs)
+
+	services := service.New(*repository, db.WithTx, dbs)
+
+	jwtTokenConfig := JwtConfig{
+		SecretKey: os.Getenv("SECRET_KEY"),
+		Iss:       "authentication",
+		Sub:       "user",
+		Exp:       time.Now().Add(time.Hour * 24 * 3).Unix(),
+	}
+
+	jwtAuthentication := auth.New(jwtTokenConfig.SecretKey, jwtTokenConfig.Iss, jwtTokenConfig.Sub)
+
+	application := Application{
+		Port:           os.Getenv("PORT"),
+		Host:           os.Getenv("HOST"),
+		Env:            os.Getenv("ENV"),
+		DbConfig:       dbConfig,
+		Services:       *services,
+		JwtAuth:        jwtTokenConfig,
+		Authentication: jwtAuthentication,
+		Logger:         logger.Logger,
+
+		//http:domain:port/version/swagger/*
+		SwaggerUrl: fmt.Sprintf("http://%v/v%v/swagger/doc.json", net.JoinHostPort(os.Getenv("HOST"), os.Getenv("PORT")), 1),
+	}
+
+	err = application.Run(application.Mux())
+	if err != nil {
+		logger.Logger.Fatalw("error running application", zap.Error(err))
+	}
+
+}

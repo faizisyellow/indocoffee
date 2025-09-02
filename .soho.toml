@@ -1,0 +1,4 @@
+Handler = '/cmd/api'
+Router = '/cmd/api'
+Service = '/internal/service'
+Repository = '/internal/repository'
