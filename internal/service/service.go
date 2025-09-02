@@ -24,11 +24,21 @@ type Service struct {
 		Update(ctx context.Context, id int, nw repository.RolesModel) error
 		Delete(ctx context.Context, id int) error
 	}
+
+	BeansService interface {
+		Create(ctx context.Context, req RequestCreateBean) (string, error)
+		FindAll(ctx context.Context) ([]repository.BeansModel, error)
+		FindById(ctx context.Context, id int) (repository.BeansModel, error)
+		Update(ctx context.Context, id int, nw repository.BeansModel) error
+		Delete(ctx context.Context, id int) error
+		Remove(ctx context.Context, id int) error
+	}
 }
 
 func New(store repository.Repository, txfnc db.TransFnc, Db *sql.DB) *Service {
 	return &Service{
 		UsersService: &UsersServices{Repository: store, TransFnc: txfnc, Db: Db},
 		RolesService: &RolesServices{Repository: store},
+		BeansService: &BeansServices{Repository: store},
 	}
 }

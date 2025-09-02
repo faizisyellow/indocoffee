@@ -34,6 +34,14 @@ func (app *Application) Mux() http.Handler {
 			r.Patch("/{id}", app.UpdateRolesHandler)
 			r.Delete("/{id}", app.DeleteRolesHandler)
 		})
+
+    	r.Route("/beans", func(r chi.Router) {
+			r.Post("/", app.CreateBeansHandler)
+			r.Get("/", app.GetAllBeansHandler)
+			r.Get("/{id}", app.GetBeansHandler)
+			r.Patch("/{id}", app.UpdateBeansHandler)
+			r.Delete("/{id}", app.DeleteBeansHandler)
+		})
 	})
 
 	return r
