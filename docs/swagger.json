@@ -6,7 +6,7 @@
     "swagger": "2.0",
     "info": {
         "description": "Rest API Documentation.",
-        "title": "Falcon Rest API Generator",
+        "title": "Indocoffee REST APIs service",
         "termsOfService": "http://swagger.io/terms/",
         "contact": {
             "name": "API Support",

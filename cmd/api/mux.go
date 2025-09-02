@@ -7,10 +7,7 @@ import (
 	httpSwagger "github.com/swaggo/http-swagger"
 )
 
-
 func (app *Application) Mux() http.Handler {
-
-
 
 	r := chi.NewRouter()
 
@@ -30,12 +27,14 @@ func (app *Application) Mux() http.Handler {
 			r.Post("/sign-in", app.SignInHandler)
 		})
 
+		r.Route("/roles", func(r chi.Router) {
+			r.Post("/", app.CreateRolesHandler)
+			r.Get("/", app.GetAllRolesHandler)
+			r.Get("/{id}", app.GetRolesHandler)
+			r.Patch("/{id}", app.UpdateRolesHandler)
+			r.Delete("/{id}", app.DeleteRolesHandler)
+		})
 	})
 
-
-
-
-
-return r
+	return r
 }
-

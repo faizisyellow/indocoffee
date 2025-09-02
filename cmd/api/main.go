@@ -16,7 +16,7 @@ import (
 	"go.uber.org/zap"
 )
 
-//	@title			Falcon Rest API Generator
+//	@title			Indocoffee REST APIs service
 //	@version		1.0
 //	@description	Rest API Documentation.
 //	@termsOfService	http://swagger.io/terms/

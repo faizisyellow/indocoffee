@@ -16,10 +16,19 @@ type Service struct {
 		DeleteAccount(ctx context.Context, id int) error
 		FindUserById(ctx context.Context, id int) (*repository.UserModel, error)
 	}
+
+	RolesService interface {
+		Create(ctx context.Context) (string, error)
+		FindAll(ctx context.Context) ([]repository.RolesModel, error)
+		FindById(ctx context.Context, id int) (repository.RolesModel, error)
+		Update(ctx context.Context, id int, nw repository.RolesModel) error
+		Delete(ctx context.Context, id int) error
+	}
 }
 
 func New(store repository.Repository, txfnc db.TransFnc, Db *sql.DB) *Service {
 	return &Service{
 		UsersService: &UsersServices{Repository: store, TransFnc: txfnc, Db: Db},
+		RolesService: &RolesServices{Repository: store},
 	}
 }

@@ -652,7 +652,7 @@ var SwaggerInfo = &swag.Spec{
 	Host:             "localhost:8080",
 	BasePath:         "/v1",
 	Schemes:          []string{"http", "https"},
-	Title:            "Falcon Rest API Generator",
+	Title:            "Indocoffee REST APIs service",
 	Description:      "Rest API Documentation.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,

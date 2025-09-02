@@ -20,6 +20,14 @@ type Repository struct {
 		Get(ctx context.Context, tx *sql.Tx, token string) (int, error)
 		DeleteByUserId(ctx context.Context, tx *sql.Tx, usrid int) error
 	}
+
+	Roles interface {
+		Insert(ctx context.Context) error
+		GetAll(ctx context.Context) ([]RolesModel, error)
+		GetById(ctx context.Context, id int) (RolesModel, error)
+		Update(ctx context.Context, nw RolesModel) error
+		Delete(ctx context.Context, id int) error
+	}
 }
 
 const QueryTimeout = time.Second * 5
@@ -29,5 +37,6 @@ func New(db *sql.DB) *Repository {
 	return &Repository{
 		Users:      &UsersRepository{Db: db},
 		Invitation: &InvitationRepository{Db: db},
+		Roles:      &RolesRepository{Db: db},
 	}
 }
