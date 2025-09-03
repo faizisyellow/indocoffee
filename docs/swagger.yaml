@@ -83,6 +83,13 @@ definitions:
     required:
     - name
     type: object
+  service.ResponseFindAll:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
 host: localhost:8080
 info:
   contact:
@@ -296,7 +303,7 @@ paths:
             - properties:
                 data:
                   items:
-                    $ref: '#/definitions/repository.BeansModel'
+                    $ref: '#/definitions/service.ResponseFindAll'
                   type: array
                 error:
                   type: object
@@ -430,6 +437,17 @@ paths:
               type: object
         "400":
           description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+        "404":
+          description: Not Found
           schema:
             allOf:
             - $ref: '#/definitions/main.Envelope'

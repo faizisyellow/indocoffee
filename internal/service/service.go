@@ -27,13 +27,15 @@ type Service struct {
 
 	BeansService interface {
 		Create(ctx context.Context, req RequestCreateBean) (string, error)
-		FindAll(ctx context.Context) ([]repository.BeansModel, error)
+		FindAll(ctx context.Context) ([]ResponseFindAll, error)
 		FindById(ctx context.Context, id int) (repository.BeansModel, error)
 		Update(ctx context.Context, id int, req RequestUpdateBean) error
 		Delete(ctx context.Context, id int) error
 		Remove(ctx context.Context, id int) error
 	}
 }
+
+var CONFLICT_CODE = "Error 1062 (23000)"
 
 func New(store repository.Repository, txfnc db.TransFnc, Db *sql.DB) *Service {
 	return &Service{

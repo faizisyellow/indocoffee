@@ -57,11 +57,7 @@ func (Beans *BeansRepository) GetAll(ctx context.Context) ([]BeansModel, error) 
 		beans = append(beans, bean)
 	}
 
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-
-	return beans, nil
+	return beans, rows.Err()
 }
 
 func (Beans *BeansRepository) GetById(ctx context.Context, id int) (BeansModel, error) {

@@ -2,6 +2,9 @@ package service
 
 import (
 	"context"
+	"errors"
+	"fmt"
+	"strings"
 
 	"github.com/faizisyellow/indocoffee/internal/repository"
 )
@@ -18,6 +21,10 @@ type RequestUpdateBean struct {
 	Name string `json:"name" validate:"required,min=3,max=18"`
 }
 
+var (
+	ErrConflictBean = errors.New("beans: bean already exist")
+)
+
 func (Beans *BeansServices) Create(ctx context.Context, req RequestCreateBean) (string, error) {
 
 	var newBean repository.BeansModel
@@ -25,20 +32,54 @@ func (Beans *BeansServices) Create(ctx context.Context, req RequestCreateBean) (
 
 	err := Beans.Repository.Beans.Insert(ctx, newBean)
 	if err != nil {
+		if strings.Contains(err.Error(), CONFLICT_CODE) {
+			return "", ErrConflictBean
+		}
 		return "", err
 	}
 
 	return "create new bean successfully", nil
 }
 
-func (Beans *BeansServices) FindAll(ctx context.Context) ([]repository.BeansModel, error) {
+type ResponseFindAll struct {
+	Id   int    `json:"id"`
+	Name string `json:"name"`
+}
+
+func (rf *ResponseFindAll) ParseDTO(data any) error {
+
+	switch v := data.(type) {
+	case repository.BeansModel:
+		rf.Id = v.Id
+		rf.Name = v.Name
+	default:
+		return fmt.Errorf("something went wrong when response to client")
+	}
+
+	return nil
+}
+
+func (Beans *BeansServices) FindAll(ctx context.Context) ([]ResponseFindAll, error) {
 
 	beans, err := Beans.Repository.Beans.GetAll(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	return beans, nil
+	response := make([]ResponseFindAll, 0)
+
+	for _, bean := range beans {
+		buffRes := new(ResponseFindAll)
+
+		err := buffRes.ParseDTO(bean)
+		if err != nil {
+			return nil, err
+		}
+
+		response = append(response, *buffRes)
+	}
+
+	return response, nil
 }
 
 func (Beans *BeansServices) FindById(ctx context.Context, id int) (repository.BeansModel, error) {
