@@ -2,8 +2,8 @@ package service
 
 import (
 	"context"
+	"database/sql"
 	"errors"
-	"fmt"
 	"strings"
 
 	"github.com/faizisyellow/indocoffee/internal/repository"
@@ -18,12 +18,20 @@ type RequestCreateBean struct {
 	Name string `json:"name" validate:"required,min=3,max=18"`
 }
 
+func (rcb RequestCreateBean) Serialize() RequestCreateBean {
+
+	rcb.Name = strings.ToLower(rcb.Name)
+	return rcb
+}
+
 type RequestUpdateBean struct {
 	Name string `json:"name" validate:"required,min=3,max=18"`
 }
 
 var (
 	ErrConflictBean = errors.New("beans: bean already exist")
+	ErrInternalBean = errors.New("beans: encountered an internal error")
+	ErrNotFoundBean = errors.New("beans: no such as bean")
 )
 
 func (Beans *BeansServices) Create(ctx context.Context, req RequestCreateBean) (string, error) {
@@ -33,10 +41,12 @@ func (Beans *BeansServices) Create(ctx context.Context, req RequestCreateBean) (
 
 	err := Beans.Repository.Beans.Insert(ctx, newBean)
 	if err != nil {
+
+		// TODO: should success create new bean if the existing bean is deleted
 		if strings.Contains(err.Error(), CONFLICT_CODE) {
 			return "", ErrConflictBean
 		}
-		return "", err
+		return "", ErrInternalBean
 	}
 
 	return "create new bean successfully", nil
@@ -54,7 +64,7 @@ func (rf *ResponseFindAll) ParseDTO(data any) error {
 		rf.Id = v.Id
 		rf.Name = v.Name
 	default:
-		return fmt.Errorf("something went wrong when response to client")
+		return ErrInternalBean
 	}
 
 	return nil
@@ -64,7 +74,7 @@ func (Beans *BeansServices) FindAll(ctx context.Context) ([]ResponseFindAll, err
 
 	beans, err := Beans.Repository.Beans.GetAll(ctx)
 	if err != nil {
-		return nil, err
+		return nil, ErrInternalBean
 	}
 
 	response := make([]ResponseFindAll, 0)
@@ -74,7 +84,7 @@ func (Beans *BeansServices) FindAll(ctx context.Context) ([]ResponseFindAll, err
 
 		err := serviceParser.Parse(buffRes, bean)
 		if err != nil {
-			return nil, err
+			return nil, ErrInternalBean
 		}
 
 		response = append(response, *buffRes)
@@ -87,7 +97,12 @@ func (Beans *BeansServices) FindById(ctx context.Context, id int) (repository.Be
 
 	bean, err := Beans.Repository.Beans.GetById(ctx, id)
 	if err != nil {
-		return repository.BeansModel{}, err
+		switch err {
+		case sql.ErrNoRows:
+			return repository.BeansModel{}, ErrNotFoundBean
+		default:
+			return repository.BeansModel{}, ErrInternalBean
+		}
 	}
 
 	return bean, nil
@@ -109,7 +124,8 @@ func (Beans *BeansServices) Update(ctx context.Context, id int, req RequestUpdat
 
 	err = Beans.Repository.Beans.Update(ctx, updateBeanPayload(req, bean))
 	if err != nil {
-		return err
+		// TODO: should success update bean if the existing bean is deleted
+		return ErrInternalBean
 	}
 
 	return nil
@@ -123,7 +139,7 @@ func (Beans *BeansServices) Delete(ctx context.Context, id int) error {
 	}
 
 	if err := Beans.Repository.Beans.Delete(ctx, bean.Id); err != nil {
-		return err
+		return ErrInternalBean
 	}
 
 	return nil
@@ -137,7 +153,7 @@ func (Beans *BeansServices) Remove(ctx context.Context, id int) error {
 	}
 
 	if err := Beans.Repository.Beans.Destroy(ctx, bean.Id); err != nil {
-		return err
+		return ErrInternalBean
 	}
 
 	return nil

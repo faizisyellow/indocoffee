@@ -358,6 +358,17 @@ paths:
                 error:
                   type: string
               type: object
+        "409":
+          description: Conflict
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
         "500":
           description: Internal Server Error
           schema:
@@ -390,6 +401,17 @@ paths:
           description: No Content
         "400":
           description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+        "404":
+          description: Not Found
           schema:
             allOf:
             - $ref: '#/definitions/main.Envelope'
@@ -503,6 +525,17 @@ paths:
               type: object
         "400":
           description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+        "404":
+          description: Not Found
           schema:
             allOf:
             - $ref: '#/definitions/main.Envelope'

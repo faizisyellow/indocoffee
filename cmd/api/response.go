@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 
@@ -56,7 +57,7 @@ func ResponseServerError(w http.ResponseWriter, r *http.Request, rErr error, sta
 		zap.Error(rErr),
 	)
 
-	err := WriteHttpJson(w, Envelope{Data: nil, Error: rErr}, status)
+	err := WriteHttpJson(w, Envelope{Data: nil, Error: errors.New("server encountered an internal error")}, status)
 	if err != nil {
 		fallbackServerError(w)
 	}

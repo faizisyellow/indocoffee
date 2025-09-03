@@ -1,8 +1,6 @@
 package main
 
 import (
-	"database/sql"
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -18,6 +16,7 @@ import (
 // @Param			payload	body		service.RequestCreateBean	true	"Payload create new bean"
 // @Success		201		{object}	main.Envelope{data=string,error=nil}
 // @Failure		400		{object}	main.Envelope{data=nil,error=string}
+// @Failure		409		{object}	main.Envelope{data=nil,error=string}
 // @Failure		500		{object}	main.Envelope{data=nil,error=string}
 // @Router			/beans [post]
 func (app *Application) CreateBeansHandler(w http.ResponseWriter, r *http.Request) {
@@ -36,9 +35,14 @@ func (app *Application) CreateBeansHandler(w http.ResponseWriter, r *http.Reques
 
 	ctx := r.Context()
 
-	res, err := app.Services.BeansService.Create(ctx, req)
+	res, err := app.Services.BeansService.Create(ctx, req.Serialize())
 	if err != nil {
-		ResponseServerError(w, r, err, http.StatusInternalServerError)
+		switch err {
+		case service.ErrConflictBean:
+			ResponseClientError(w, r, err, http.StatusConflict)
+		default:
+			ResponseServerError(w, r, err, http.StatusInternalServerError)
+		}
 		return
 	}
 
@@ -87,8 +91,8 @@ func (app *Application) GetBeansHandler(w http.ResponseWriter, r *http.Request) 
 	res, err := app.Services.BeansService.FindById(r.Context(), id)
 	if err != nil {
 		switch err {
-		case sql.ErrNoRows:
-			ResponseClientError(w, r, fmt.Errorf("beans %d: no such as bean", id), http.StatusNotFound)
+		case service.ErrNotFoundBean:
+			ResponseClientError(w, r, err, http.StatusNotFound)
 		default:
 			ResponseServerError(w, r, err, http.StatusInternalServerError)
 		}
@@ -108,6 +112,7 @@ func (app *Application) GetBeansHandler(w http.ResponseWriter, r *http.Request) 
 // @Param			payload	body		service.RequestUpdateBean	true	"Payload Update bean"
 // @Success		200		{object}	main.Envelope{data=string,error=nil}
 // @Failure		400		{object}	main.Envelope{data=nil,error=string}
+// @Failure		404		{object}	main.Envelope{data=nil,error=string}
 // @Failure		500		{object}	main.Envelope{data=nil,error=string}
 // @Router			/beans/{id} [patch]
 func (app *Application) UpdateBeansHandler(w http.ResponseWriter, r *http.Request) {
@@ -134,7 +139,13 @@ func (app *Application) UpdateBeansHandler(w http.ResponseWriter, r *http.Reques
 
 	err = app.Services.BeansService.Update(r.Context(), id, req)
 	if err != nil {
-		ResponseServerError(w, r, err, http.StatusInternalServerError)
+		switch err {
+		case service.ErrNotFoundBean:
+			ResponseClientError(w, r, err, http.StatusNotFound)
+		default:
+			ResponseServerError(w, r, err, http.StatusInternalServerError)
+
+		}
 		return
 	}
 
@@ -150,6 +161,7 @@ func (app *Application) UpdateBeansHandler(w http.ResponseWriter, r *http.Reques
 // @Param			id	path	int	true	"Id coffee bean"
 // @Success		204
 // @Failure		400	{object}	main.Envelope{data=nil,error=string}
+// @Failure		404	{object}	main.Envelope{data=nil,error=string}
 // @Failure		500	{object}	main.Envelope{data=nil,error=string}
 // @Router			/beans/{id} [delete]
 func (app *Application) DeleteBeansHandler(w http.ResponseWriter, r *http.Request) {
@@ -164,7 +176,13 @@ func (app *Application) DeleteBeansHandler(w http.ResponseWriter, r *http.Reques
 
 	err = app.Services.BeansService.Delete(r.Context(), id)
 	if err != nil {
-		ResponseServerError(w, r, err, http.StatusInternalServerError)
+		switch err {
+		case service.ErrNotFoundBean:
+			ResponseClientError(w, r, err, http.StatusNotFound)
+		default:
+			ResponseServerError(w, r, err, http.StatusInternalServerError)
+
+		}
 		return
 	}
 
