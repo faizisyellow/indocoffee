@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/faizisyellow/indocoffee/internal/repository"
+	serviceParser "github.com/faizisyellow/indocoffee/internal/service/parser"
 )
 
 type BeansServices struct {
@@ -71,7 +72,7 @@ func (Beans *BeansServices) FindAll(ctx context.Context) ([]ResponseFindAll, err
 	for _, bean := range beans {
 		buffRes := new(ResponseFindAll)
 
-		err := buffRes.ParseDTO(bean)
+		err := serviceParser.Parse(buffRes, bean)
 		if err != nil {
 			return nil, err
 		}
