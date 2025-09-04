@@ -18,11 +18,12 @@ type Service struct {
 	}
 
 	RolesService interface {
-		Create(ctx context.Context) (string, error)
-		FindAll(ctx context.Context) ([]repository.RolesModel, error)
-		FindById(ctx context.Context, id int) (repository.RolesModel, error)
+		Create(ctx context.Context, req CreateRoleRequest) (string, error)
+		FindAll(ctx context.Context) ([]ResponseRolesFindAll, error)
+		FindById(ctx context.Context, id int) (ResponseRolesById, error)
 		Update(ctx context.Context, id int, nw repository.RolesModel) error
 		Delete(ctx context.Context, id int) error
+		Remove(ctx context.Context, id int) error
 	}
 
 	BeansService interface {

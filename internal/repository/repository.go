@@ -22,11 +22,12 @@ type Repository struct {
 	}
 
 	Roles interface {
-		Insert(ctx context.Context) error
+		Insert(ctx context.Context, nw RolesModel) error
 		GetAll(ctx context.Context) ([]RolesModel, error)
 		GetById(ctx context.Context, id int) (RolesModel, error)
 		Update(ctx context.Context, nw RolesModel) error
 		Delete(ctx context.Context, id int) error
+		Destroy(ctx context.Context, id int) error
 	}
 
 	Beans interface {

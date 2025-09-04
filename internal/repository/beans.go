@@ -94,14 +94,23 @@ func (Beans *BeansRepository) Update(ctx context.Context, nw BeansModel) error {
 
 func (Beans *BeansRepository) Delete(ctx context.Context, id int) error {
 
-	query := `UPDATE beans SET is_delete = TRUE WHERE id = ?`
+	query := `UPDATE beans SET is_delete = TRUE WHERE id = ? AND is_delete = FALSE`
 
 	ctx, cancel := context.WithTimeout(ctx, QueryTimeout)
 	defer cancel()
 
-	_, err := Beans.Db.ExecContext(ctx, query, id)
+	result, err := Beans.Db.ExecContext(ctx, query, id)
 	if err != nil {
 		return err
+	}
+
+	n, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if n == 0 {
+		return sql.ErrNoRows
 	}
 
 	return nil

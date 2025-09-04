@@ -32,6 +32,14 @@ definitions:
       username:
         type: string
     type: object
+  service.CreateRoleRequest:
+    properties:
+      name:
+        minLength: 4
+        type: string
+    required:
+    - name
+    type: object
   service.LoginRequest:
     properties:
       email:
@@ -83,7 +91,27 @@ definitions:
     required:
     - name
     type: object
+  service.RequestUpdateRole:
+    properties:
+      name:
+        minLength: 4
+        type: string
+    type: object
   service.ResponseFindAll:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+  service.ResponseRolesById:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+  service.ResponseRolesFindAll:
     properties:
       id:
         type: integer
@@ -559,6 +587,289 @@ paths:
       summary: Update coffee bean
       tags:
       - Beans
+  /roles:
+    get:
+      description: Get All user roles
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/service.ResponseRolesFindAll'
+                  type: array
+                error:
+                  type: object
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+      summary: Get user roles
+      tags:
+      - Roles
+    post:
+      consumes:
+      - application/json
+      description: Create new user role
+      parameters:
+      - description: Payload create new role
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/service.CreateRoleRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: string
+                error:
+                  type: object
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+        "409":
+          description: Conflict
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+      summary: Add user role
+      tags:
+      - Roles
+  /roles/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete user role by Id
+      parameters:
+      - description: Role id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+        "404":
+          description: Not Found
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+      summary: Delete user role
+      tags:
+      - Roles
+    get:
+      consumes:
+      - application/json
+      description: Get user role by Id
+      parameters:
+      - description: Role id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  $ref: '#/definitions/service.ResponseRolesById'
+                error:
+                  type: object
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+        "404":
+          description: Not Found
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+      summary: Get user role
+      tags:
+      - Roles
+    patch:
+      consumes:
+      - application/json
+      description: Update user role by Id
+      parameters:
+      - description: Role id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Role payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/service.RequestUpdateRole'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  $ref: '#/definitions/service.ResponseRolesById'
+                error:
+                  type: object
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+        "404":
+          description: Not Found
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+        "409":
+          description: Conflict
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+      summary: Update user role
+      tags:
+      - Roles
   /users/delete:
     delete:
       consumes:
