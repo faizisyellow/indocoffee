@@ -1594,9 +1594,14 @@
         "service.CreateRoleRequest": {
             "type": "object",
             "required": [
+                "level",
                 "name"
             ],
             "properties": {
+                "level": {
+                    "type": "integer",
+                    "minimum": 1
+                },
                 "name": {
                     "type": "string",
                     "minLength": 4
@@ -1679,6 +1684,9 @@
         "service.RequestUpdateRole": {
             "type": "object",
             "properties": {
+                "level": {
+                    "type": "integer"
+                },
                 "name": {
                     "type": "string",
                     "minLength": 4
@@ -1702,6 +1710,9 @@
                 "id": {
                     "type": "integer"
                 },
+                "level": {
+                    "type": "integer"
+                },
                 "name": {
                     "type": "string"
                 }
@@ -1711,6 +1722,9 @@
             "type": "object",
             "properties": {
                 "id": {
+                    "type": "integer"
+                },
+                "level": {
                     "type": "integer"
                 },
                 "name": {

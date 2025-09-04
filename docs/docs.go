@@ -1596,9 +1596,14 @@ const docTemplate = `{
         "service.CreateRoleRequest": {
             "type": "object",
             "required": [
+                "level",
                 "name"
             ],
             "properties": {
+                "level": {
+                    "type": "integer",
+                    "minimum": 1
+                },
                 "name": {
                     "type": "string",
                     "minLength": 4
@@ -1681,6 +1686,9 @@ const docTemplate = `{
         "service.RequestUpdateRole": {
             "type": "object",
             "properties": {
+                "level": {
+                    "type": "integer"
+                },
                 "name": {
                     "type": "string",
                     "minLength": 4
@@ -1704,6 +1712,9 @@ const docTemplate = `{
                 "id": {
                     "type": "integer"
                 },
+                "level": {
+                    "type": "integer"
+                },
                 "name": {
                     "type": "string"
                 }
@@ -1713,6 +1724,9 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "id": {
+                    "type": "integer"
+                },
+                "level": {
                     "type": "integer"
                 },
                 "name": {

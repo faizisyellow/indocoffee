@@ -149,6 +149,7 @@ func (app *Application) UpdateRolesHandler(w http.ResponseWriter, r *http.Reques
 	var role repository.RolesModel
 	role.Id = roleReq.Id
 	role.Name = roleReq.Name
+	role.Level = roleReq.Level
 
 	role = service.UpdateRolePayload(req.Serialize(), role)
 	err = app.Services.RolesService.Update(ctx, id, role)

@@ -21,7 +21,8 @@ var (
 )
 
 type CreateRoleRequest struct {
-	Name string `json:"name" validate:"required,min=4"`
+	Name  string `json:"name" validate:"required,min=4"`
+	Level int    `json:"level" validate:"required,min=1"`
 }
 
 func (Cr CreateRoleRequest) Serialize() CreateRoleRequest {
@@ -34,6 +35,7 @@ func (Roles *RolesServices) Create(ctx context.Context, req CreateRoleRequest) (
 
 	var newRole repository.RolesModel
 	newRole.Name = req.Name
+	newRole.Level = req.Level
 
 	err := Roles.Repository.Roles.Insert(ctx, newRole)
 	if err != nil {
@@ -48,8 +50,9 @@ func (Roles *RolesServices) Create(ctx context.Context, req CreateRoleRequest) (
 }
 
 type ResponseRolesFindAll struct {
-	Id   int    `json:"id"`
-	Name string `json:"name"`
+	Id    int    `json:"id"`
+	Name  string `json:"name"`
+	Level int    `json:"level"`
 }
 
 func (rr *ResponseRolesFindAll) ParseDTO(data any) error {
@@ -57,6 +60,7 @@ func (rr *ResponseRolesFindAll) ParseDTO(data any) error {
 	case repository.RolesModel:
 		rr.Id = v.Id
 		rr.Name = v.Name
+		rr.Level = v.Level
 	default:
 		return ErrInternalRole
 	}
@@ -86,8 +90,9 @@ func (Roles *RolesServices) FindAll(ctx context.Context) ([]ResponseRolesFindAll
 }
 
 type ResponseRolesById struct {
-	Id   int    `json:"id"`
-	Name string `json:"name"`
+	Id    int    `json:"id"`
+	Name  string `json:"name"`
+	Level int    `json:"level"`
 }
 
 func (rr *ResponseRolesById) ParseDTO(data any) error {
@@ -95,6 +100,7 @@ func (rr *ResponseRolesById) ParseDTO(data any) error {
 	case repository.RolesModel:
 		rr.Id = v.Id
 		rr.Name = v.Name
+		rr.Level = v.Level
 	default:
 		return ErrInternalRole
 	}
@@ -124,7 +130,8 @@ func (Roles *RolesServices) FindById(ctx context.Context, id int) (ResponseRoles
 }
 
 type RequestUpdateRole struct {
-	Name string `json:"name" validate:"min=4"`
+	Name  string `json:"name" validate:"min=4"`
+	Level *int   `json:"level"`
 }
 
 func (ru RequestUpdateRole) Serialize() RequestUpdateRole {
@@ -136,6 +143,9 @@ func (ru RequestUpdateRole) Serialize() RequestUpdateRole {
 func UpdateRolePayload(req RequestUpdateRole, ltsRole repository.RolesModel) repository.RolesModel {
 
 	ltsRole.Name = req.Name
+	if req.Level != nil {
+		ltsRole.Level = *req.Level
+	}
 
 	return ltsRole
 }

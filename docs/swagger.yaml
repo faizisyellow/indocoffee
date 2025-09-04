@@ -34,10 +34,14 @@ definitions:
     type: object
   service.CreateRoleRequest:
     properties:
+      level:
+        minimum: 1
+        type: integer
       name:
         minLength: 4
         type: string
     required:
+    - level
     - name
     type: object
   service.LoginRequest:
@@ -93,6 +97,8 @@ definitions:
     type: object
   service.RequestUpdateRole:
     properties:
+      level:
+        type: integer
       name:
         minLength: 4
         type: string
@@ -108,12 +114,16 @@ definitions:
     properties:
       id:
         type: integer
+      level:
+        type: integer
       name:
         type: string
     type: object
   service.ResponseRolesFindAll:
     properties:
       id:
+        type: integer
+      level:
         type: integer
       name:
         type: string

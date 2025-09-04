@@ -10,18 +10,19 @@ type RolesRepository struct {
 }
 
 type RolesModel struct {
-	Id   int    `json:"id"`
-	Name string `json:"name"`
+	Id    int    `json:"id"`
+	Name  string `json:"name"`
+	Level int    `json:"level"`
 }
 
 func (Roles *RolesRepository) Insert(ctx context.Context, nw RolesModel) error {
 
-	qry := `INSERT INTO roles (name) VALUES (?)`
+	qry := `INSERT INTO roles (name,level) VALUES (?,?)`
 
 	ctx, cancel := context.WithTimeout(ctx, QueryTimeout)
 	defer cancel()
 
-	_, err := Roles.Db.ExecContext(ctx, qry, nw.Name)
+	_, err := Roles.Db.ExecContext(ctx, qry, nw.Name, nw.Level)
 	if err != nil {
 		return err
 	}
@@ -31,7 +32,7 @@ func (Roles *RolesRepository) Insert(ctx context.Context, nw RolesModel) error {
 
 func (Roles *RolesRepository) GetAll(ctx context.Context) ([]RolesModel, error) {
 
-	qry := `SELECT id,name FROM roles WHERE is_delete = FALSE`
+	qry := `SELECT id,name,level FROM roles WHERE is_delete = FALSE`
 
 	ctx, cancel := context.WithTimeout(ctx, QueryTimeout)
 	defer cancel()
@@ -47,7 +48,7 @@ func (Roles *RolesRepository) GetAll(ctx context.Context) ([]RolesModel, error) 
 
 	for result.Next() {
 		var role RolesModel
-		if err := result.Scan(&role.Id, &role.Name); err != nil {
+		if err := result.Scan(&role.Id, &role.Name, &role.Level); err != nil {
 			return nil, err
 		}
 		roles = append(roles, role)
@@ -58,7 +59,7 @@ func (Roles *RolesRepository) GetAll(ctx context.Context) ([]RolesModel, error) 
 
 func (Roles *RolesRepository) GetById(ctx context.Context, id int) (RolesModel, error) {
 
-	qry := `SELECT id,name FROM roles WHERE id  = ?  AND is_delete = FALSE`
+	qry := `SELECT id,name,level FROM roles WHERE id  = ?  AND is_delete = FALSE`
 
 	ctx, cancel := context.WithTimeout(ctx, QueryTimeout)
 	defer cancel()
@@ -67,17 +68,17 @@ func (Roles *RolesRepository) GetById(ctx context.Context, id int) (RolesModel, 
 
 	var role RolesModel
 
-	return role, result.Scan(&role.Id, &role.Name)
+	return role, result.Scan(&role.Id, &role.Name, &role.Level)
 }
 
 func (Roles *RolesRepository) Update(ctx context.Context, nw RolesModel) error {
 
-	qry := `UPDATE roles SET name = ? WHERE id  = ? AND is_delete = FALSE`
+	qry := `UPDATE roles SET name = ?, level = ? WHERE id  = ? AND is_delete = FALSE`
 
 	ctx, cancel := context.WithTimeout(ctx, QueryTimeout)
 	defer cancel()
 
-	_, err := Roles.Db.ExecContext(ctx, qry, nw.Name, nw.Id)
+	_, err := Roles.Db.ExecContext(ctx, qry, nw.Name, nw.Level, nw.Id)
 	if err != nil {
 		return err
 	}
