@@ -32,6 +32,14 @@ definitions:
       username:
         type: string
     type: object
+  service.CreateFormRequest:
+    properties:
+      name:
+        minLength: 4
+        type: string
+    required:
+    - name
+    type: object
   service.CreateRoleRequest:
     properties:
       level:
@@ -110,6 +118,13 @@ definitions:
       name:
         type: string
     type: object
+  service.ResponseFormsFindAll:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
   service.ResponseRolesById:
     properties:
       id:
@@ -127,6 +142,14 @@ definitions:
         type: integer
       name:
         type: string
+    type: object
+  service.UpdateFormRequest:
+    properties:
+      name:
+        minLength: 4
+        type: string
+    required:
+    - name
     type: object
 host: localhost:8080
 info:
@@ -597,6 +620,291 @@ paths:
       summary: Update coffee bean
       tags:
       - Beans
+  /forms:
+    get:
+      description: Get all coffee's form
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/service.ResponseFormsFindAll'
+                  type: array
+                error:
+                  type: object
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+      summary: Get coffee's form
+      tags:
+      - Forms
+    post:
+      consumes:
+      - application/json
+      description: Create new coffee's form
+      parameters:
+      - description: Form body payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/service.CreateFormRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: string
+                error:
+                  type: object
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+        "409":
+          description: Conflict
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+      summary: Create coffee's form
+      tags:
+      - Forms
+  /forms/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete coffee's form by id
+      parameters:
+      - description: Form id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+        "404":
+          description: Not Found
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+      summary: Delete coffee's form
+      tags:
+      - Forms
+    get:
+      description: Get coffee's form by id
+      parameters:
+      - description: Form id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/service.ResponseFormsFindAll'
+                  type: array
+                error:
+                  type: object
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+        "404":
+          description: Not Found
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+      summary: Get coffee's form
+      tags:
+      - Forms
+    patch:
+      consumes:
+      - application/json
+      description: Update coffee's form by id
+      parameters:
+      - description: Form id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Form body payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/service.UpdateFormRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/service.ResponseFormsFindAll'
+                  type: array
+                error:
+                  type: object
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+        "404":
+          description: Not Found
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+        "409":
+          description: Conflict
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+      summary: Update coffee's form
+      tags:
+      - Forms
   /roles:
     get:
       description: Get All user roles

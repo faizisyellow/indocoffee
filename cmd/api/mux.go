@@ -42,6 +42,14 @@ func (app *Application) Mux() http.Handler {
 			r.Patch("/{id}", app.UpdateBeansHandler)
 			r.Delete("/{id}", app.DeleteBeansHandler)
 		})
+
+    	r.Route("/forms", func(r chi.Router) {
+			r.Post("/", app.CreateFormsHandler)
+			r.Get("/", app.GetAllFormsHandler)
+			r.Get("/{id}", app.GetFormsHandler)
+			r.Patch("/{id}", app.UpdateFormsHandler)
+			r.Delete("/{id}", app.DeleteFormsHandler)
+		})
 	})
 
 	return r

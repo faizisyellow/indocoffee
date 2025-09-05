@@ -38,6 +38,15 @@ type Repository struct {
 		Delete(ctx context.Context, id int) error
 		Destroy(ctx context.Context, id int) error
 	}
+
+	Forms interface {
+		Insert(ctx context.Context, nw FormsModel) error
+		GetAll(ctx context.Context) ([]FormsModel, error)
+		GetById(ctx context.Context, id int) (FormsModel, error)
+		Update(ctx context.Context, nw FormsModel) error
+		Delete(ctx context.Context, id int) error
+		Destroy(ctx context.Context, id int) error
+	}
 }
 
 const QueryTimeout = time.Second * 5
@@ -49,5 +58,6 @@ func New(db *sql.DB) *Repository {
 		Invitation: &InvitationRepository{Db: db},
 		Roles:      &RolesRepository{Db: db},
 		Beans:      &BeansRepository{Db: db},
+		Forms:      &FormsRepository{Db: db},
 	}
 }

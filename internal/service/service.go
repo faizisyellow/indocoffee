@@ -34,6 +34,14 @@ type Service struct {
 		Delete(ctx context.Context, id int) error
 		Remove(ctx context.Context, id int) error
 	}
+
+	FormsService interface {
+		Create(ctx context.Context, req CreateFormRequest) (string, error)
+		FindAll(ctx context.Context) ([]ResponseFormsFindAll, error)
+		FindById(ctx context.Context, id int) (ResponseFormsById, error)
+		Update(ctx context.Context, id int, nw repository.FormsModel) error
+		Delete(ctx context.Context, id int) error
+	}
 }
 
 var CONFLICT_CODE = "Error 1062 (23000)"
@@ -43,5 +51,6 @@ func New(store repository.Repository, txfnc db.TransFnc, Db *sql.DB) *Service {
 		UsersService: &UsersServices{Repository: store, TransFnc: txfnc, Db: Db},
 		RolesService: &RolesServices{Repository: store},
 		BeansService: &BeansServices{Repository: store},
+		FormsService: &FormsServices{Repository: store},
 	}
 }
