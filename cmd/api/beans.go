@@ -194,3 +194,14 @@ func (app *Application) DeleteBeansHandler(w http.ResponseWriter, r *http.Reques
 	ResponseSuccess(w, r, nil, http.StatusNoContent)
 
 }
+
+// @Summary		Delete coffe's beans
+// @Description	Delete all coffe's beans permanently
+// @Tags			Beans
+// @Success		204
+// @Failure		404		{object}	main.Envelope{data=nil,error=string}
+// @Failure		500		{object}	main.Envelope{data=nil,error=string}
+// @Router			/beans [delete]
+func (app *Application) TrashBeansHandler(w http.ResponseWriter, r *http.Request) {
+
+}

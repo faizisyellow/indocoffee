@@ -33,22 +33,25 @@ func (app *Application) Mux() http.Handler {
 			r.Get("/{id}", app.GetRolesHandler)
 			r.Patch("/{id}", app.UpdateRolesHandler)
 			r.Delete("/{id}", app.DeleteRolesHandler)
+			r.Delete("/trash", app.TrashRolesHandler)
 		})
 
-    	r.Route("/beans", func(r chi.Router) {
+		r.Route("/beans", func(r chi.Router) {
 			r.Post("/", app.CreateBeansHandler)
 			r.Get("/", app.GetAllBeansHandler)
 			r.Get("/{id}", app.GetBeansHandler)
 			r.Patch("/{id}", app.UpdateBeansHandler)
 			r.Delete("/{id}", app.DeleteBeansHandler)
+			r.Delete("/trash", app.TrashBeansHandler)
 		})
 
-    	r.Route("/forms", func(r chi.Router) {
+		r.Route("/forms", func(r chi.Router) {
 			r.Post("/", app.CreateFormsHandler)
 			r.Get("/", app.GetAllFormsHandler)
 			r.Get("/{id}", app.GetFormsHandler)
 			r.Patch("/{id}", app.UpdateFormsHandler)
 			r.Delete("/{id}", app.DeleteFormsHandler)
+			r.Delete("/trash", app.TrashFormsHandler)
 		})
 	})
 

@@ -23,7 +23,7 @@ type Service struct {
 		FindById(ctx context.Context, id int) (ResponseRolesById, error)
 		Update(ctx context.Context, id int, nw repository.RolesModel) error
 		Delete(ctx context.Context, id int) error
-		Remove(ctx context.Context, id int) error
+		Remove(ctx context.Context) error
 	}
 
 	BeansService interface {
@@ -32,7 +32,7 @@ type Service struct {
 		FindById(ctx context.Context, id int) (repository.BeansModel, error)
 		Update(ctx context.Context, id int, req RequestUpdateBean) error
 		Delete(ctx context.Context, id int) error
-		Remove(ctx context.Context, id int) error
+		Remove(ctx context.Context) error
 	}
 
 	FormsService interface {
@@ -41,6 +41,7 @@ type Service struct {
 		FindById(ctx context.Context, id int) (ResponseFormsById, error)
 		Update(ctx context.Context, id int, nw repository.FormsModel) error
 		Delete(ctx context.Context, id int) error
+		Remove(ctx context.Context) error
 	}
 }
 

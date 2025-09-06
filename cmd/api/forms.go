@@ -208,3 +208,14 @@ func (app *Application) DeleteFormsHandler(w http.ResponseWriter, r *http.Reques
 
 	ResponseSuccess(w, r, nil, http.StatusNoContent)
 }
+
+// @Summary		Delete coffee's forms
+// @Description	Delete all coffee's forms permanently
+// @Tags			Forms
+// @Success		204
+// @Failure		404		{object}	main.Envelope{data=nil,error=string}
+// @Failure		500		{object}	main.Envelope{data=nil,error=string}
+// @Router			/forms [delete]
+func (app *Application) TrashFormsHandler(w http.ResponseWriter, r *http.Request) {
+
+}

@@ -206,3 +206,14 @@ func (app *Application) DeleteRolesHandler(w http.ResponseWriter, r *http.Reques
 
 	ResponseSuccess(w, r, nil, http.StatusNoContent)
 }
+
+// @Summary		Delete user roles
+// @Description	Delete all user roles permanently
+// @Tags			Roles
+// @Success		204
+// @Failure		404		{object}	main.Envelope{data=nil,error=string}
+// @Failure		500		{object}	main.Envelope{data=nil,error=string}
+// @Router			/roles [delete]
+func (app *Application) TrashRolesHandler(w http.ResponseWriter, r *http.Request) {
+
+}

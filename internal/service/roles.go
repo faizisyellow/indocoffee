@@ -180,22 +180,13 @@ func (Roles *RolesServices) Delete(ctx context.Context, id int) error {
 	return nil
 }
 
-func (Roles *RolesServices) Remove(ctx context.Context, id int) error {
-
-	role, err := Roles.FindById(ctx, id)
-	if err != nil {
-		switch err {
-		case sql.ErrNoRows:
-			return errorService.New(ErrNotFoundRole, err)
-		default:
-			return errorService.New(ErrInternalRole, err)
-		}
-	}
-
-	err = Roles.Repository.Roles.Destroy(ctx, role.Id)
-	if err != nil {
-		return errorService.New(ErrInternalRole, err)
-	}
+func removeRolesWithConcurrent(repo repository.Repository, ctx context.Context) error {
 
 	return nil
+}
+
+func (Roles *RolesServices) Remove(ctx context.Context) error {
+
+	// can switch services
+	return removeRolesWithConcurrent(Roles.Repository, ctx)
 }

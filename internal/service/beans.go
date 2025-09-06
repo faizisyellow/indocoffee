@@ -147,16 +147,12 @@ func (Beans *BeansServices) Delete(ctx context.Context, id int) error {
 	return nil
 }
 
-func (Beans *BeansServices) Remove(ctx context.Context, id int) error {
-
-	bean, err := Beans.FindById(ctx, id)
-	if err != nil {
-		return err
-	}
-
-	if err := Beans.Repository.Beans.Destroy(ctx, bean.Id); err != nil {
-		return errorService.New(ErrInternalBean, err)
-	}
+func removeBeansWithConcurrent(repo repository.Repository, ctx context.Context) error {
 
 	return nil
+}
+
+func (Beans *BeansServices) Remove(ctx context.Context) error {
+
+	return removeBeansWithConcurrent(Beans.Repository, ctx)
 }

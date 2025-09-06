@@ -170,22 +170,12 @@ func (Forms *FormsServices) Delete(ctx context.Context, id int) error {
 	return nil
 }
 
-func (Forms *FormsServices) Remove(ctx context.Context, id int) error {
-
-	form, err := Forms.FindById(ctx, id)
-	if err != nil {
-		switch err {
-		case sql.ErrNoRows:
-			return errorService.New(ErrNotFoundForm, err)
-		default:
-			return errorService.New(ErrInternalForm, err)
-		}
-	}
-
-	err = Forms.Repository.Forms.Destroy(ctx, form.Id)
-	if err != nil {
-		return errorService.New(ErrInternalForm, err)
-	}
+func removeFormsWithConcurrent(repo repository.Repository, ctx context.Context) error {
 
 	return nil
+}
+
+func (Forms *FormsServices) Remove(ctx context.Context) error {
+
+	return removeRolesWithConcurrent(Forms.Repository, ctx)
 }
