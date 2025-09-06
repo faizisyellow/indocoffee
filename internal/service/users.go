@@ -9,6 +9,7 @@ import (
 
 	"github.com/faizisyellow/indocoffee/internal/db"
 	"github.com/faizisyellow/indocoffee/internal/repository"
+	errorService "github.com/faizisyellow/indocoffee/internal/service/error"
 	"github.com/faizisyellow/indocoffee/internal/utils"
 )
 
@@ -51,7 +52,8 @@ func (us *UsersServices) RegisterAccount(ctx context.Context, req RegisterReques
 
 	err := utils.IsPasswordValid(req.Password)
 	if err != nil {
-		return nil, err
+		//Todo: handle error client
+		return nil, errorService.New(err, err)
 	}
 
 	err = us.TransFnc(us.Db, ctx, func(tx *sql.Tx) error {
@@ -61,17 +63,19 @@ func (us *UsersServices) RegisterAccount(ctx context.Context, req RegisterReques
 		newAccount.Username = req.Username
 
 		if err = newAccount.Password.ParseFromPassword(req.Password); err != nil {
-			return err
+			//Todo: handle error client
+			return errorService.New(err, err)
 		}
 
 		usrId, err := us.Repository.Users.Insert(ctx, tx, newAccount)
 		if err != nil {
-			duplicateKey := "Error 1062"
+			duplicateKey := CONFLICT_CODE
 			switch {
 			case strings.Contains(err.Error(), duplicateKey):
-				return ErrUserAlreadyExist
+				return errorService.New(ErrUserAlreadyExist, err)
 			default:
-				return err
+				//Todo: handle error client
+				return errorService.New(err, err)
 			}
 
 		}
@@ -86,7 +90,8 @@ func (us *UsersServices) RegisterAccount(ctx context.Context, req RegisterReques
 
 		err = us.Repository.Invitation.Insert(ctx, tx, invt)
 		if err != nil {
-			return err
+			//Todo: handle error client
+			return errorService.New(err, err)
 		}
 
 		// register and invite success, send to response
@@ -104,38 +109,34 @@ func (us *UsersServices) RegisterAccount(ctx context.Context, req RegisterReques
 
 func (us *UsersServices) ActivateAccount(ctx context.Context, token string) error {
 
-	err := us.TransFnc(us.Db, ctx, func(tx *sql.Tx) error {
+	return us.TransFnc(us.Db, ctx, func(tx *sql.Tx) error {
 
 		usrId, err := us.Repository.Invitation.Get(ctx, tx, token)
 		if err != nil {
-			return ErrTokenInvitationNotFound
+			return errorService.New(ErrTokenInvitationNotFound, err)
 		}
 
 		user, err := us.Repository.Users.GetById(ctx, usrId)
 		if err != nil {
-			return ErrUserRegisteredNotFound
+			return errorService.New(ErrUserRegisteredNotFound, err)
 		}
 
 		user.IsActive = utils.BoolToPoint(true)
 
 		err = us.Repository.Users.Update(ctx, tx, user)
 		if err != nil {
-			return err
+			//TODO: handle error to client
+			return errorService.New(err, err)
 		}
 
 		err = us.Repository.Invitation.DeleteByUserId(ctx, tx, user.Id)
 		if err != nil {
-			return err
+			//TODO: handle error to client
+			return errorService.New(err, err)
 		}
 
 		return nil
 	})
-
-	if err != nil {
-		return err
-	}
-
-	return nil
 
 }
 
@@ -143,16 +144,17 @@ func (us *UsersServices) Login(ctx context.Context, req LoginRequest) (*reposito
 
 	user, err := us.Repository.Users.GetByEmail(ctx, req.Email)
 	if err != nil {
-		return nil, ErrUserNotFound
+		return nil, errorService.New(ErrUserNotFound, err)
 	}
 
 	if !*user.IsActive {
-		return nil, ErrUserNotActivated
+		return nil, errorService.New(ErrUserNotActivated, err)
 	}
 
 	err = user.Password.ComparePassword(req.Password)
 	if err != nil {
-		return nil, err
+		//TODO: handle error to client
+		return nil, errorService.New(err, err)
 	}
 
 	return &user, nil
@@ -164,7 +166,8 @@ func (us *UsersServices) DeleteAccount(ctx context.Context, usrid int) error {
 
 		err := us.Repository.Users.Delete(ctx, tx, usrid)
 		if err != nil {
-			return err
+			//TODO: handle error to client
+			return errorService.New(err, err)
 		}
 
 		return nil
@@ -178,9 +181,10 @@ func (us *UsersServices) FindUserById(ctx context.Context, usrid int) (*reposito
 	if err != nil {
 		switch err {
 		case sql.ErrNoRows:
-			return nil, ErrUserNotFound
+			return nil, errorService.New(ErrUserNotFound, err)
 		default:
-			return nil, err
+			//TODO: handle error to client
+			return nil, errorService.New(err, err)
 		}
 
 	}

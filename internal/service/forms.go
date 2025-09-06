@@ -38,10 +38,10 @@ func (Forms *FormsServices) Create(ctx context.Context, req CreateFormRequest) (
 	err := Forms.Repository.Forms.Insert(ctx, newForm)
 	if err != nil {
 		if strings.Contains(err.Error(), CONFLICT_CODE) {
-			return "", errorService.New(ErrConflictForm.Error(), err.Error())
+			return "", errorService.New(ErrConflictForm, err)
 		}
 
-		return "", errorService.New(ErrInternalForm.Error(), err.Error())
+		return "", errorService.New(ErrInternalForm, err)
 	}
 
 	return "success create new form", nil
@@ -69,7 +69,7 @@ func (Forms *FormsServices) FindAll(ctx context.Context) ([]ResponseFormsFindAll
 
 	forms, err := Forms.Repository.Forms.GetAll(ctx)
 	if err != nil {
-		return nil, errorService.New(ErrInternalForm.Error(), err.Error())
+		return nil, errorService.New(ErrInternalForm, err)
 	}
 
 	response := make([]ResponseFormsFindAll, 0)
@@ -78,7 +78,7 @@ func (Forms *FormsServices) FindAll(ctx context.Context) ([]ResponseFormsFindAll
 		res := new(ResponseFormsFindAll)
 		err := res.ParseDTO(form)
 		if err != nil {
-			return nil, errorService.New(ErrInternalForm.Error(), err.Error())
+			return nil, errorService.New(ErrInternalForm, err)
 		}
 		response = append(response, *res)
 	}
@@ -110,16 +110,17 @@ func (Forms *FormsServices) FindById(ctx context.Context, id int) (ResponseForms
 	if err != nil {
 		switch err {
 		case sql.ErrNoRows:
-			return ResponseFormsById{}, errorService.New(ErrNotFoundForm.Error(), err.Error())
+			//TODO: interface value is different
+			return ResponseFormsById{}, errorService.New(ErrNotFoundForm, err)
 		default:
-			return ResponseFormsById{}, errorService.New(ErrInternalForm.Error(), err.Error())
+			return ResponseFormsById{}, errorService.New(ErrInternalForm, err)
 		}
 	}
 
 	var response ResponseFormsById
 	err = response.ParseDTO(form)
 	if err != nil {
-		return ResponseFormsById{}, errorService.New(ErrInternalForm.Error(), err.Error())
+		return ResponseFormsById{}, errorService.New(ErrInternalForm, err)
 	}
 
 	return response, nil
@@ -140,10 +141,10 @@ func (Forms *FormsServices) Update(ctx context.Context, id int, nw repository.Fo
 	err := Forms.Repository.Forms.Update(ctx, nw)
 	if err != nil {
 		if strings.Contains(err.Error(), CONFLICT_CODE) {
-			return errorService.New(ErrConflictForm.Error(), err.Error())
+			return errorService.New(ErrConflictForm, err)
 		}
 
-		return errorService.New(ErrInternalForm.Error(), err.Error())
+		return errorService.New(ErrInternalForm, err)
 	}
 
 	return nil
@@ -155,15 +156,15 @@ func (Forms *FormsServices) Delete(ctx context.Context, id int) error {
 	if err != nil {
 		switch err {
 		case sql.ErrNoRows:
-			return errorService.New(ErrNotFoundForm.Error(), err.Error())
+			return errorService.New(ErrNotFoundForm, err)
 		default:
-			return errorService.New(ErrInternalForm.Error(), err.Error())
+			return errorService.New(ErrInternalForm, err)
 		}
 	}
 
 	err = Forms.Repository.Forms.Delete(ctx, form.Id)
 	if err != nil {
-		return errorService.New(ErrInternalForm.Error(), err.Error())
+		return errorService.New(ErrInternalForm, err)
 	}
 
 	return nil
@@ -175,15 +176,15 @@ func (Forms *FormsServices) Remove(ctx context.Context, id int) error {
 	if err != nil {
 		switch err {
 		case sql.ErrNoRows:
-			return errorService.New(ErrNotFoundForm.Error(), err.Error())
+			return errorService.New(ErrNotFoundForm, err)
 		default:
-			return errorService.New(ErrInternalForm.Error(), err.Error())
+			return errorService.New(ErrInternalForm, err)
 		}
 	}
 
 	err = Forms.Repository.Forms.Destroy(ctx, form.Id)
 	if err != nil {
-		return errorService.New(ErrInternalForm.Error(), err.Error())
+		return errorService.New(ErrInternalForm, err)
 	}
 
 	return nil

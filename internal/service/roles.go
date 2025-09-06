@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/faizisyellow/indocoffee/internal/repository"
+	errorService "github.com/faizisyellow/indocoffee/internal/service/error"
 	serviceParser "github.com/faizisyellow/indocoffee/internal/service/parser"
 )
 
@@ -40,10 +41,10 @@ func (Roles *RolesServices) Create(ctx context.Context, req CreateRoleRequest) (
 	err := Roles.Repository.Roles.Insert(ctx, newRole)
 	if err != nil {
 		if strings.Contains(err.Error(), CONFLICT_CODE) {
-			return "", ErrConflictRole
+			return "", errorService.New(ErrConflictRole, err)
 		}
 
-		return "", ErrInternalRole
+		return "", errorService.New(ErrInternalRole, err)
 	}
 
 	return "success create new role", nil
@@ -62,7 +63,7 @@ func (rr *ResponseRolesFindAll) ParseDTO(data any) error {
 		rr.Name = v.Name
 		rr.Level = v.Level
 	default:
-		return ErrInternalRole
+		return errors.New("parse responseRolesFindAll: unknown type")
 	}
 
 	return nil
@@ -72,7 +73,7 @@ func (Roles *RolesServices) FindAll(ctx context.Context) ([]ResponseRolesFindAll
 
 	roles, err := Roles.Repository.Roles.GetAll(ctx)
 	if err != nil {
-		return nil, ErrInternalRole
+		return nil, errorService.New(ErrInternalRole, err)
 	}
 
 	response := make([]ResponseRolesFindAll, 0)
@@ -81,7 +82,7 @@ func (Roles *RolesServices) FindAll(ctx context.Context) ([]ResponseRolesFindAll
 		res := new(ResponseRolesFindAll)
 		err := serviceParser.Parse(res, role)
 		if err != nil {
-			return nil, err
+			return nil, errorService.New(ErrInternalRole, err)
 		}
 		response = append(response, *res)
 	}
@@ -102,7 +103,7 @@ func (rr *ResponseRolesById) ParseDTO(data any) error {
 		rr.Name = v.Name
 		rr.Level = v.Level
 	default:
-		return ErrInternalRole
+		return errors.New("parse responseRolesById: unknown type")
 	}
 
 	return nil
@@ -114,16 +115,16 @@ func (Roles *RolesServices) FindById(ctx context.Context, id int) (ResponseRoles
 	if err != nil {
 		switch err {
 		case sql.ErrNoRows:
-			return ResponseRolesById{}, ErrNotFoundRole
+			return ResponseRolesById{}, errorService.New(ErrNotFoundRole, err)
 		default:
-			return ResponseRolesById{}, ErrInternalRole
+			return ResponseRolesById{}, errorService.New(ErrInternalRole, err)
 		}
 	}
 
 	response := new(ResponseRolesById)
 	err = serviceParser.Parse(response, role)
 	if err != nil {
-		return ResponseRolesById{}, ErrInternalRole
+		return ResponseRolesById{}, errorService.New(ErrInternalRole, err)
 	}
 
 	return *response, nil
@@ -131,7 +132,7 @@ func (Roles *RolesServices) FindById(ctx context.Context, id int) (ResponseRoles
 
 type RequestUpdateRole struct {
 	Name  string `json:"name" validate:"min=4"`
-	Level *int   `json:"level"`
+	Level *int   `json:"level" validate:"omitempty,min=1"`
 }
 
 func (ru RequestUpdateRole) Serialize() RequestUpdateRole {
@@ -155,10 +156,10 @@ func (Roles *RolesServices) Update(ctx context.Context, id int, nw repository.Ro
 	err := Roles.Repository.Roles.Update(ctx, nw)
 	if err != nil {
 		if strings.Contains(err.Error(), CONFLICT_CODE) {
-			return ErrConflictRole
+			return errorService.New(ErrConflictRole, err)
 		}
 
-		return ErrInternalRole
+		return errorService.New(ErrInternalRole, err)
 	}
 
 	return nil
@@ -173,7 +174,7 @@ func (Roles *RolesServices) Delete(ctx context.Context, id int) error {
 
 	err = Roles.Repository.Roles.Delete(ctx, role.Id)
 	if err != nil {
-		return ErrInternalRole
+		return errorService.New(ErrInternalRole, err)
 	}
 
 	return nil
@@ -185,15 +186,15 @@ func (Roles *RolesServices) Remove(ctx context.Context, id int) error {
 	if err != nil {
 		switch err {
 		case sql.ErrNoRows:
-			return ErrNotFoundRole
+			return errorService.New(ErrNotFoundRole, err)
 		default:
-			return ErrInternalRole
+			return errorService.New(ErrInternalRole, err)
 		}
 	}
 
 	err = Roles.Repository.Roles.Destroy(ctx, role.Id)
 	if err != nil {
-		return ErrInternalRole
+		return errorService.New(ErrInternalRole, err)
 	}
 
 	return nil

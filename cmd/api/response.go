@@ -33,6 +33,10 @@ func ResponseSuccess(w http.ResponseWriter, r *http.Request, data any, status in
 }
 
 func validErrorService(err error) string {
+	if err == nil {
+		return "error service is nil"
+	}
+
 	v, ok := err.(*errorService.ErrorService)
 	if !ok {
 		return ""
@@ -42,7 +46,6 @@ func validErrorService(err error) string {
 }
 
 func ResponseClientError(w http.ResponseWriter, r *http.Request, rErr error, status int) {
-
 	logger.Logger.Warnw(
 		"Client Error Response",
 		zap.Any("Path", r.URL),
@@ -59,7 +62,6 @@ func ResponseClientError(w http.ResponseWriter, r *http.Request, rErr error, sta
 }
 
 func ResponseServerError(w http.ResponseWriter, r *http.Request, rErr error, status int) {
-
 	logger.Logger.Errorw(
 		"Server Error",
 		zap.Any("Path", r.URL),

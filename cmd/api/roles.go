@@ -6,6 +6,7 @@ import (
 
 	"github.com/faizisyellow/indocoffee/internal/repository"
 	"github.com/faizisyellow/indocoffee/internal/service"
+	errorService "github.com/faizisyellow/indocoffee/internal/service/error"
 	"github.com/go-chi/chi/v5"
 )
 
@@ -34,7 +35,8 @@ func (app *Application) CreateRolesHandler(w http.ResponseWriter, r *http.Reques
 
 	res, err := app.Services.RolesService.Create(r.Context(), req.Serialize())
 	if err != nil {
-		switch err {
+		errorValue := errorService.GetError(err)
+		switch errorValue.E {
 		case service.ErrConflictRole:
 			ResponseClientError(w, r, err, http.StatusConflict)
 		default:
@@ -85,7 +87,8 @@ func (app *Application) GetRolesHandler(w http.ResponseWriter, r *http.Request) 
 
 	role, err := app.Services.RolesService.FindById(r.Context(), id)
 	if err != nil {
-		switch err {
+		errorValue := errorService.GetError(err)
+		switch errorValue.E {
 		case service.ErrNotFoundRole:
 			ResponseClientError(w, r, err, http.StatusNotFound)
 		default:
@@ -125,7 +128,8 @@ func (app *Application) UpdateRolesHandler(w http.ResponseWriter, r *http.Reques
 
 	roleReq, err := app.Services.RolesService.FindById(ctx, id)
 	if err != nil {
-		switch err {
+		errorValue := errorService.GetError(err)
+		switch errorValue.E {
 		case service.ErrNotFoundRole:
 			ResponseClientError(w, r, err, http.StatusNotFound)
 		default:
@@ -154,7 +158,8 @@ func (app *Application) UpdateRolesHandler(w http.ResponseWriter, r *http.Reques
 	role = service.UpdateRolePayload(req.Serialize(), role)
 	err = app.Services.RolesService.Update(ctx, id, role)
 	if err != nil {
-		switch err {
+		errorValue := errorService.GetError(err)
+		switch errorValue.E {
 		case service.ErrConflictRole:
 			ResponseClientError(w, r, err, http.StatusConflict)
 		default:
@@ -189,7 +194,8 @@ func (app *Application) DeleteRolesHandler(w http.ResponseWriter, r *http.Reques
 
 	err = app.Services.RolesService.Delete(r.Context(), id)
 	if err != nil {
-		switch err {
+		errorValue := errorService.GetError(err)
+		switch errorValue.E {
 		case service.ErrNotFoundRole:
 			ResponseClientError(w, r, err, http.StatusNotFound)
 		default:

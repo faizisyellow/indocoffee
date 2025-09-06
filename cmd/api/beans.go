@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/faizisyellow/indocoffee/internal/service"
+	errorService "github.com/faizisyellow/indocoffee/internal/service/error"
 	"github.com/go-chi/chi/v5"
 )
 
@@ -37,7 +38,8 @@ func (app *Application) CreateBeansHandler(w http.ResponseWriter, r *http.Reques
 
 	res, err := app.Services.BeansService.Create(ctx, req.Serialize())
 	if err != nil {
-		switch err {
+		errValue := errorService.GetError(err)
+		switch errValue.E {
 		case service.ErrConflictBean:
 			ResponseClientError(w, r, err, http.StatusConflict)
 		default:
@@ -90,7 +92,8 @@ func (app *Application) GetBeansHandler(w http.ResponseWriter, r *http.Request) 
 
 	res, err := app.Services.BeansService.FindById(r.Context(), id)
 	if err != nil {
-		switch err {
+		errValue := errorService.GetError(err)
+		switch errValue.E {
 		case service.ErrNotFoundBean:
 			ResponseClientError(w, r, err, http.StatusNotFound)
 		default:
@@ -139,7 +142,8 @@ func (app *Application) UpdateBeansHandler(w http.ResponseWriter, r *http.Reques
 
 	err = app.Services.BeansService.Update(r.Context(), id, req)
 	if err != nil {
-		switch err {
+		errValue := errorService.GetError(err)
+		switch errValue.E {
 		case service.ErrNotFoundBean:
 			ResponseClientError(w, r, err, http.StatusNotFound)
 		default:
@@ -176,7 +180,8 @@ func (app *Application) DeleteBeansHandler(w http.ResponseWriter, r *http.Reques
 
 	err = app.Services.BeansService.Delete(r.Context(), id)
 	if err != nil {
-		switch err {
+		errValue := errorService.GetError(err)
+		switch errValue.E {
 		case service.ErrNotFoundBean:
 			ResponseClientError(w, r, err, http.StatusNotFound)
 		default:

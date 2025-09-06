@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/faizisyellow/indocoffee/internal/service"
+	errorService "github.com/faizisyellow/indocoffee/internal/service/error"
 	"github.com/faizisyellow/indocoffee/internal/utils"
 	"github.com/go-chi/chi/v5"
 	"github.com/golang-jwt/jwt/v5"
@@ -38,7 +39,8 @@ func (app *Application) SignUpHandler(w http.ResponseWriter, r *http.Request) {
 
 	res, err := app.Services.UsersService.RegisterAccount(r.Context(), req)
 	if err != nil {
-		switch err {
+		errorValue := errorService.GetError(err)
+		switch errorValue.E {
 		case service.ErrUserAlreadyExist:
 			ResponseClientError(w, r, fmt.Errorf("email not available"), http.StatusConflict)
 		case utils.ErrInvalidPasswordSignature:
@@ -75,7 +77,8 @@ func (app *Application) ActivateAccountHandler(w http.ResponseWriter, r *http.Re
 
 	err := app.Services.UsersService.ActivateAccount(r.Context(), req)
 	if err != nil {
-		switch err {
+		errorValue := errorService.GetError(err)
+		switch errorValue.E {
 		case service.ErrTokenInvitationNotFound, service.ErrUserRegisteredNotFound:
 			ResponseClientError(w, r, err, http.StatusNotFound)
 		default:
@@ -119,7 +122,8 @@ func (app *Application) SignInHandler(w http.ResponseWriter, r *http.Request) {
 
 	user, err := app.Services.UsersService.Login(r.Context(), req)
 	if err != nil {
-		switch err {
+		errorValue := errorService.GetError(err)
+		switch errorValue.E {
 		case service.ErrUserNotFound:
 			ResponseClientError(w, r, err, http.StatusNotFound)
 		case service.ErrUserNotActivated:
