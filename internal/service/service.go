@@ -19,19 +19,19 @@ type Service struct {
 	}
 
 	RolesService interface {
-		Create(ctx context.Context, req CreateRoleRequest) (string, error)
-		FindAll(ctx context.Context) ([]ResponseRolesFindAll, error)
-		FindById(ctx context.Context, id int) (ResponseRolesById, error)
-		Update(ctx context.Context, id int, nw repository.RolesModel) error
+		Create(ctx context.Context, req dto.CreateRoleRequest) (string, error)
+		FindAll(ctx context.Context) ([]repository.RolesModel, error)
+		FindById(ctx context.Context, id int) (repository.RolesModel, error)
+		Update(ctx context.Context, id int, req dto.UpdateRoleRequest) error
 		Delete(ctx context.Context, id int) error
 		Remove(ctx context.Context) error
 	}
 
 	BeansService interface {
-		Create(ctx context.Context, req RequestCreateBean) (string, error)
-		FindAll(ctx context.Context) ([]ResponseFindAll, error)
+		Create(ctx context.Context, req dto.CreateBeanRequest) (string, error)
+		FindAll(ctx context.Context) ([]repository.BeansModel, error)
 		FindById(ctx context.Context, id int) (repository.BeansModel, error)
-		Update(ctx context.Context, id int, req RequestUpdateBean) error
+		Update(ctx context.Context, id int, req dto.UpdateBeanRequest) error
 		Delete(ctx context.Context, id int) error
 		Remove(ctx context.Context) error
 	}

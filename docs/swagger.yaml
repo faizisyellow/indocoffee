@@ -1,5 +1,88 @@
 basePath: /v1
 definitions:
+  dto.BeanResponse:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+  dto.CreateBeanRequest:
+    properties:
+      name:
+        maxLength: 18
+        minLength: 3
+        type: string
+    required:
+    - name
+    type: object
+  dto.CreateFormRequest:
+    properties:
+      name:
+        maxLength: 18
+        minLength: 4
+        type: string
+    required:
+    - name
+    type: object
+  dto.CreateRoleRequest:
+    properties:
+      level:
+        maximum: 5
+        minimum: 1
+        type: integer
+      name:
+        maxLength: 16
+        minLength: 4
+        type: string
+    required:
+    - level
+    - name
+    type: object
+  dto.FormResponse:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+  dto.RolesResponse:
+    properties:
+      id:
+        type: integer
+      level:
+        type: integer
+      name:
+        type: string
+    type: object
+  dto.UpdateBeanRequest:
+    properties:
+      name:
+        maxLength: 18
+        minLength: 3
+        type: string
+    required:
+    - name
+    type: object
+  dto.UpdateFormRequest:
+    properties:
+      name:
+        minLength: 4
+        type: string
+    required:
+    - name
+    type: object
+  dto.UpdateRoleRequest:
+    properties:
+      level:
+        maximum: 5
+        minimum: 1
+        type: integer
+      name:
+        maxLength: 16
+        minLength: 4
+        type: string
+    type: object
   main.Envelope:
     properties:
       data: {}
@@ -8,15 +91,6 @@ definitions:
   main.LoginResponse:
     properties:
       token:
-        type: string
-    type: object
-  repository.BeansModel:
-    properties:
-      id:
-        type: integer
-      is_delete:
-        type: boolean
-      name:
         type: string
     type: object
   repository.UserModel:
@@ -31,26 +105,6 @@ definitions:
         type: boolean
       username:
         type: string
-    type: object
-  service.CreateFormRequest:
-    properties:
-      name:
-        minLength: 4
-        type: string
-    required:
-    - name
-    type: object
-  service.CreateRoleRequest:
-    properties:
-      level:
-        minimum: 1
-        type: integer
-      name:
-        minLength: 4
-        type: string
-    required:
-    - level
-    - name
     type: object
   service.LoginRequest:
     properties:
@@ -84,72 +138,6 @@ definitions:
     properties:
       token:
         type: string
-    type: object
-  service.RequestCreateBean:
-    properties:
-      name:
-        maxLength: 18
-        minLength: 3
-        type: string
-    required:
-    - name
-    type: object
-  service.RequestUpdateBean:
-    properties:
-      name:
-        maxLength: 18
-        minLength: 3
-        type: string
-    required:
-    - name
-    type: object
-  service.RequestUpdateRole:
-    properties:
-      level:
-        type: integer
-      name:
-        minLength: 4
-        type: string
-    type: object
-  service.ResponseFindAll:
-    properties:
-      id:
-        type: integer
-      name:
-        type: string
-    type: object
-  service.ResponseFormsFindAll:
-    properties:
-      id:
-        type: integer
-      name:
-        type: string
-    type: object
-  service.ResponseRolesById:
-    properties:
-      id:
-        type: integer
-      level:
-        type: integer
-      name:
-        type: string
-    type: object
-  service.ResponseRolesFindAll:
-    properties:
-      id:
-        type: integer
-      level:
-        type: integer
-      name:
-        type: string
-    type: object
-  service.UpdateFormRequest:
-    properties:
-      name:
-        minLength: 4
-        type: string
-    required:
-    - name
     type: object
 host: localhost:8080
 info:
@@ -351,6 +339,36 @@ paths:
       tags:
       - Auth
   /beans:
+    delete:
+      description: Delete all coffe's beans permanently
+      responses:
+        "204":
+          description: No Content
+        "404":
+          description: Not Found
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+      summary: Delete coffe's beans
+      tags:
+      - Beans
     get:
       description: Get All coffee beans
       produces:
@@ -364,7 +382,7 @@ paths:
             - properties:
                 data:
                   items:
-                    $ref: '#/definitions/service.ResponseFindAll'
+                    $ref: '#/definitions/dto.BeanResponse'
                   type: array
                 error:
                   type: object
@@ -393,7 +411,7 @@ paths:
         name: payload
         required: true
         schema:
-          $ref: '#/definitions/service.RequestCreateBean'
+          $ref: '#/definitions/dto.CreateBeanRequest'
       produces:
       - application/json
       responses:
@@ -514,7 +532,7 @@ paths:
             - $ref: '#/definitions/main.Envelope'
             - properties:
                 data:
-                  $ref: '#/definitions/repository.BeansModel'
+                  $ref: '#/definitions/dto.BeanResponse'
                 error:
                   type: object
               type: object
@@ -569,7 +587,7 @@ paths:
         name: payload
         required: true
         schema:
-          $ref: '#/definitions/service.RequestUpdateBean'
+          $ref: '#/definitions/dto.UpdateBeanRequest'
       produces:
       - application/json
       responses:
@@ -606,6 +624,17 @@ paths:
                 error:
                   type: string
               type: object
+        "409":
+          description: Conflict
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
         "500":
           description: Internal Server Error
           schema:
@@ -621,6 +650,36 @@ paths:
       tags:
       - Beans
   /forms:
+    delete:
+      description: Delete all coffee's forms permanently
+      responses:
+        "204":
+          description: No Content
+        "404":
+          description: Not Found
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+      summary: Delete coffee's forms
+      tags:
+      - Forms
     get:
       description: Get all coffee's form
       produces:
@@ -634,7 +693,7 @@ paths:
             - properties:
                 data:
                   items:
-                    $ref: '#/definitions/service.ResponseFormsFindAll'
+                    $ref: '#/definitions/dto.FormResponse'
                   type: array
                 error:
                   type: object
@@ -663,7 +722,7 @@ paths:
         name: payload
         required: true
         schema:
-          $ref: '#/definitions/service.CreateFormRequest'
+          $ref: '#/definitions/dto.CreateFormRequest'
       produces:
       - application/json
       responses:
@@ -784,9 +843,7 @@ paths:
             - $ref: '#/definitions/main.Envelope'
             - properties:
                 data:
-                  items:
-                    $ref: '#/definitions/service.ResponseFormsFindAll'
-                  type: array
+                  $ref: '#/definitions/dto.FormResponse'
                 error:
                   type: object
               type: object
@@ -841,7 +898,7 @@ paths:
         name: payload
         required: true
         schema:
-          $ref: '#/definitions/service.UpdateFormRequest'
+          $ref: '#/definitions/dto.UpdateFormRequest'
       produces:
       - application/json
       responses:
@@ -852,9 +909,7 @@ paths:
             - $ref: '#/definitions/main.Envelope'
             - properties:
                 data:
-                  items:
-                    $ref: '#/definitions/service.ResponseFormsFindAll'
-                  type: array
+                  type: string
                 error:
                   type: object
               type: object
@@ -906,6 +961,36 @@ paths:
       tags:
       - Forms
   /roles:
+    delete:
+      description: Delete all user roles permanently
+      responses:
+        "204":
+          description: No Content
+        "404":
+          description: Not Found
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+      summary: Delete user roles
+      tags:
+      - Roles
     get:
       description: Get All user roles
       produces:
@@ -919,7 +1004,7 @@ paths:
             - properties:
                 data:
                   items:
-                    $ref: '#/definitions/service.ResponseRolesFindAll'
+                    $ref: '#/definitions/dto.RolesResponse'
                   type: array
                 error:
                   type: object
@@ -948,7 +1033,7 @@ paths:
         name: payload
         required: true
         schema:
-          $ref: '#/definitions/service.CreateRoleRequest'
+          $ref: '#/definitions/dto.CreateRoleRequest'
       produces:
       - application/json
       responses:
@@ -1071,7 +1156,7 @@ paths:
             - $ref: '#/definitions/main.Envelope'
             - properties:
                 data:
-                  $ref: '#/definitions/service.ResponseRolesById'
+                  $ref: '#/definitions/dto.RolesResponse'
                 error:
                   type: object
               type: object
@@ -1126,7 +1211,7 @@ paths:
         name: payload
         required: true
         schema:
-          $ref: '#/definitions/service.RequestUpdateRole'
+          $ref: '#/definitions/dto.UpdateRoleRequest'
       produces:
       - application/json
       responses:
@@ -1137,7 +1222,7 @@ paths:
             - $ref: '#/definitions/main.Envelope'
             - properties:
                 data:
-                  $ref: '#/definitions/service.ResponseRolesById'
+                  type: string
                 error:
                   type: object
               type: object

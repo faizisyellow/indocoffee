@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/faizisyellow/indocoffee/internal/service"
+	"github.com/faizisyellow/indocoffee/internal/service/dto"
 	errorService "github.com/faizisyellow/indocoffee/internal/service/error"
 	"github.com/go-chi/chi/v5"
 )
@@ -14,7 +15,7 @@ import (
 // @Tags			Beans
 // @Accept			json
 // @Produce		json
-// @Param			payload	body		service.RequestCreateBean	true	"Payload create new bean"
+// @Param			payload	body		dto.CreateBeanRequest	true	"Payload create new bean"
 // @Success		201		{object}	main.Envelope{data=string,error=nil}
 // @Failure		400		{object}	main.Envelope{data=nil,error=string}
 // @Failure		409		{object}	main.Envelope{data=nil,error=string}
@@ -22,8 +23,7 @@ import (
 // @Router			/beans [post]
 func (app *Application) CreateBeansHandler(w http.ResponseWriter, r *http.Request) {
 
-	var req service.RequestCreateBean
-
+	var req dto.CreateBeanRequest
 	if err := ReadHttpJson(w, r, &req); err != nil {
 		ResponseClientError(w, r, err, http.StatusBadRequest)
 		return
@@ -34,9 +34,7 @@ func (app *Application) CreateBeansHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	ctx := r.Context()
-
-	res, err := app.Services.BeansService.Create(ctx, req.Serialize())
+	res, err := app.Services.BeansService.Create(r.Context(), req)
 	if err != nil {
 		errValue := errorService.GetError(err)
 		switch errValue.E {
@@ -55,18 +53,23 @@ func (app *Application) CreateBeansHandler(w http.ResponseWriter, r *http.Reques
 // @Description	Get All coffee beans
 // @Tags			Beans
 // @Produce		json
-// @Success		200	{object}	main.Envelope{data=[]service.ResponseFindAll,error=nil}
+// @Success		200	{object}	main.Envelope{data=[]dto.BeanResponse,error=nil}
 // @Failure		500	{object}	main.Envelope{data=nil,error=string}
 // @Router			/beans [get]
 func (app *Application) GetAllBeansHandler(w http.ResponseWriter, r *http.Request) {
 
-	res, err := app.Services.BeansService.FindAll(r.Context())
+	beans, err := app.Services.BeansService.FindAll(r.Context())
 	if err != nil {
 		ResponseServerError(w, r, err, http.StatusInternalServerError)
 		return
 	}
 
-	ResponseSuccess(w, r, res, http.StatusOK)
+	response := make([]dto.BeanResponse, 0)
+	for _, bean := range beans {
+		response = append(response, dto.BeanResponse{Id: bean.Id, Name: bean.Name})
+	}
+
+	ResponseSuccess(w, r, response, http.StatusOK)
 
 }
 
@@ -75,7 +78,7 @@ func (app *Application) GetAllBeansHandler(w http.ResponseWriter, r *http.Reques
 // @Tags			Beans
 // @Produce		json
 // @Param			id	path		int	true	"Id coffee bean"
-// @Success		200	{object}	main.Envelope{data=repository.BeansModel,error=nil}
+// @Success		200	{object}	main.Envelope{data=dto.BeanResponse,error=nil}
 // @Failure		400	{object}	main.Envelope{data=nil,error=string}
 // @Failure		404	{object}	main.Envelope{data=nil,error=string}
 // @Failure		500	{object}	main.Envelope{data=nil,error=string}
@@ -90,7 +93,7 @@ func (app *Application) GetBeansHandler(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	res, err := app.Services.BeansService.FindById(r.Context(), id)
+	bean, err := app.Services.BeansService.FindById(r.Context(), id)
 	if err != nil {
 		errValue := errorService.GetError(err)
 		switch errValue.E {
@@ -102,7 +105,12 @@ func (app *Application) GetBeansHandler(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	ResponseSuccess(w, r, res, http.StatusOK)
+	response := dto.BeanResponse{
+		Id:   bean.Id,
+		Name: bean.Name,
+	}
+
+	ResponseSuccess(w, r, response, http.StatusOK)
 
 }
 
@@ -111,25 +119,25 @@ func (app *Application) GetBeansHandler(w http.ResponseWriter, r *http.Request) 
 // @Tags			Beans
 // @Accept			json
 // @Produce		json
-// @Param			id		path		int							true	"Id coffee bean"
-// @Param			payload	body		service.RequestUpdateBean	true	"Payload Update bean"
+// @Param			id		path		int						true	"Id coffee bean"
+// @Param			payload	body		dto.UpdateBeanRequest	true	"Payload Update bean"
 // @Success		200		{object}	main.Envelope{data=string,error=nil}
 // @Failure		400		{object}	main.Envelope{data=nil,error=string}
 // @Failure		404		{object}	main.Envelope{data=nil,error=string}
+// @Failure		409		{object}	main.Envelope{data=nil,error=string}
 // @Failure		500		{object}	main.Envelope{data=nil,error=string}
 // @Router			/beans/{id} [patch]
 func (app *Application) UpdateBeansHandler(w http.ResponseWriter, r *http.Request) {
 
 	idParam := chi.URLParam(r, "id")
 
-	id, err := strconv.Atoi(idParam)
+	beanId, err := strconv.Atoi(idParam)
 	if err != nil {
 		ResponseClientError(w, r, err, http.StatusBadRequest)
 		return
 	}
 
-	var req service.RequestUpdateBean
-
+	var req dto.UpdateBeanRequest
 	if err := ReadHttpJson(w, r, &req); err != nil {
 		ResponseClientError(w, r, err, http.StatusBadRequest)
 		return
@@ -140,15 +148,16 @@ func (app *Application) UpdateBeansHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	err = app.Services.BeansService.Update(r.Context(), id, req)
+	err = app.Services.BeansService.Update(r.Context(), beanId, req)
 	if err != nil {
 		errValue := errorService.GetError(err)
 		switch errValue.E {
 		case service.ErrNotFoundBean:
 			ResponseClientError(w, r, err, http.StatusNotFound)
+		case service.ErrConflictBean:
+			ResponseClientError(w, r, err, http.StatusConflict)
 		default:
 			ResponseServerError(w, r, err, http.StatusInternalServerError)
-
 		}
 		return
 	}
@@ -199,8 +208,8 @@ func (app *Application) DeleteBeansHandler(w http.ResponseWriter, r *http.Reques
 // @Description	Delete all coffe's beans permanently
 // @Tags			Beans
 // @Success		204
-// @Failure		404		{object}	main.Envelope{data=nil,error=string}
-// @Failure		500		{object}	main.Envelope{data=nil,error=string}
+// @Failure		404	{object}	main.Envelope{data=nil,error=string}
+// @Failure		500	{object}	main.Envelope{data=nil,error=string}
 // @Router			/beans [delete]
 func (app *Application) TrashBeansHandler(w http.ResponseWriter, r *http.Request) {
 

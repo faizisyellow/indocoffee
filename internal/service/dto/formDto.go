@@ -10,5 +10,5 @@ type FormResponse struct {
 }
 
 type UpdateFormRequest struct {
-	Name string `json:"name" validate:"required,min=4"`
+	Name string `json:"name" validate:"required,min=4,max=18"`
 }

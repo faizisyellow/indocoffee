@@ -382,7 +382,7 @@ const docTemplate = `{
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/service.ResponseFindAll"
+                                                "$ref": "#/definitions/dto.BeanResponse"
                                             }
                                         },
                                         "error": {
@@ -435,7 +435,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/service.RequestCreateBean"
+                            "$ref": "#/definitions/dto.CreateBeanRequest"
                         }
                     }
                 ],
@@ -525,6 +525,60 @@ const docTemplate = `{
                         }
                     }
                 }
+            },
+            "delete": {
+                "description": "Delete all coffe's beans permanently",
+                "tags": [
+                    "Beans"
+                ],
+                "summary": "Delete coffe's beans",
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/main.Envelope"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object"
+                                        },
+                                        "error": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/main.Envelope"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object"
+                                        },
+                                        "error": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
             }
         },
         "/beans/{id}": {
@@ -558,7 +612,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/repository.BeansModel"
+                                            "$ref": "#/definitions/dto.BeanResponse"
                                         },
                                         "error": {
                                             "type": "object"
@@ -749,7 +803,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/service.RequestUpdateBean"
+                            "$ref": "#/definitions/dto.UpdateBeanRequest"
                         }
                     }
                 ],
@@ -817,6 +871,27 @@ const docTemplate = `{
                             ]
                         }
                     },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/main.Envelope"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object"
+                                        },
+                                        "error": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
@@ -865,7 +940,7 @@ const docTemplate = `{
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/service.ResponseFormsFindAll"
+                                                "$ref": "#/definitions/dto.FormResponse"
                                             }
                                         },
                                         "error": {
@@ -918,7 +993,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/service.CreateFormRequest"
+                            "$ref": "#/definitions/dto.CreateFormRequest"
                         }
                     }
                 ],
@@ -1008,6 +1083,60 @@ const docTemplate = `{
                         }
                     }
                 }
+            },
+            "delete": {
+                "description": "Delete all coffee's forms permanently",
+                "tags": [
+                    "Forms"
+                ],
+                "summary": "Delete coffee's forms",
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/main.Envelope"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object"
+                                        },
+                                        "error": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/main.Envelope"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object"
+                                        },
+                                        "error": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
             }
         },
         "/forms/{id}": {
@@ -1041,10 +1170,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "$ref": "#/definitions/service.ResponseFormsFindAll"
-                                            }
+                                            "$ref": "#/definitions/dto.FormResponse"
                                         },
                                         "error": {
                                             "type": "object"
@@ -1235,7 +1361,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/service.UpdateFormRequest"
+                            "$ref": "#/definitions/dto.UpdateFormRequest"
                         }
                     }
                 ],
@@ -1251,10 +1377,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "$ref": "#/definitions/service.ResponseFormsFindAll"
-                                            }
+                                            "type": "string"
                                         },
                                         "error": {
                                             "type": "object"
@@ -1375,7 +1498,7 @@ const docTemplate = `{
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/service.ResponseRolesFindAll"
+                                                "$ref": "#/definitions/dto.RolesResponse"
                                             }
                                         },
                                         "error": {
@@ -1428,7 +1551,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/service.CreateRoleRequest"
+                            "$ref": "#/definitions/dto.CreateRoleRequest"
                         }
                     }
                 ],
@@ -1518,6 +1641,60 @@ const docTemplate = `{
                         }
                     }
                 }
+            },
+            "delete": {
+                "description": "Delete all user roles permanently",
+                "tags": [
+                    "Roles"
+                ],
+                "summary": "Delete user roles",
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/main.Envelope"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object"
+                                        },
+                                        "error": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/main.Envelope"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object"
+                                        },
+                                        "error": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
             }
         },
         "/roles/{id}": {
@@ -1554,7 +1731,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/service.ResponseRolesById"
+                                            "$ref": "#/definitions/dto.RolesResponse"
                                         },
                                         "error": {
                                             "type": "object"
@@ -1745,7 +1922,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/service.RequestUpdateRole"
+                            "$ref": "#/definitions/dto.UpdateRoleRequest"
                         }
                     }
                 ],
@@ -1761,7 +1938,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/service.ResponseRolesById"
+                                            "type": "string"
                                         },
                                         "error": {
                                             "type": "object"
@@ -2054,6 +2231,127 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "dto.BeanResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.CreateBeanRequest": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "maxLength": 18,
+                    "minLength": 3
+                }
+            }
+        },
+        "dto.CreateFormRequest": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "maxLength": 18,
+                    "minLength": 4
+                }
+            }
+        },
+        "dto.CreateRoleRequest": {
+            "type": "object",
+            "required": [
+                "level",
+                "name"
+            ],
+            "properties": {
+                "level": {
+                    "type": "integer",
+                    "maximum": 5,
+                    "minimum": 1
+                },
+                "name": {
+                    "type": "string",
+                    "maxLength": 16,
+                    "minLength": 4
+                }
+            }
+        },
+        "dto.FormResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.RolesResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "level": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.UpdateBeanRequest": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "maxLength": 18,
+                    "minLength": 3
+                }
+            }
+        },
+        "dto.UpdateFormRequest": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "minLength": 4
+                }
+            }
+        },
+        "dto.UpdateRoleRequest": {
+            "type": "object",
+            "properties": {
+                "level": {
+                    "type": "integer",
+                    "maximum": 5,
+                    "minimum": 1
+                },
+                "name": {
+                    "type": "string",
+                    "maxLength": 16,
+                    "minLength": 4
+                }
+            }
+        },
         "main.Envelope": {
             "type": "object",
             "properties": {
@@ -2065,20 +2363,6 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "token": {
-                    "type": "string"
-                }
-            }
-        },
-        "repository.BeansModel": {
-            "type": "object",
-            "properties": {
-                "id": {
-                    "type": "integer"
-                },
-                "is_delete": {
-                    "type": "boolean"
-                },
-                "name": {
                     "type": "string"
                 }
             }
@@ -2100,35 +2384,6 @@ const docTemplate = `{
                 },
                 "username": {
                     "type": "string"
-                }
-            }
-        },
-        "service.CreateFormRequest": {
-            "type": "object",
-            "required": [
-                "name"
-            ],
-            "properties": {
-                "name": {
-                    "type": "string",
-                    "minLength": 4
-                }
-            }
-        },
-        "service.CreateRoleRequest": {
-            "type": "object",
-            "required": [
-                "level",
-                "name"
-            ],
-            "properties": {
-                "level": {
-                    "type": "integer",
-                    "minimum": 1
-                },
-                "name": {
-                    "type": "string",
-                    "minLength": 4
                 }
             }
         },
@@ -2176,106 +2431,6 @@ const docTemplate = `{
             "properties": {
                 "token": {
                     "type": "string"
-                }
-            }
-        },
-        "service.RequestCreateBean": {
-            "type": "object",
-            "required": [
-                "name"
-            ],
-            "properties": {
-                "name": {
-                    "type": "string",
-                    "maxLength": 18,
-                    "minLength": 3
-                }
-            }
-        },
-        "service.RequestUpdateBean": {
-            "type": "object",
-            "required": [
-                "name"
-            ],
-            "properties": {
-                "name": {
-                    "type": "string",
-                    "maxLength": 18,
-                    "minLength": 3
-                }
-            }
-        },
-        "service.RequestUpdateRole": {
-            "type": "object",
-            "properties": {
-                "level": {
-                    "type": "integer"
-                },
-                "name": {
-                    "type": "string",
-                    "minLength": 4
-                }
-            }
-        },
-        "service.ResponseFindAll": {
-            "type": "object",
-            "properties": {
-                "id": {
-                    "type": "integer"
-                },
-                "name": {
-                    "type": "string"
-                }
-            }
-        },
-        "service.ResponseFormsFindAll": {
-            "type": "object",
-            "properties": {
-                "id": {
-                    "type": "integer"
-                },
-                "name": {
-                    "type": "string"
-                }
-            }
-        },
-        "service.ResponseRolesById": {
-            "type": "object",
-            "properties": {
-                "id": {
-                    "type": "integer"
-                },
-                "level": {
-                    "type": "integer"
-                },
-                "name": {
-                    "type": "string"
-                }
-            }
-        },
-        "service.ResponseRolesFindAll": {
-            "type": "object",
-            "properties": {
-                "id": {
-                    "type": "integer"
-                },
-                "level": {
-                    "type": "integer"
-                },
-                "name": {
-                    "type": "string"
-                }
-            }
-        },
-        "service.UpdateFormRequest": {
-            "type": "object",
-            "required": [
-                "name"
-            ],
-            "properties": {
-                "name": {
-                    "type": "string",
-                    "minLength": 4
                 }
             }
         }

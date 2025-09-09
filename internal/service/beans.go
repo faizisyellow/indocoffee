@@ -7,26 +7,12 @@ import (
 	"strings"
 
 	"github.com/faizisyellow/indocoffee/internal/repository"
+	"github.com/faizisyellow/indocoffee/internal/service/dto"
 	errorService "github.com/faizisyellow/indocoffee/internal/service/error"
-	serviceParser "github.com/faizisyellow/indocoffee/internal/service/parser"
 )
 
 type BeansServices struct {
 	Repository repository.Repository
-}
-
-type RequestCreateBean struct {
-	Name string `json:"name" validate:"required,min=3,max=18"`
-}
-
-func (rcb RequestCreateBean) Serialize() RequestCreateBean {
-
-	rcb.Name = strings.ToLower(rcb.Name)
-	return rcb
-}
-
-type RequestUpdateBean struct {
-	Name string `json:"name" validate:"required,min=3,max=18"`
 }
 
 var (
@@ -35,10 +21,11 @@ var (
 	ErrNotFoundBean = errors.New("beans: no such as bean")
 )
 
-func (Beans *BeansServices) Create(ctx context.Context, req RequestCreateBean) (string, error) {
+func (Beans *BeansServices) Create(ctx context.Context, req dto.CreateBeanRequest) (string, error) {
 
-	var newBean repository.BeansModel
-	newBean.Name = req.Name
+	newBean := repository.BeansModel{
+		Name: req.Name,
+	}
 
 	err := Beans.Repository.Beans.Insert(ctx, newBean)
 	if err != nil {
@@ -53,48 +40,16 @@ func (Beans *BeansServices) Create(ctx context.Context, req RequestCreateBean) (
 	return "success create new bean", nil
 }
 
-type ResponseFindAll struct {
-	Id   int    `json:"id"`
-	Name string `json:"name"`
-}
-
-func (rf *ResponseFindAll) ParseDTO(data any) error {
-
-	switch v := data.(type) {
-	case repository.BeansModel:
-		rf.Id = v.Id
-		rf.Name = v.Name
-	default:
-		return errors.New("parse ResponseFindAll: unknown type")
-	}
-
-	return nil
-}
-
-func (Beans *BeansServices) FindAll(ctx context.Context) ([]ResponseFindAll, error) {
+func (Beans *BeansServices) FindAll(ctx context.Context) ([]repository.BeansModel, error) {
 
 	beans, err := Beans.Repository.Beans.GetAll(ctx)
 	if err != nil {
 		return nil, errorService.New(ErrInternalBean, err)
 	}
 
-	response := make([]ResponseFindAll, 0)
-
-	for _, bean := range beans {
-		buffRes := new(ResponseFindAll)
-
-		err := serviceParser.Parse(buffRes, bean)
-		if err != nil {
-			return nil, errorService.New(ErrInternalBean, err)
-		}
-
-		response = append(response, *buffRes)
-	}
-
-	return response, nil
+	return beans, nil
 }
 
-// TODO: only expose id and name.
 func (Beans *BeansServices) FindById(ctx context.Context, id int) (repository.BeansModel, error) {
 
 	bean, err := Beans.Repository.Beans.GetById(ctx, id)
@@ -110,23 +65,21 @@ func (Beans *BeansServices) FindById(ctx context.Context, id int) (repository.Be
 	return bean, nil
 }
 
-func updateBeanPayload(req RequestUpdateBean, ltsBean repository.BeansModel) repository.BeansModel {
-
-	ltsBean.Name = req.Name
-
-	return ltsBean
-}
-
-func (Beans *BeansServices) Update(ctx context.Context, id int, req RequestUpdateBean) error {
+func (Beans *BeansServices) Update(ctx context.Context, id int, req dto.UpdateBeanRequest) error {
 
 	bean, err := Beans.FindById(ctx, id)
 	if err != nil {
 		return err
 	}
+	bean.Name = req.Name
 
-	err = Beans.Repository.Beans.Update(ctx, updateBeanPayload(req, bean))
+	err = Beans.Repository.Beans.Update(ctx, bean)
 	if err != nil {
 		// TODO: should success update bean if the existing bean is deleted
+		if strings.Contains(err.Error(), CONFLICT_CODE) {
+			return errorService.New(ErrConflictBean, err)
+		}
+
 		return errorService.New(ErrInternalBean, err)
 	}
 
