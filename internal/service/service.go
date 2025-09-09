@@ -6,6 +6,7 @@ import (
 
 	"github.com/faizisyellow/indocoffee/internal/db"
 	"github.com/faizisyellow/indocoffee/internal/repository"
+	"github.com/faizisyellow/indocoffee/internal/service/dto"
 )
 
 type Service struct {
@@ -36,10 +37,10 @@ type Service struct {
 	}
 
 	FormsService interface {
-		Create(ctx context.Context, req CreateFormRequest) (string, error)
-		FindAll(ctx context.Context) ([]ResponseFormsFindAll, error)
-		FindById(ctx context.Context, id int) (ResponseFormsById, error)
-		Update(ctx context.Context, id int, nw repository.FormsModel) error
+		Create(ctx context.Context, req dto.CreateFormRequest) (string, error)
+		FindAll(ctx context.Context) ([]repository.FormsModel, error)
+		FindById(ctx context.Context, id int) (repository.FormsModel, error)
+		Update(ctx context.Context, id int, req dto.UpdateFormRequest) error
 		Delete(ctx context.Context, id int) error
 		Remove(ctx context.Context) error
 	}

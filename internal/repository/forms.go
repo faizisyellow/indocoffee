@@ -80,12 +80,12 @@ func (Forms *FormsRepository) GetById(ctx context.Context, id int) (FormsModel, 
 
 func (Forms *FormsRepository) Update(ctx context.Context, nw FormsModel) error {
 
-	qry := `UPDATE forms SET name = ?, is_delete = ? WHERE id = ? AND is_delete = FALSE`
+	qry := `UPDATE forms SET name = ? WHERE id = ? AND is_delete = FALSE`
 
 	ctx, cancel := context.WithTimeout(ctx, QueryTimeout)
 	defer cancel()
 
-	_, err := Forms.Db.ExecContext(ctx, qry, nw.Name, nw.IsDelete, nw.Id)
+	_, err := Forms.Db.ExecContext(ctx, qry, nw.Name, nw.Id)
 	if err != nil {
 		return err
 	}
