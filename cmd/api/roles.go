@@ -10,17 +10,17 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-//	@Summary		Add user role
-//	@Description	Create new user role
-//	@Tags			Roles
-//	@Accept			json
-//	@Produce		json
-//	@Param			payload	body		dto.CreateRoleRequest	true	"Payload create new role"
-//	@Success		201		{object}	main.Envelope{data=string,error=nil}
-//	@Failure		400		{object}	main.Envelope{data=nil,error=string}
-//	@Failure		409		{object}	main.Envelope{data=nil,error=string}
-//	@Failure		500		{object}	main.Envelope{data=nil,error=string}
-//	@Router			/roles [post]
+// @Summary		Add user role
+// @Description	Create new user role
+// @Tags			Roles
+// @Accept			json
+// @Produce		json
+// @Param			payload	body		dto.CreateRoleRequest	true	"Payload create new role"
+// @Success		201		{object}	main.Envelope{data=string,error=nil}
+// @Failure		400		{object}	main.Envelope{data=nil,error=string}
+// @Failure		409		{object}	main.Envelope{data=nil,error=string}
+// @Failure		500		{object}	main.Envelope{data=nil,error=string}
+// @Router			/roles [post]
 func (app *Application) CreateRolesHandler(w http.ResponseWriter, r *http.Request) {
 	var req dto.CreateRoleRequest
 	if err := ReadHttpJson(w, r, &req); err != nil {
@@ -48,13 +48,13 @@ func (app *Application) CreateRolesHandler(w http.ResponseWriter, r *http.Reques
 	ResponseSuccess(w, r, res, http.StatusCreated)
 }
 
-//	@Summary		Get user roles
-//	@Description	Get All user roles
-//	@Tags			Roles
-//	@Produce		json
-//	@Success		200	{object}	main.Envelope{data=[]dto.RolesResponse,error=nil}
-//	@Failure		500	{object}	main.Envelope{data=nil,error=string}
-//	@Router			/roles [get]
+// @Summary		Get user roles
+// @Description	Get All user roles
+// @Tags			Roles
+// @Produce		json
+// @Success		200	{object}	main.Envelope{data=[]dto.RolesResponse,error=nil}
+// @Failure		500	{object}	main.Envelope{data=nil,error=string}
+// @Router			/roles [get]
 func (app *Application) GetAllRolesHandler(w http.ResponseWriter, r *http.Request) {
 
 	roles, err := app.Services.RolesService.FindAll(r.Context())
@@ -70,17 +70,17 @@ func (app *Application) GetAllRolesHandler(w http.ResponseWriter, r *http.Reques
 	ResponseSuccess(w, r, response, http.StatusOK)
 }
 
-//	@Summary		Get user role
-//	@Description	Get user role by Id
-//	@Tags			Roles
-//	@Accept			json
-//	@Produce		json
-//	@Param			id	path		int	true	"Role id"
-//	@Success		200	{object}	main.Envelope{data=dto.RolesResponse,error=nil}
-//	@Failure		400	{object}	main.Envelope{data=nil,error=string}
-//	@Failure		404	{object}	main.Envelope{data=nil,error=string}
-//	@Failure		500	{object}	main.Envelope{data=nil,error=string}
-//	@Router			/roles/{id} [get]
+// @Summary		Get user role
+// @Description	Get user role by Id
+// @Tags			Roles
+// @Accept			json
+// @Produce		json
+// @Param			id	path		int	true	"Role id"
+// @Success		200	{object}	main.Envelope{data=dto.RolesResponse,error=nil}
+// @Failure		400	{object}	main.Envelope{data=nil,error=string}
+// @Failure		404	{object}	main.Envelope{data=nil,error=string}
+// @Failure		500	{object}	main.Envelope{data=nil,error=string}
+// @Router			/roles/{id} [get]
 func (app *Application) GetRolesHandler(w http.ResponseWriter, r *http.Request) {
 
 	idParam := chi.URLParam(r, "id")
@@ -113,19 +113,19 @@ func (app *Application) GetRolesHandler(w http.ResponseWriter, r *http.Request) 
 	ResponseSuccess(w, r, response, http.StatusOK)
 }
 
-//	@Summary		Update user role
-//	@Description	Update user role by Id
-//	@Tags			Roles
-//	@Accept			json
-//	@Produce		json
-//	@Param			id		path		int						true	"Role id"
-//	@Param			payload	body		dto.UpdateRoleRequest	true	"Role payload"
-//	@Success		200		{object}	main.Envelope{data=string,error=nil}
-//	@Failure		400		{object}	main.Envelope{data=nil,error=string}
-//	@Failure		404		{object}	main.Envelope{data=nil,error=string}
-//	@Failure		409		{object}	main.Envelope{data=nil,error=string}
-//	@Failure		500		{object}	main.Envelope{data=nil,error=string}
-//	@Router			/roles/{id} [patch]
+// @Summary		Update user role
+// @Description	Update user role by Id
+// @Tags			Roles
+// @Accept			json
+// @Produce		json
+// @Param			id		path		int						true	"Role id"
+// @Param			payload	body		dto.UpdateRoleRequest	true	"Role payload"
+// @Success		200		{object}	main.Envelope{data=string,error=nil}
+// @Failure		400		{object}	main.Envelope{data=nil,error=string}
+// @Failure		404		{object}	main.Envelope{data=nil,error=string}
+// @Failure		409		{object}	main.Envelope{data=nil,error=string}
+// @Failure		500		{object}	main.Envelope{data=nil,error=string}
+// @Router			/roles/{id} [patch]
 func (app *Application) UpdateRolesHandler(w http.ResponseWriter, r *http.Request) {
 
 	ctx := r.Context()
@@ -168,17 +168,17 @@ func (app *Application) UpdateRolesHandler(w http.ResponseWriter, r *http.Reques
 	ResponseSuccess(w, r, "success update role", http.StatusOK)
 }
 
-//	@Summary		Delete user role
-//	@Description	Delete user role by Id
-//	@Tags			Roles
-//	@Accept			json
-//	@Produce		json
-//	@Param			id	path	int	true	"Role id"
-//	@Success		204
-//	@Failure		400	{object}	main.Envelope{data=nil,error=string}
-//	@Failure		404	{object}	main.Envelope{data=nil,error=string}
-//	@Failure		500	{object}	main.Envelope{data=nil,error=string}
-//	@Router			/roles/{id} [delete]
+// @Summary		Delete user role
+// @Description	Delete user role by Id
+// @Tags			Roles
+// @Accept			json
+// @Produce		json
+// @Param			id	path	int	true	"Role id"
+// @Success		204
+// @Failure		400	{object}	main.Envelope{data=nil,error=string}
+// @Failure		404	{object}	main.Envelope{data=nil,error=string}
+// @Failure		500	{object}	main.Envelope{data=nil,error=string}
+// @Router			/roles/{id} [delete]
 func (app *Application) DeleteRolesHandler(w http.ResponseWriter, r *http.Request) {
 
 	idParam := chi.URLParam(r, "id")
@@ -204,13 +204,26 @@ func (app *Application) DeleteRolesHandler(w http.ResponseWriter, r *http.Reques
 	ResponseSuccess(w, r, nil, http.StatusNoContent)
 }
 
-//	@Summary		Delete user roles
-//	@Description	Delete all user roles permanently
-//	@Tags			Roles
-//	@Success		204
-//	@Failure		404	{object}	main.Envelope{data=nil,error=string}
-//	@Failure		500	{object}	main.Envelope{data=nil,error=string}
-//	@Router			/roles [delete]
+// @Summary		Delete user roles
+// @Description	Delete all user roles permanently
+// @Tags			Roles
+// @Success		204
+// @Failure		404	{object}	main.Envelope{data=nil,error=string}
+// @Failure		500	{object}	main.Envelope{data=nil,error=string}
+// @Router			/roles/trash [delete]
 func (app *Application) TrashRolesHandler(w http.ResponseWriter, r *http.Request) {
 
+	err := app.Services.RolesService.Remove(r.Context())
+	if err != nil {
+		errorValue := errorService.GetError(err)
+		switch errorValue.E {
+		case service.ErrNotFoundRole:
+			ResponseClientError(w, r, err, http.StatusNotFound)
+		default:
+			ResponseServerError(w, r, err, http.StatusInternalServerError)
+		}
+		return
+	}
+
+	ResponseSuccess(w, r, nil, http.StatusNoContent)
 }

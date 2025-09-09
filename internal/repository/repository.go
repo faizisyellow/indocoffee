@@ -27,7 +27,7 @@ type Repository struct {
 		GetById(ctx context.Context, id int) (RolesModel, error)
 		Update(ctx context.Context, nw RolesModel) error
 		Delete(ctx context.Context, id int) error
-		Destroy(ctx context.Context, id int) error
+		DestroyMany(ctx context.Context) error
 	}
 
 	Beans interface {
@@ -36,7 +36,7 @@ type Repository struct {
 		GetById(ctx context.Context, id int) (BeansModel, error)
 		Update(ctx context.Context, nw BeansModel) error
 		Delete(ctx context.Context, id int) error
-		Destroy(ctx context.Context, id int) error
+		DestroyMany(ctx context.Context) error
 	}
 
 	Forms interface {
@@ -45,7 +45,7 @@ type Repository struct {
 		GetById(ctx context.Context, id int) (FormsModel, error)
 		Update(ctx context.Context, nw FormsModel) error
 		Delete(ctx context.Context, id int) error
-		Destroy(ctx context.Context, id int) error
+		DestroyMany(ctx context.Context) error
 	}
 }
 

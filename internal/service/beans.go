@@ -100,12 +100,17 @@ func (Beans *BeansServices) Delete(ctx context.Context, id int) error {
 	return nil
 }
 
-func removeBeansWithConcurrent(repo repository.Repository, ctx context.Context) error {
-
-	return nil
-}
-
 func (Beans *BeansServices) Remove(ctx context.Context) error {
 
-	return removeBeansWithConcurrent(Beans.Repository, ctx)
+	err := Beans.Repository.Beans.DestroyMany(ctx)
+	if err != nil {
+		switch err {
+		case sql.ErrNoRows:
+			return errorService.New(ErrNotFoundBean, err)
+		default:
+			return errorService.New(ErrInternalBean, err)
+		}
+	}
+
+	return nil
 }

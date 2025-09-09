@@ -111,14 +111,14 @@ func (Roles *RolesRepository) Delete(ctx context.Context, id int) error {
 	return nil
 }
 
-func (Roles *RolesRepository) Destroy(ctx context.Context, id int) error {
+func (Roles *RolesRepository) DestroyMany(ctx context.Context) error {
 
-	query := `DELETE FROM roles WHERE id = ?`
+	query := `DELETE FROM roles WHERE is_delete = TRUE`
 
 	ctx, cancel := context.WithTimeout(ctx, QueryTimeout)
 	defer cancel()
 
-	_, err := Roles.Db.ExecContext(ctx, query, id)
+	_, err := Roles.Db.ExecContext(ctx, query)
 	if err != nil {
 		return err
 	}

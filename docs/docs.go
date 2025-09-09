@@ -525,13 +525,15 @@ const docTemplate = `{
                         }
                     }
                 }
-            },
+            }
+        },
+        "/beans/trash": {
             "delete": {
-                "description": "Delete all coffe's beans permanently",
+                "description": "Delete all coffee's beans permanently",
                 "tags": [
                     "Beans"
                 ],
-                "summary": "Delete coffe's beans",
+                "summary": "Delete coffee's beans",
                 "responses": {
                     "204": {
                         "description": "No Content"
@@ -1083,7 +1085,9 @@ const docTemplate = `{
                         }
                     }
                 }
-            },
+            }
+        },
+        "/forms/trash": {
             "delete": {
                 "description": "Delete all coffee's forms permanently",
                 "tags": [
@@ -1641,7 +1645,9 @@ const docTemplate = `{
                         }
                     }
                 }
-            },
+            }
+        },
+        "/roles/trash": {
             "delete": {
                 "description": "Delete all user roles permanently",
                 "tags": [
@@ -2333,6 +2339,7 @@ const docTemplate = `{
             "properties": {
                 "name": {
                     "type": "string",
+                    "maxLength": 18,
                     "minLength": 4
                 }
             }

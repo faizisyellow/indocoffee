@@ -67,6 +67,7 @@ definitions:
   dto.UpdateFormRequest:
     properties:
       name:
+        maxLength: 18
         minLength: 4
         type: string
     required:
@@ -339,36 +340,6 @@ paths:
       tags:
       - Auth
   /beans:
-    delete:
-      description: Delete all coffe's beans permanently
-      responses:
-        "204":
-          description: No Content
-        "404":
-          description: Not Found
-          schema:
-            allOf:
-            - $ref: '#/definitions/main.Envelope'
-            - properties:
-                data:
-                  type: object
-                error:
-                  type: string
-              type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            allOf:
-            - $ref: '#/definitions/main.Envelope'
-            - properties:
-                data:
-                  type: object
-                error:
-                  type: string
-              type: object
-      summary: Delete coffe's beans
-      tags:
-      - Beans
     get:
       description: Get All coffee beans
       produces:
@@ -649,9 +620,9 @@ paths:
       summary: Update coffee bean
       tags:
       - Beans
-  /forms:
+  /beans/trash:
     delete:
-      description: Delete all coffee's forms permanently
+      description: Delete all coffee's beans permanently
       responses:
         "204":
           description: No Content
@@ -677,9 +648,10 @@ paths:
                 error:
                   type: string
               type: object
-      summary: Delete coffee's forms
+      summary: Delete coffee's beans
       tags:
-      - Forms
+      - Beans
+  /forms:
     get:
       description: Get all coffee's form
       produces:
@@ -960,9 +932,9 @@ paths:
       summary: Update coffee's form
       tags:
       - Forms
-  /roles:
+  /forms/trash:
     delete:
-      description: Delete all user roles permanently
+      description: Delete all coffee's forms permanently
       responses:
         "204":
           description: No Content
@@ -988,9 +960,10 @@ paths:
                 error:
                   type: string
               type: object
-      summary: Delete user roles
+      summary: Delete coffee's forms
       tags:
-      - Roles
+      - Forms
+  /roles:
     get:
       description: Get All user roles
       produces:
@@ -1271,6 +1244,37 @@ paths:
                   type: string
               type: object
       summary: Update user role
+      tags:
+      - Roles
+  /roles/trash:
+    delete:
+      description: Delete all user roles permanently
+      responses:
+        "204":
+          description: No Content
+        "404":
+          description: Not Found
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+      summary: Delete user roles
       tags:
       - Roles
   /users/delete:

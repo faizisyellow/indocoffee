@@ -195,7 +195,6 @@ func (app *Application) DeleteBeansHandler(w http.ResponseWriter, r *http.Reques
 			ResponseClientError(w, r, err, http.StatusNotFound)
 		default:
 			ResponseServerError(w, r, err, http.StatusInternalServerError)
-
 		}
 		return
 	}
@@ -204,13 +203,25 @@ func (app *Application) DeleteBeansHandler(w http.ResponseWriter, r *http.Reques
 
 }
 
-// @Summary		Delete coffe's beans
-// @Description	Delete all coffe's beans permanently
+// @Summary		Delete coffee's beans
+// @Description	Delete all coffee's beans permanently
 // @Tags			Beans
 // @Success		204
 // @Failure		404	{object}	main.Envelope{data=nil,error=string}
 // @Failure		500	{object}	main.Envelope{data=nil,error=string}
-// @Router			/beans [delete]
+// @Router			/beans/trash [delete]
 func (app *Application) TrashBeansHandler(w http.ResponseWriter, r *http.Request) {
 
+	err := app.Services.BeansService.Remove(r.Context())
+	if err != nil {
+		errorValue := errorService.GetError(err)
+		switch errorValue.E {
+		case service.ErrNotFoundBean:
+			ResponseClientError(w, r, err, http.StatusNotFound)
+		default:
+			ResponseServerError(w, r, err, http.StatusInternalServerError)
+		}
+	}
+
+	ResponseSuccess(w, r, nil, http.StatusNoContent)
 }

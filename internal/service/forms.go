@@ -99,12 +99,17 @@ func (Forms *FormsServices) Delete(ctx context.Context, id int) error {
 	return nil
 }
 
-func removeFormsWithConcurrent(repo repository.Repository, ctx context.Context) error {
-
-	return nil
-}
-
 func (Forms *FormsServices) Remove(ctx context.Context) error {
 
-	return removeRolesWithConcurrent(Forms.Repository, ctx)
+	err := Forms.Repository.Forms.DestroyMany(ctx)
+	if err != nil {
+		switch err {
+		case sql.ErrNoRows:
+			return errorService.New(ErrNotFoundForm, err)
+		default:
+			return errorService.New(ErrInternalForm, err)
+		}
+	}
+
+	return nil
 }

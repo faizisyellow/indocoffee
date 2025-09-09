@@ -108,14 +108,14 @@ func (Forms *FormsRepository) Delete(ctx context.Context, id int) error {
 	return nil
 }
 
-func (Forms *FormsRepository) Destroy(ctx context.Context, id int) error {
+func (Forms *FormsRepository) DestroyMany(ctx context.Context) error {
 
-	qry := `DELETE FROM forms WHERE id = ?`
+	qry := `DELETE FROM forms WHERE is_delete = TRUE `
 
 	ctx, cancel := context.WithTimeout(ctx, QueryTimeout)
 	defer cancel()
 
-	_, err := Forms.Db.ExecContext(ctx, qry, id)
+	_, err := Forms.Db.ExecContext(ctx, qry)
 	if err != nil {
 		return err
 	}

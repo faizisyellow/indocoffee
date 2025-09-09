@@ -116,14 +116,14 @@ func (Beans *BeansRepository) Delete(ctx context.Context, id int) error {
 	return nil
 }
 
-func (Beans *BeansRepository) Destroy(ctx context.Context, id int) error {
+func (Beans *BeansRepository) DestroyMany(ctx context.Context) error {
 
-	query := `DELETE FROM beans WHERE id = ?`
+	query := `DELETE FROM beans WHERE is_delete = TRUE`
 
 	ctx, cancel := context.WithTimeout(ctx, QueryTimeout)
 	defer cancel()
 
-	_, err := Beans.Db.ExecContext(ctx, query, id)
+	_, err := Beans.Db.ExecContext(ctx, query)
 	if err != nil {
 		return err
 	}
