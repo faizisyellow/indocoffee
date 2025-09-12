@@ -17,6 +17,7 @@ type UsersServices struct {
 	Repository repository.Repository
 	Db         *sql.DB
 	TransFnc   db.TransFnc
+	Token      utils.Token
 }
 
 type RegisterRequest struct {
@@ -69,9 +70,8 @@ func (us *UsersServices) RegisterAccount(ctx context.Context, req RegisterReques
 
 		usrId, err := us.Repository.Users.Insert(ctx, tx, newAccount)
 		if err != nil {
-			duplicateKey := CONFLICT_CODE
 			switch {
-			case strings.Contains(err.Error(), duplicateKey):
+			case strings.Contains(err.Error(), CONFLICT_CODE):
 				return errorService.New(ErrUserAlreadyExist, err)
 			default:
 				//Todo: handle error client
@@ -80,7 +80,7 @@ func (us *UsersServices) RegisterAccount(ctx context.Context, req RegisterReques
 
 		}
 
-		tokenIvt := utils.GenerateTokenUuid()
+		tokenIvt := us.Token.Generate()
 
 		invt := repository.InvitationModel{
 			UserId:   usrId,

@@ -7,6 +7,8 @@ import (
 	"github.com/faizisyellow/indocoffee/internal/db"
 	"github.com/faizisyellow/indocoffee/internal/repository"
 	"github.com/faizisyellow/indocoffee/internal/service/dto"
+	"github.com/faizisyellow/indocoffee/internal/utils"
+	"github.com/google/uuid"
 )
 
 type Service struct {
@@ -50,7 +52,7 @@ var CONFLICT_CODE = "Error 1062 (23000)"
 
 func New(store repository.Repository, txfnc db.TransFnc, Db *sql.DB) *Service {
 	return &Service{
-		UsersService: &UsersServices{Repository: store, TransFnc: txfnc, Db: Db},
+		UsersService: &UsersServices{Repository: store, TransFnc: txfnc, Db: Db, Token: utils.UUID{Plaintoken: uuid.New().String()}},
 		RolesService: &RolesServices{Repository: store},
 		BeansService: &BeansServices{Repository: store},
 		FormsService: &FormsServices{Repository: store},

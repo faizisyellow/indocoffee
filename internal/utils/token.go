@@ -3,15 +3,19 @@ package utils
 import (
 	"crypto/sha256"
 	"encoding/hex"
-
-	"github.com/google/uuid"
 )
 
-func GenerateTokenUuid() string {
+type Token interface {
+	Generate() string
+}
 
-	plaintoken := uuid.New().String()
+type UUID struct {
+	Plaintoken string
+}
 
-	hash := sha256.Sum256([]byte(plaintoken))
+func (u UUID) Generate() string {
+
+	hash := sha256.Sum256([]byte(u.Plaintoken))
 
 	return hex.EncodeToString(hash[:])
 
