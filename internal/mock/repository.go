@@ -3,6 +3,7 @@ package mock
 import (
 	"context"
 	"database/sql"
+	"errors"
 
 	"github.com/faizisyellow/indocoffee/internal/repository"
 )
@@ -11,8 +12,15 @@ type UsersRepositoryMock struct {
 }
 
 func (u *UsersRepositoryMock) Insert(ctx context.Context, tx *sql.Tx, usr repository.UserModel) (int, error) {
+	existingUser := repository.UserModel{
+		Email: "lizzymcalpine@test.com",
+	}
 
-	return 0, nil
+	if usr.Email == existingUser.Email {
+		return 0, errors.New("account already exist")
+	}
+
+	return usr.Id, nil
 }
 
 func (u *UsersRepositoryMock) GetById(ctx context.Context, id int) (repository.UserModel, error) {

@@ -90,21 +90,41 @@ func TestRegisterAccount(t *testing.T) {
 	transMock := transactionMock{status: initial}
 	usersSrv := setupUsersServiceTest(tkn, &transMock)
 
-	request := RegisterRequest{
-		Username: "username",
-		Email:    "test@gmail.com",
-		Password: "HelloWorld$123",
-	}
+	t.Run("register new account", func(t *testing.T) {
+		request := RegisterRequest{
+			Username: "username",
+			Email:    "test@gmail.com",
+			Password: "HelloWorld$123",
+		}
 
-	want := &RegisterResponse{Token: tkn.token}
-	got, err := usersSrv.RegisterAccount(context.Background(), request)
-	if err != nil {
-		t.Errorf("got error %q but want none", err)
-	}
+		want := &RegisterResponse{Token: tkn.token}
+		got, err := usersSrv.RegisterAccount(context.Background(), request)
+		if err != nil {
+			t.Errorf("not expected an error but got one: %q", err)
+		}
 
-	if !reflect.DeepEqual(want, got) {
-		t.Errorf("want to equal %v, but got: %v", want, got)
-	}
+		if !reflect.DeepEqual(want, got) {
+			t.Errorf("want to equal %v, but got: %v", want, got)
+		}
+
+	})
+
+	t.Run("account that registered already exist", func(t *testing.T) {
+		request := RegisterRequest{
+			Username: "lizzy",
+			Email:    "lizzymcalpine@test.com",
+			Password: "HelloWorld$123",
+		}
+
+		got, err := usersSrv.RegisterAccount(context.Background(), request)
+		if err == nil {
+			t.Error("expected an error but got none")
+		}
+
+		if got != nil {
+			t.Error("expected response to be empty but has a response")
+		}
+	})
 }
 
 func setupUsersServiceTest(token tokenInvitation, trans db.Transactioner) UsersServices {
