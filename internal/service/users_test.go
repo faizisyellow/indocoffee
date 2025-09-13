@@ -3,8 +3,12 @@ package service
 import (
 	"context"
 	"database/sql"
+	"errors"
+	"reflect"
 	"testing"
 
+	"github.com/faizisyellow/indocoffee/internal/db"
+	"github.com/faizisyellow/indocoffee/internal/mock"
 	"github.com/faizisyellow/indocoffee/internal/repository"
 )
 
@@ -17,59 +21,101 @@ func (t tokenInvitation) Generate() string {
 	return t.token
 }
 
-func TestRegisterAccount(t *testing.T) {
+type statusTransaction int
 
-	userMock := &UserRepositoryMock{}
-	token := tokenInvitation{token: "this is test token"}
+func (s *statusTransaction) string(stat statusTransaction) string {
 
-	userServ := UsersServices{
-		Repository: repository.Repository{
-			Users: userMock,
-		},
-		Db:       nil,
-		TransFnc: nil,
-		Token:    token,
+	return []string{"init", "begin", "open", "failed"}[stat]
+}
+
+const (
+	initial statusTransaction = iota
+	begin
+	open
+	failed
+)
+
+type transactionMock struct {
+	status statusTransaction
+}
+
+func (t *transactionMock) Begin() (*sql.Tx, error) {
+	t.status = begin
+
+	if t.status.string(begin) != "begin" {
+		return nil, errors.New("transaction not begin")
 	}
 
+	return nil, nil
+}
+
+func (t *transactionMock) Rollback() error {
+	t.status = failed
+	if t.status.string(failed) != "failed" {
+		return errors.New("transaction rollback errors")
+	}
+
+	return nil
+}
+
+func (t *transactionMock) Commit() error {
+	t.status = open
+	if t.status.string(open) != "open" {
+		return errors.New("transaction errors")
+	}
+
+	return nil
+}
+
+func (t *transactionMock) WithTx(ctx context.Context, fn func(tx *sql.Tx) error) error {
+	_, err := t.Begin()
+	if err != nil {
+		return err
+	}
+
+	err = fn(nil)
+
+	if err != nil {
+		if err := t.Rollback(); err != nil {
+			return err
+		}
+		return err
+	}
+
+	return t.Commit()
+}
+
+func TestRegisterAccount(t *testing.T) {
+	tkn := tokenInvitation{token: "this is test token"}
+	transMock := transactionMock{status: initial}
+	usersSrv := setupUsersServiceTest(tkn, &transMock)
+
 	request := RegisterRequest{
-		Username: "test69",
+		Username: "username",
 		Email:    "test@gmail.com",
 		Password: "HelloWorld$123",
 	}
 
-	want := &RegisterResponse{Token: token.token}
-	got, err := userServ.RegisterAccount(context.Background(), request)
+	want := &RegisterResponse{Token: tkn.token}
+	got, err := usersSrv.RegisterAccount(context.Background(), request)
 	if err != nil {
 		t.Errorf("got error %q but want none", err)
 	}
 
-	if got != want {
+	if !reflect.DeepEqual(want, got) {
 		t.Errorf("want to equal %v, but got: %v", want, got)
 	}
 }
 
-type UserRepositoryMock struct{}
+func setupUsersServiceTest(token tokenInvitation, trans db.Transactioner) UsersServices {
 
-func (u *UserRepositoryMock) Insert(ctx context.Context, tx *sql.Tx, usr repository.UserModel) (int, error) {
+	return UsersServices{
+		Repository: repository.Repository{
+			Users:      &mock.UsersRepositoryMock{},
+			Invitation: &mock.InvitationRepositoryMock{},
+		},
+		Transaction: trans,
+		Token:       token,
+	}
 
-	return 0, nil
-}
-
-func (u *UserRepositoryMock) GetById(ctx context.Context, id int) (repository.UserModel, error) {
-
-	return repository.UserModel{}, nil
-}
-
-func (u *UserRepositoryMock) GetByEmail(ctx context.Context, email string) (repository.UserModel, error) {
-	return repository.UserModel{}, nil
-}
-
-func (u *UserRepositoryMock) Update(ctx context.Context, tx *sql.Tx, usr repository.UserModel) error {
-
-	return nil
-}
-
-func (u *UserRepositoryMock) Delete(ctx context.Context, tx *sql.Tx, id int) error {
-
-	return nil
 }

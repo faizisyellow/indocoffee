@@ -14,10 +14,9 @@ import (
 )
 
 type UsersServices struct {
-	Repository repository.Repository
-	Db         *sql.DB
-	TransFnc   db.TransFnc
-	Token      utils.Token
+	Repository  repository.Repository
+	Token       utils.Token
+	Transaction db.Transactioner
 }
 
 type RegisterRequest struct {
@@ -57,7 +56,7 @@ func (us *UsersServices) RegisterAccount(ctx context.Context, req RegisterReques
 		return nil, errorService.New(err, err)
 	}
 
-	err = us.TransFnc(us.Db, ctx, func(tx *sql.Tx) error {
+	err = us.Transaction.WithTx(ctx, func(tx *sql.Tx) error {
 
 		var newAccount repository.UserModel
 		newAccount.Email = req.Email
@@ -109,7 +108,7 @@ func (us *UsersServices) RegisterAccount(ctx context.Context, req RegisterReques
 
 func (us *UsersServices) ActivateAccount(ctx context.Context, token string) error {
 
-	return us.TransFnc(us.Db, ctx, func(tx *sql.Tx) error {
+	return us.Transaction.WithTx(ctx, func(tx *sql.Tx) error {
 
 		usrId, err := us.Repository.Invitation.Get(ctx, tx, token)
 		if err != nil {
@@ -162,7 +161,7 @@ func (us *UsersServices) Login(ctx context.Context, req LoginRequest) (*reposito
 
 func (us *UsersServices) DeleteAccount(ctx context.Context, usrid int) error {
 
-	return us.TransFnc(us.Db, ctx, func(tx *sql.Tx) error {
+	return us.Transaction.WithTx(ctx, func(tx *sql.Tx) error {
 
 		err := us.Repository.Users.Delete(ctx, tx, usrid)
 		if err != nil {

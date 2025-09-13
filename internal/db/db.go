@@ -44,19 +44,26 @@ func New(dsn string, maxOpenConn, maxIdleConn int, maxIdleTime, maxLifeTime stri
 	return db, nil
 }
 
-// WithTx access database with transaction.
-func WithTx(db *sql.DB, ctx context.Context, fnc func(*sql.Tx) error) error {
+type TransactionDB struct {
+	Db *sql.DB
+	*sql.Tx
+}
 
-	tx, err := db.BeginTx(ctx, nil)
-	if err != nil {
-		return fmt.Errorf("error begin tx=%v", err)
-	}
+func (t *TransactionDB) WithTx(ctx context.Context, fnc func() error) error {
 
-	err = fnc(tx)
+	tx, err := t.Db.BeginTx(ctx, nil)
 	if err != nil {
-		_ = tx.Rollback()
 		return err
 	}
 
-	return tx.Commit()
+	t.Tx = tx
+
+	if err := fnc(); err != nil {
+		if err := t.Tx.Rollback(); err != nil {
+			return err
+		}
+		return err
+	}
+
+	return t.Tx.Commit()
 }

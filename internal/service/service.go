@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"database/sql"
 
 	"github.com/faizisyellow/indocoffee/internal/db"
 	"github.com/faizisyellow/indocoffee/internal/repository"
@@ -50,9 +49,13 @@ type Service struct {
 
 var CONFLICT_CODE = "Error 1062 (23000)"
 
-func New(store repository.Repository, txfnc db.TransFnc, Db *sql.DB) *Service {
+func New(store repository.Repository, tx db.Transactioner) *Service {
 	return &Service{
-		UsersService: &UsersServices{Repository: store, TransFnc: txfnc, Db: Db, Token: utils.UUID{Plaintoken: uuid.New().String()}},
+		UsersService: &UsersServices{
+			Repository:  store,
+			Token:       utils.UUID{Plaintoken: uuid.New().String()},
+			Transaction: tx,
+		},
 		RolesService: &RolesServices{Repository: store},
 		BeansService: &BeansServices{Repository: store},
 		FormsService: &FormsServices{Repository: store},

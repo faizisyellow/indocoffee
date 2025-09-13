@@ -66,7 +66,8 @@ func main() {
 
 	repository := repository.New(dbs)
 
-	services := service.New(*repository, db.WithTx, dbs)
+	//TODO: add transaction
+	services := service.New(*repository, nil)
 
 	jwtTokenConfig := JwtConfig{
 		SecretKey: os.Getenv("SECRET_KEY"),
