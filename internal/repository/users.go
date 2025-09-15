@@ -3,7 +3,6 @@ package repository
 import (
 	"context"
 	"database/sql"
-	"reflect"
 	"time"
 
 	"github.com/faizisyellow/indocoffee/internal/utils"
@@ -17,68 +16,6 @@ type UserModel struct {
 	Password  Hashed    `json:"-"`
 	IsActive  *bool     `json:"is_active"`
 	CreatedAt time.Time `json:"created_at"`
-}
-
-// Merge merges the changed field from usr
-// to the original UserModel
-func (us *UserModel) Merge(usr UserModel) {
-
-	currentUser := reflect.ValueOf(us).Elem()
-	newUser := reflect.ValueOf(&usr).Elem()
-
-	for i := 0; i < newUser.NumField(); i++ {
-		valueNewUserField := newUser.Field(i).Interface()
-		valueCurrentUserField := currentUser.Field(i)
-
-		if value, ok := valueNewUserField.(int); ok {
-			if value != 0 {
-				valueCurrentUserField.SetInt(int64(value))
-			}
-		}
-
-		if value, ok := valueNewUserField.(string); ok {
-			if value != "" {
-				valueCurrentUserField.SetString(value)
-			}
-		}
-
-		if value, ok := valueNewUserField.(*bool); ok {
-			if value != nil {
-				valueCurrentUserField.Elem().SetBool(*value)
-			}
-		}
-
-		if value, ok := valueNewUserField.(Hashed); ok {
-			if value.Text != nil {
-
-				var structUserField reflect.Value
-				if valueCurrentUserField.Kind() == reflect.Ptr {
-					structUserField = valueCurrentUserField.Elem()
-				} else {
-					structUserField = valueCurrentUserField
-				}
-
-				for i := 0; i < structUserField.NumField(); i++ {
-					field := structUserField.Field(i)
-					fieldType := structUserField.Type().Field(i)
-
-					switch fieldType.Name {
-					case "Text":
-						if field.CanSet() {
-							field.Set(reflect.ValueOf(value.Text))
-						}
-					case "HashedText":
-						if field.CanSet() {
-							// regenerate with new password
-							hashed, _ := utils.GeneratePassword(*value.Text)
-							field.Set(reflect.ValueOf(hashed))
-						}
-					}
-				}
-			}
-		}
-
-	}
 }
 
 type Hashed struct {

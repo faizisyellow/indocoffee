@@ -15,6 +15,10 @@ type BeansServices struct {
 	Repository repository.Repository
 }
 
+const (
+	SUCCESS_CREATE_BEAN_MESSAGE = "success create new bean"
+)
+
 var (
 	ErrConflictBean = errors.New("beans: bean already exist")
 	ErrInternalBean = errors.New("beans: encountered an internal error")
@@ -37,7 +41,7 @@ func (Beans *BeansServices) Create(ctx context.Context, req dto.CreateBeanReques
 		return "", errorService.New(ErrInternalBean, err)
 	}
 
-	return "success create new bean", nil
+	return SUCCESS_CREATE_BEAN_MESSAGE, nil
 }
 
 func (Beans *BeansServices) FindAll(ctx context.Context) ([]repository.BeansModel, error) {

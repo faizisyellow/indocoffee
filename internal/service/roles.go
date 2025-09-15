@@ -15,6 +15,10 @@ type RolesServices struct {
 	Repository repository.Repository
 }
 
+const (
+	SUCCESS_CREATE_ROLES_MESSAGE = "success create new role"
+)
+
 var (
 	ErrConflictRole = errors.New("roles: role already exist")
 	ErrInternalRole = errors.New("roles: encountered an internal error")
@@ -38,7 +42,7 @@ func (Roles *RolesServices) Create(ctx context.Context, req dto.CreateRoleReques
 		return "", errorService.New(ErrInternalRole, err)
 	}
 
-	return "success create new role", nil
+	return SUCCESS_CREATE_ROLES_MESSAGE, nil
 }
 
 func (Roles *RolesServices) FindAll(ctx context.Context) ([]repository.RolesModel, error) {

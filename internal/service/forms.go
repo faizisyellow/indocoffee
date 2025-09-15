@@ -15,6 +15,10 @@ type FormsServices struct {
 	Repository repository.Repository
 }
 
+const (
+	SUCCESS_CREATE_FORMS_MESSAGE = "success create new form"
+)
+
 var (
 	ErrConflictForm = errors.New("forms: form already exist")
 	ErrInternalForm = errors.New("forms: encountered an internal error")
@@ -36,7 +40,7 @@ func (Forms *FormsServices) Create(ctx context.Context, req dto.CreateFormReques
 		return "", errorService.New(ErrInternalForm, err)
 	}
 
-	return "success create new form", nil
+	return SUCCESS_CREATE_FORMS_MESSAGE, nil
 }
 
 func (Forms *FormsServices) FindAll(ctx context.Context) ([]repository.FormsModel, error) {
