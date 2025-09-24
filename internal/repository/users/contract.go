@@ -20,25 +20,27 @@ type Users interface {
 }
 
 type Contract struct {
-	NewUsers Users
+	NewUsers func() (Users, *sql.Tx, func())
 }
 
 func (u Contract) Test(t *testing.T) {
 	t.Run("create new user", func(t *testing.T) {
 		var (
-			ctx         = context.Background()
-			users       = u.NewUsers
-			userPayload = models.User{
+			ctx                = context.Background()
+			users, tx, cleanup = u.NewUsers()
+			userPayload        = models.User{
 				Username: "lizzy",
 				Email:    "lizzy@test.test",
 			}
 		)
+		t.Cleanup(cleanup)
+
 		err := userPayload.Password.ParseFromPassword("Test1234$")
 		if err != nil {
 			t.Error("should not be error")
 		}
 
-		_, err = users.Insert(ctx, nil, userPayload)
+		_, err = users.Insert(ctx, tx, userPayload)
 		if err != nil {
 			t.Error("should not be error")
 		}
@@ -46,9 +48,9 @@ func (u Contract) Test(t *testing.T) {
 
 	t.Run("get user by id", func(t *testing.T) {
 		var (
-			ctx      = context.Background()
-			users    = u.NewUsers
-			expected = models.User{
+			ctx                = context.Background()
+			users, tx, cleanup = u.NewUsers()
+			expected           = models.User{
 				Id:        1,
 				Username:  "lizzy",
 				Email:     "lizzy@test.test",
@@ -56,8 +58,9 @@ func (u Contract) Test(t *testing.T) {
 				CreatedAt: time.Time{},
 			}
 		)
+		t.Cleanup(cleanup)
 
-		_, err := users.Insert(ctx, nil, expected)
+		_, err := users.Insert(ctx, tx, expected)
 		if err != nil {
 			t.Error("should not be error")
 		}
@@ -74,9 +77,9 @@ func (u Contract) Test(t *testing.T) {
 
 	t.Run("get user by email", func(t *testing.T) {
 		var (
-			ctx      = context.Background()
-			users    = u.NewUsers
-			expected = models.User{
+			ctx                = context.Background()
+			users, tx, cleanup = u.NewUsers()
+			expected           = models.User{
 				Id:        1,
 				Username:  "lizzy",
 				Email:     "lizzy@test.test",
@@ -84,8 +87,9 @@ func (u Contract) Test(t *testing.T) {
 				CreatedAt: time.Time{},
 			}
 		)
+		t.Cleanup(cleanup)
 
-		_, err := users.Insert(ctx, nil, expected)
+		_, err := users.Insert(ctx, tx, expected)
 		if err != nil {
 			t.Error("should not be error")
 		}
@@ -102,9 +106,9 @@ func (u Contract) Test(t *testing.T) {
 
 	t.Run("update user given updated field", func(t *testing.T) {
 		var (
-			ctx         = context.Background()
-			users       = u.NewUsers
-			initialUser = models.User{
+			ctx                = context.Background()
+			users, tx, cleanup = u.NewUsers()
+			initialUser        = models.User{
 				Id:        1,
 				Username:  "lizzy",
 				Email:     "lizzy@test.test",
@@ -123,7 +127,9 @@ func (u Contract) Test(t *testing.T) {
 			}
 		)
 
-		_, err := users.Insert(ctx, nil, initialUser)
+		t.Cleanup(cleanup)
+
+		_, err := users.Insert(ctx, tx, initialUser)
 		if err != nil {
 			t.Error("should not be error")
 		}
@@ -146,9 +152,9 @@ func (u Contract) Test(t *testing.T) {
 
 	t.Run("delete user by id", func(t *testing.T) {
 		var (
-			ctx         = context.Background()
-			users       = u.NewUsers
-			initialUser = models.User{
+			ctx                = context.Background()
+			users, tx, cleanup = u.NewUsers()
+			initialUser        = models.User{
 				Id:        1,
 				Username:  "lizzy",
 				Email:     "lizzy@test.test",
@@ -157,7 +163,9 @@ func (u Contract) Test(t *testing.T) {
 			}
 		)
 
-		_, err := users.Insert(ctx, nil, initialUser)
+		t.Cleanup(cleanup)
+
+		_, err := users.Insert(ctx, tx, initialUser)
 		if err != nil {
 			t.Error("should not be error")
 		}

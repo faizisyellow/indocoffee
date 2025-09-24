@@ -1,6 +1,7 @@
 package users_test
 
 import (
+	"database/sql"
 	"testing"
 
 	"github.com/faizisyellow/indocoffee/internal/repository/users"
@@ -8,6 +9,8 @@ import (
 
 func TestInMemoryUsers(t *testing.T) {
 	users.Contract{
-		NewUsers: &users.InMemoryUsers{},
+		NewUsers: func() (users.Users, *sql.Tx, func()) {
+			return &users.InMemoryUsers{}, nil, func() {}
+		},
 	}.Test(t)
 }

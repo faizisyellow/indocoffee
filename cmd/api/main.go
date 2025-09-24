@@ -68,28 +68,12 @@ func main() {
 	defer dbs.Close()
 	logger.Logger.Infow("database connection pool has established")
 
-	usersStore := users.Contract{
-		NewUsers: &users.UsersRepository{Db: dbs},
-	}
-	invitationsStore := invitations.Contract{
-		NewInvitations: &invitations.InvitationRepository{Db: dbs},
-	}
-	beansStore := beans.Contract{
-		NewBeans: &beans.BeansRepository{Db: dbs},
-	}
-	formsStore := forms.Contract{
-		NewForms: &forms.FormsRepository{Db: dbs},
-	}
-	rolesStore := roles.Contract{
-		NewRoles: &roles.RolesRepository{Db: dbs},
-	}
-
 	services := service.New(
-		usersStore.NewUsers,
-		invitationsStore.NewInvitations,
-		beansStore.NewBeans,
-		formsStore.NewForms,
-		rolesStore.NewRoles,
+		&users.UsersRepository{Db: dbs},
+		&invitations.InvitationRepository{Db: dbs},
+		&beans.BeansRepository{Db: dbs},
+		&forms.FormsRepository{Db: dbs},
+		&roles.RolesRepository{Db: dbs},
 		//TODO: add transactions
 		nil,
 	)
