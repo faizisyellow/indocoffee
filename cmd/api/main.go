@@ -10,7 +10,11 @@ import (
 	"github.com/faizisyellow/indocoffee/internal/auth"
 	"github.com/faizisyellow/indocoffee/internal/db"
 	"github.com/faizisyellow/indocoffee/internal/logger"
-	"github.com/faizisyellow/indocoffee/internal/repository"
+	"github.com/faizisyellow/indocoffee/internal/repository/beans"
+	"github.com/faizisyellow/indocoffee/internal/repository/forms"
+	"github.com/faizisyellow/indocoffee/internal/repository/invitations"
+	"github.com/faizisyellow/indocoffee/internal/repository/roles"
+	"github.com/faizisyellow/indocoffee/internal/repository/users"
 	"github.com/faizisyellow/indocoffee/internal/service"
 	"github.com/joho/godotenv"
 	"go.uber.org/zap"
@@ -64,10 +68,31 @@ func main() {
 	defer dbs.Close()
 	logger.Logger.Infow("database connection pool has established")
 
-	repository := repository.New(dbs)
+	usersStore := users.Contract{
+		NewUsers: &users.UsersRepository{Db: dbs},
+	}
+	invitationsStore := invitations.Contract{
+		NewInvitations: &invitations.InvitationRepository{Db: dbs},
+	}
+	beansStore := beans.Contract{
+		NewBeans: &beans.BeansRepository{Db: dbs},
+	}
+	formsStore := forms.Contract{
+		NewForms: &forms.FormsRepository{Db: dbs},
+	}
+	rolesStore := roles.Contract{
+		NewRoles: &roles.RolesRepository{Db: dbs},
+	}
 
-	//TODO: add transaction
-	services := service.New(*repository, nil)
+	services := service.New(
+		usersStore.NewUsers,
+		invitationsStore.NewInvitations,
+		beansStore.NewBeans,
+		formsStore.NewForms,
+		rolesStore.NewRoles,
+		//TODO: add transactions
+		nil,
+	)
 
 	jwtTokenConfig := JwtConfig{
 		SecretKey: os.Getenv("SECRET_KEY"),

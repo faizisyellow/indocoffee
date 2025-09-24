@@ -6,13 +6,14 @@ import (
 	"errors"
 	"strings"
 
-	"github.com/faizisyellow/indocoffee/internal/repository"
+	"github.com/faizisyellow/indocoffee/internal/models"
+	"github.com/faizisyellow/indocoffee/internal/repository/roles"
 	"github.com/faizisyellow/indocoffee/internal/service/dto"
 	errorService "github.com/faizisyellow/indocoffee/internal/service/error"
 )
 
 type RolesServices struct {
-	Repository repository.Repository
+	RolesStore roles.Roles
 }
 
 const (
@@ -28,12 +29,12 @@ var (
 
 func (Roles *RolesServices) Create(ctx context.Context, req dto.CreateRoleRequest) (string, error) {
 
-	newRole := repository.RolesModel{
+	newRole := models.RolesModel{
 		Name:  req.Name,
 		Level: req.Level,
 	}
 
-	err := Roles.Repository.Roles.Insert(ctx, newRole)
+	err := Roles.RolesStore.Insert(ctx, newRole)
 	if err != nil {
 		if strings.Contains(err.Error(), CONFLICT_CODE) {
 			return "", errorService.New(ErrConflictRole, err)
@@ -45,9 +46,9 @@ func (Roles *RolesServices) Create(ctx context.Context, req dto.CreateRoleReques
 	return SUCCESS_CREATE_ROLES_MESSAGE, nil
 }
 
-func (Roles *RolesServices) FindAll(ctx context.Context) ([]repository.RolesModel, error) {
+func (Roles *RolesServices) FindAll(ctx context.Context) ([]models.RolesModel, error) {
 
-	roles, err := Roles.Repository.Roles.GetAll(ctx)
+	roles, err := Roles.RolesStore.GetAll(ctx)
 	if err != nil {
 		return nil, errorService.New(ErrInternalRole, err)
 	}
@@ -55,15 +56,15 @@ func (Roles *RolesServices) FindAll(ctx context.Context) ([]repository.RolesMode
 	return roles, nil
 }
 
-func (Roles *RolesServices) FindById(ctx context.Context, id int) (repository.RolesModel, error) {
+func (Roles *RolesServices) FindById(ctx context.Context, id int) (models.RolesModel, error) {
 
-	role, err := Roles.Repository.Roles.GetById(ctx, id)
+	role, err := Roles.RolesStore.GetById(ctx, id)
 	if err != nil {
 		switch err {
 		case sql.ErrNoRows:
-			return repository.RolesModel{}, errorService.New(ErrNotFoundRole, err)
+			return models.RolesModel{}, errorService.New(ErrNotFoundRole, err)
 		default:
-			return repository.RolesModel{}, errorService.New(ErrInternalRole, err)
+			return models.RolesModel{}, errorService.New(ErrInternalRole, err)
 		}
 	}
 
@@ -89,7 +90,7 @@ func (Roles *RolesServices) Update(ctx context.Context, id int, req dto.UpdateRo
 		existingRole.Level = *req.Level
 	}
 
-	err = Roles.Repository.Roles.Update(ctx, existingRole)
+	err = Roles.RolesStore.Update(ctx, existingRole)
 	if err != nil {
 		if strings.Contains(err.Error(), CONFLICT_CODE) {
 			return errorService.New(ErrConflictRole, err)
@@ -108,7 +109,7 @@ func (Roles *RolesServices) Delete(ctx context.Context, id int) error {
 		return err
 	}
 
-	err = Roles.Repository.Roles.Delete(ctx, role.Id)
+	err = Roles.RolesStore.Delete(ctx, role.Id)
 	if err != nil {
 		return errorService.New(ErrInternalRole, err)
 	}
@@ -118,7 +119,7 @@ func (Roles *RolesServices) Delete(ctx context.Context, id int) error {
 
 func (Roles *RolesServices) Remove(ctx context.Context) error {
 
-	err := Roles.Repository.Roles.DestroyMany(ctx)
+	err := Roles.RolesStore.DestroyMany(ctx)
 	if err != nil {
 		switch err {
 		case sql.ErrNoRows:

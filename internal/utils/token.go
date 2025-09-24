@@ -3,6 +3,8 @@ package utils
 import (
 	"crypto/sha256"
 	"encoding/hex"
+
+	"github.com/google/uuid"
 )
 
 type Token interface {
@@ -14,6 +16,10 @@ type UUID struct {
 }
 
 func (u UUID) Generate() string {
+
+	if u.Plaintoken == "" {
+		u.Plaintoken = uuid.New().String()
+	}
 
 	hash := sha256.Sum256([]byte(u.Plaintoken))
 

@@ -1,16 +1,13 @@
-package repository
+package invitations
 
 import (
 	"context"
 	"database/sql"
 	"time"
-)
 
-type InvitationModel struct {
-	UserId   int           `json:"user_id"`
-	Token    string        `json:"token"`
-	ExpireAt time.Duration `json:"expire_at"`
-}
+	"github.com/faizisyellow/indocoffee/internal/models"
+	"github.com/faizisyellow/indocoffee/internal/repository"
+)
 
 type InvitationRepository struct {
 	Db *sql.DB
@@ -18,13 +15,13 @@ type InvitationRepository struct {
 
 // Insert inserts new invitation to database.
 // Returns  nil on success or an error on failure.
-func (ir *InvitationRepository) Insert(ctx context.Context, tx *sql.Tx, invt InvitationModel) error {
+func (ir *InvitationRepository) Insert(ctx context.Context, tx *sql.Tx, invt models.InvitationModel) error {
 
 	query := `INSERT INTO invitations(user_id,token,expire_at)
 	VALUES(?,?,?)
 	`
 
-	ctx, cancel := context.WithTimeout(ctx, QueryTimeout)
+	ctx, cancel := context.WithTimeout(ctx, repository.QueryTimeout)
 	defer cancel()
 
 	_, err := tx.ExecContext(ctx, query, invt.UserId, invt.Token, time.Now().Add(invt.ExpireAt))
@@ -41,7 +38,7 @@ func (ir *InvitationRepository) Get(ctx context.Context, tx *sql.Tx, token strin
 
 	query := `SELECT user_id FROM invitations WHERE token = ? AND expire_at > ?;`
 
-	ctx, cancel := context.WithTimeout(ctx, QueryTimeout)
+	ctx, cancel := context.WithTimeout(ctx, repository.QueryTimeout)
 	defer cancel()
 
 	userId := 0
@@ -61,7 +58,7 @@ func (ir *InvitationRepository) DeleteByUserId(ctx context.Context, tx *sql.Tx, 
 
 	query := `DELETE FROM invitations WHERE user_id = ?`
 
-	ctx, cancel := context.WithTimeout(ctx, QueryTimeout)
+	ctx, cancel := context.WithTimeout(ctx, repository.QueryTimeout)
 	defer cancel()
 
 	_, err := tx.ExecContext(ctx, query, usrId)

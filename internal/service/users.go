@@ -8,15 +8,18 @@ import (
 	"time"
 
 	"github.com/faizisyellow/indocoffee/internal/db"
-	"github.com/faizisyellow/indocoffee/internal/repository"
+	"github.com/faizisyellow/indocoffee/internal/models"
+	"github.com/faizisyellow/indocoffee/internal/repository/invitations"
+	"github.com/faizisyellow/indocoffee/internal/repository/users"
 	errorService "github.com/faizisyellow/indocoffee/internal/service/error"
 	"github.com/faizisyellow/indocoffee/internal/utils"
 )
 
 type UsersServices struct {
-	Repository  repository.Repository
-	Token       utils.Token
-	Transaction db.Transactioner
+	UsersStore       users.Users
+	InvitationsStore invitations.Invitations
+	Token            utils.Token
+	Transaction      db.Transactioner
 }
 
 type RegisterRequest struct {
@@ -56,9 +59,9 @@ func (us *UsersServices) RegisterAccount(ctx context.Context, req RegisterReques
 		return nil, errorService.New(err, err)
 	}
 
-	err = us.Transaction.WithTx(ctx, func(tx *sql.Tx) error {
+	return response, us.Transaction.WithTx(ctx, func(tx *sql.Tx) error {
 
-		var newAccount repository.UserModel
+		var newAccount models.User
 		newAccount.Email = req.Email
 		newAccount.Username = req.Username
 
@@ -67,7 +70,7 @@ func (us *UsersServices) RegisterAccount(ctx context.Context, req RegisterReques
 			return errorService.New(err, err)
 		}
 
-		usrId, err := us.Repository.Users.Insert(ctx, tx, newAccount)
+		usrId, err := us.UsersStore.Insert(ctx, tx, newAccount)
 		if err != nil {
 			switch {
 			case strings.Contains(err.Error(), CONFLICT_CODE):
@@ -81,13 +84,13 @@ func (us *UsersServices) RegisterAccount(ctx context.Context, req RegisterReques
 
 		tokenIvt := us.Token.Generate()
 
-		invt := repository.InvitationModel{
+		invt := models.InvitationModel{
 			UserId:   usrId,
 			Token:    tokenIvt,
 			ExpireAt: time.Hour * 24,
 		}
 
-		err = us.Repository.Invitation.Insert(ctx, tx, invt)
+		err = us.InvitationsStore.Insert(ctx, tx, invt)
 		if err != nil {
 			//Todo: handle error client
 			return errorService.New(err, err)
@@ -99,36 +102,31 @@ func (us *UsersServices) RegisterAccount(ctx context.Context, req RegisterReques
 		return nil
 	})
 
-	if err != nil {
-		return nil, err
-	}
-
-	return response, nil
 }
 
 func (us *UsersServices) ActivateAccount(ctx context.Context, token string) error {
 
 	return us.Transaction.WithTx(ctx, func(tx *sql.Tx) error {
 
-		usrId, err := us.Repository.Invitation.Get(ctx, tx, token)
+		usrId, err := us.InvitationsStore.Get(ctx, tx, token)
 		if err != nil {
 			return errorService.New(ErrTokenInvitationNotFound, err)
 		}
 
-		user, err := us.Repository.Users.GetById(ctx, usrId)
+		user, err := us.UsersStore.GetById(ctx, usrId)
 		if err != nil {
 			return errorService.New(ErrUserRegisteredNotFound, err)
 		}
 
 		user.IsActive = utils.BoolToPoint(true)
 
-		err = us.Repository.Users.Update(ctx, tx, user)
+		err = us.UsersStore.Update(ctx, tx, user)
 		if err != nil {
 			//TODO: handle error to client
 			return errorService.New(err, err)
 		}
 
-		err = us.Repository.Invitation.DeleteByUserId(ctx, tx, user.Id)
+		err = us.InvitationsStore.DeleteByUserId(ctx, tx, user.Id)
 		if err != nil {
 			//TODO: handle error to client
 			return errorService.New(err, err)
@@ -139,9 +137,9 @@ func (us *UsersServices) ActivateAccount(ctx context.Context, token string) erro
 
 }
 
-func (us *UsersServices) Login(ctx context.Context, req LoginRequest) (*repository.UserModel, error) {
+func (us *UsersServices) Login(ctx context.Context, req LoginRequest) (*models.User, error) {
 
-	user, err := us.Repository.Users.GetByEmail(ctx, req.Email)
+	user, err := us.UsersStore.GetByEmail(ctx, req.Email)
 	if err != nil {
 		return nil, errorService.New(ErrUserNotFound, err)
 	}
@@ -163,7 +161,7 @@ func (us *UsersServices) DeleteAccount(ctx context.Context, usrid int) error {
 
 	return us.Transaction.WithTx(ctx, func(tx *sql.Tx) error {
 
-		err := us.Repository.Users.Delete(ctx, tx, usrid)
+		err := us.UsersStore.Delete(ctx, tx, usrid)
 		if err != nil {
 			//TODO: handle error to client
 			return errorService.New(err, err)
@@ -174,9 +172,9 @@ func (us *UsersServices) DeleteAccount(ctx context.Context, usrid int) error {
 
 }
 
-func (us *UsersServices) FindUserById(ctx context.Context, usrid int) (*repository.UserModel, error) {
+func (us *UsersServices) FindUserById(ctx context.Context, usrid int) (*models.User, error) {
 
-	user, err := us.Repository.Users.GetById(ctx, usrid)
+	user, err := us.UsersStore.GetById(ctx, usrid)
 	if err != nil {
 		switch err {
 		case sql.ErrNoRows:

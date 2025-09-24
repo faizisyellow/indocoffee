@@ -4,7 +4,12 @@ import (
 	"context"
 
 	"github.com/faizisyellow/indocoffee/internal/db"
-	"github.com/faizisyellow/indocoffee/internal/repository"
+	"github.com/faizisyellow/indocoffee/internal/models"
+	"github.com/faizisyellow/indocoffee/internal/repository/beans"
+	"github.com/faizisyellow/indocoffee/internal/repository/forms"
+	"github.com/faizisyellow/indocoffee/internal/repository/invitations"
+	"github.com/faizisyellow/indocoffee/internal/repository/roles"
+	"github.com/faizisyellow/indocoffee/internal/repository/users"
 	"github.com/faizisyellow/indocoffee/internal/service/dto"
 	"github.com/faizisyellow/indocoffee/internal/utils"
 	"github.com/google/uuid"
@@ -14,15 +19,15 @@ type Service struct {
 	UsersService interface {
 		RegisterAccount(ctx context.Context, req RegisterRequest) (*RegisterResponse, error)
 		ActivateAccount(ctx context.Context, token string) error
-		Login(ctx context.Context, req LoginRequest) (*repository.UserModel, error)
+		Login(ctx context.Context, req LoginRequest) (*models.User, error)
 		DeleteAccount(ctx context.Context, id int) error
-		FindUserById(ctx context.Context, id int) (*repository.UserModel, error)
+		FindUserById(ctx context.Context, id int) (*models.User, error)
 	}
 
 	RolesService interface {
 		Create(ctx context.Context, req dto.CreateRoleRequest) (string, error)
-		FindAll(ctx context.Context) ([]repository.RolesModel, error)
-		FindById(ctx context.Context, id int) (repository.RolesModel, error)
+		FindAll(ctx context.Context) ([]models.RolesModel, error)
+		FindById(ctx context.Context, id int) (models.RolesModel, error)
 		Update(ctx context.Context, id int, req dto.UpdateRoleRequest) error
 		Delete(ctx context.Context, id int) error
 		Remove(ctx context.Context) error
@@ -30,8 +35,8 @@ type Service struct {
 
 	BeansService interface {
 		Create(ctx context.Context, req dto.CreateBeanRequest) (string, error)
-		FindAll(ctx context.Context) ([]repository.BeansModel, error)
-		FindById(ctx context.Context, id int) (repository.BeansModel, error)
+		FindAll(ctx context.Context) ([]models.BeansModel, error)
+		FindById(ctx context.Context, id int) (models.BeansModel, error)
 		Update(ctx context.Context, id int, req dto.UpdateBeanRequest) error
 		Delete(ctx context.Context, id int) error
 		Remove(ctx context.Context) error
@@ -39,8 +44,8 @@ type Service struct {
 
 	FormsService interface {
 		Create(ctx context.Context, req dto.CreateFormRequest) (string, error)
-		FindAll(ctx context.Context) ([]repository.FormsModel, error)
-		FindById(ctx context.Context, id int) (repository.FormsModel, error)
+		FindAll(ctx context.Context) ([]models.FormsModel, error)
+		FindById(ctx context.Context, id int) (models.FormsModel, error)
 		Update(ctx context.Context, id int, req dto.UpdateFormRequest) error
 		Delete(ctx context.Context, id int) error
 		Remove(ctx context.Context) error
@@ -49,15 +54,23 @@ type Service struct {
 
 var CONFLICT_CODE = "Error 1062 (23000)"
 
-func New(store repository.Repository, tx db.Transactioner) *Service {
+func New(
+	usersStore users.Users,
+	invitationsStore invitations.Invitations,
+	beansStore beans.Beans,
+	formsStore forms.Forms,
+	rolesStore roles.Roles,
+	tx db.Transactioner,
+) *Service {
 	return &Service{
 		UsersService: &UsersServices{
-			Repository:  store,
-			Token:       utils.UUID{Plaintoken: uuid.New().String()},
-			Transaction: tx,
+			UsersStore:       usersStore,
+			InvitationsStore: invitationsStore,
+			Token:            utils.UUID{Plaintoken: uuid.New().String()},
+			Transaction:      tx,
 		},
-		RolesService: &RolesServices{Repository: store},
-		BeansService: &BeansServices{Repository: store},
-		FormsService: &FormsServices{Repository: store},
+		BeansService: &BeansServices{BeansStore: beansStore},
+		FormsService: &FormsServices{FormsStore: formsStore},
+		RolesService: &RolesServices{RolesStore: rolesStore},
 	}
 }

@@ -1,25 +1,22 @@
-package repository
+package forms
 
 import (
 	"context"
 	"database/sql"
+
+	"github.com/faizisyellow/indocoffee/internal/models"
+	"github.com/faizisyellow/indocoffee/internal/repository"
 )
 
 type FormsRepository struct {
 	Db *sql.DB
 }
 
-type FormsModel struct {
-	Id       int    `json:"id"`
-	Name     string `json:"name"`
-	IsDelete string `json:"is_delete"`
-}
-
-func (Forms *FormsRepository) Insert(ctx context.Context, nw FormsModel) error {
+func (Forms *FormsRepository) Insert(ctx context.Context, nw models.FormsModel) error {
 
 	qry := `INSERT INTO forms (name) VALUES(?)`
 
-	ctx, cancel := context.WithTimeout(ctx, QueryTimeout)
+	ctx, cancel := context.WithTimeout(ctx, repository.QueryTimeout)
 	defer cancel()
 
 	_, err := Forms.Db.ExecContext(ctx, qry, nw.Name)
@@ -30,11 +27,11 @@ func (Forms *FormsRepository) Insert(ctx context.Context, nw FormsModel) error {
 	return nil
 }
 
-func (Forms *FormsRepository) GetAll(ctx context.Context) ([]FormsModel, error) {
+func (Forms *FormsRepository) GetAll(ctx context.Context) ([]models.FormsModel, error) {
 
 	qry := `SELECT id,name FROM forms WHERE is_delete = FALSE`
 
-	ctx, cancel := context.WithTimeout(ctx, QueryTimeout)
+	ctx, cancel := context.WithTimeout(ctx, repository.QueryTimeout)
 	defer cancel()
 
 	result, err := Forms.Db.QueryContext(ctx, qry)
@@ -44,10 +41,10 @@ func (Forms *FormsRepository) GetAll(ctx context.Context) ([]FormsModel, error) 
 
 	defer result.Close()
 
-	forms := make([]FormsModel, 0)
+	forms := make([]models.FormsModel, 0)
 
 	for result.Next() {
-		var form FormsModel
+		var form models.FormsModel
 
 		err := result.Scan(&form.Id, &form.Name)
 		if err != nil {
@@ -60,29 +57,29 @@ func (Forms *FormsRepository) GetAll(ctx context.Context) ([]FormsModel, error) 
 	return forms, result.Err()
 }
 
-func (Forms *FormsRepository) GetById(ctx context.Context, id int) (FormsModel, error) {
+func (Forms *FormsRepository) GetById(ctx context.Context, id int) (models.FormsModel, error) {
 
 	qry := `SELECT id,name FROM forms WHERE id = ? AND is_delete = FALSE`
 
-	ctx, cancel := context.WithTimeout(ctx, QueryTimeout)
+	ctx, cancel := context.WithTimeout(ctx, repository.QueryTimeout)
 	defer cancel()
 
 	result := Forms.Db.QueryRowContext(ctx, qry, id)
 
-	var form FormsModel
+	var form models.FormsModel
 	err := result.Scan(&form.Id, &form.Name)
 	if err != nil {
-		return FormsModel{}, err
+		return models.FormsModel{}, err
 	}
 
 	return form, result.Err()
 }
 
-func (Forms *FormsRepository) Update(ctx context.Context, nw FormsModel) error {
+func (Forms *FormsRepository) Update(ctx context.Context, nw models.FormsModel) error {
 
 	qry := `UPDATE forms SET name = ? WHERE id = ? AND is_delete = FALSE`
 
-	ctx, cancel := context.WithTimeout(ctx, QueryTimeout)
+	ctx, cancel := context.WithTimeout(ctx, repository.QueryTimeout)
 	defer cancel()
 
 	_, err := Forms.Db.ExecContext(ctx, qry, nw.Name, nw.Id)
@@ -97,7 +94,7 @@ func (Forms *FormsRepository) Delete(ctx context.Context, id int) error {
 
 	qry := `UPDATE forms SET is_delete = TRUE WHERE id = ? AND is_delete = FALSE`
 
-	ctx, cancel := context.WithTimeout(ctx, QueryTimeout)
+	ctx, cancel := context.WithTimeout(ctx, repository.QueryTimeout)
 	defer cancel()
 
 	_, err := Forms.Db.ExecContext(ctx, qry, id)
@@ -112,7 +109,7 @@ func (Forms *FormsRepository) DestroyMany(ctx context.Context) error {
 
 	qry := `DELETE FROM forms WHERE is_delete = TRUE `
 
-	ctx, cancel := context.WithTimeout(ctx, QueryTimeout)
+	ctx, cancel := context.WithTimeout(ctx, repository.QueryTimeout)
 	defer cancel()
 
 	_, err := Forms.Db.ExecContext(ctx, qry)

@@ -1,25 +1,22 @@
-package repository
+package roles
 
 import (
 	"context"
 	"database/sql"
+
+	"github.com/faizisyellow/indocoffee/internal/models"
+	"github.com/faizisyellow/indocoffee/internal/repository"
 )
 
 type RolesRepository struct {
 	Db *sql.DB
 }
 
-type RolesModel struct {
-	Id    int    `json:"id"`
-	Name  string `json:"name"`
-	Level int    `json:"level"`
-}
-
-func (Roles *RolesRepository) Insert(ctx context.Context, nw RolesModel) error {
+func (Roles *RolesRepository) Insert(ctx context.Context, nw models.RolesModel) error {
 
 	qry := `INSERT INTO roles (name,level) VALUES (?,?)`
 
-	ctx, cancel := context.WithTimeout(ctx, QueryTimeout)
+	ctx, cancel := context.WithTimeout(ctx, repository.QueryTimeout)
 	defer cancel()
 
 	_, err := Roles.Db.ExecContext(ctx, qry, nw.Name, nw.Level)
@@ -30,11 +27,11 @@ func (Roles *RolesRepository) Insert(ctx context.Context, nw RolesModel) error {
 	return nil
 }
 
-func (Roles *RolesRepository) GetAll(ctx context.Context) ([]RolesModel, error) {
+func (Roles *RolesRepository) GetAll(ctx context.Context) ([]models.RolesModel, error) {
 
 	qry := `SELECT id,name,level FROM roles WHERE is_delete = FALSE`
 
-	ctx, cancel := context.WithTimeout(ctx, QueryTimeout)
+	ctx, cancel := context.WithTimeout(ctx, repository.QueryTimeout)
 	defer cancel()
 
 	result, err := Roles.Db.QueryContext(ctx, qry)
@@ -44,10 +41,10 @@ func (Roles *RolesRepository) GetAll(ctx context.Context) ([]RolesModel, error) 
 
 	defer result.Close()
 
-	roles := make([]RolesModel, 0)
+	roles := make([]models.RolesModel, 0)
 
 	for result.Next() {
-		var role RolesModel
+		var role models.RolesModel
 		if err := result.Scan(&role.Id, &role.Name, &role.Level); err != nil {
 			return nil, err
 		}
@@ -57,25 +54,25 @@ func (Roles *RolesRepository) GetAll(ctx context.Context) ([]RolesModel, error) 
 	return roles, result.Err()
 }
 
-func (Roles *RolesRepository) GetById(ctx context.Context, id int) (RolesModel, error) {
+func (Roles *RolesRepository) GetById(ctx context.Context, id int) (models.RolesModel, error) {
 
 	qry := `SELECT id,name,level FROM roles WHERE id  = ?  AND is_delete = FALSE`
 
-	ctx, cancel := context.WithTimeout(ctx, QueryTimeout)
+	ctx, cancel := context.WithTimeout(ctx, repository.QueryTimeout)
 	defer cancel()
 
 	result := Roles.Db.QueryRowContext(ctx, qry, id)
 
-	var role RolesModel
+	var role models.RolesModel
 
 	return role, result.Scan(&role.Id, &role.Name, &role.Level)
 }
 
-func (Roles *RolesRepository) Update(ctx context.Context, nw RolesModel) error {
+func (Roles *RolesRepository) Update(ctx context.Context, nw models.RolesModel) error {
 
 	qry := `UPDATE roles SET name = ?, level = ? WHERE id  = ? AND is_delete = FALSE`
 
-	ctx, cancel := context.WithTimeout(ctx, QueryTimeout)
+	ctx, cancel := context.WithTimeout(ctx, repository.QueryTimeout)
 	defer cancel()
 
 	_, err := Roles.Db.ExecContext(ctx, qry, nw.Name, nw.Level, nw.Id)
@@ -90,7 +87,7 @@ func (Roles *RolesRepository) Delete(ctx context.Context, id int) error {
 
 	qry := `UPDATE roles SET is_delete = TRUE WHERE id  = ? AND is_delete = FALSE`
 
-	ctx, cancel := context.WithTimeout(ctx, QueryTimeout)
+	ctx, cancel := context.WithTimeout(ctx, repository.QueryTimeout)
 	defer cancel()
 
 	result, err := Roles.Db.ExecContext(ctx, qry, id)
@@ -115,7 +112,7 @@ func (Roles *RolesRepository) DestroyMany(ctx context.Context) error {
 
 	query := `DELETE FROM roles WHERE is_delete = TRUE`
 
-	ctx, cancel := context.WithTimeout(ctx, QueryTimeout)
+	ctx, cancel := context.WithTimeout(ctx, repository.QueryTimeout)
 	defer cancel()
 
 	_, err := Roles.Db.ExecContext(ctx, query)

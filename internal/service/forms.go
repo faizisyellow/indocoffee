@@ -6,13 +6,14 @@ import (
 	"errors"
 	"strings"
 
-	"github.com/faizisyellow/indocoffee/internal/repository"
+	"github.com/faizisyellow/indocoffee/internal/models"
+	"github.com/faizisyellow/indocoffee/internal/repository/forms"
 	"github.com/faizisyellow/indocoffee/internal/service/dto"
 	errorService "github.com/faizisyellow/indocoffee/internal/service/error"
 )
 
 type FormsServices struct {
-	Repository repository.Repository
+	FormsStore forms.Forms
 }
 
 const (
@@ -27,11 +28,11 @@ var (
 
 func (Forms *FormsServices) Create(ctx context.Context, req dto.CreateFormRequest) (string, error) {
 
-	newForm := repository.FormsModel{
+	newForm := models.FormsModel{
 		Name: req.Name,
 	}
 
-	err := Forms.Repository.Forms.Insert(ctx, newForm)
+	err := Forms.FormsStore.Insert(ctx, newForm)
 	if err != nil {
 		if strings.Contains(err.Error(), CONFLICT_CODE) {
 			return "", errorService.New(ErrConflictForm, err)
@@ -43,9 +44,9 @@ func (Forms *FormsServices) Create(ctx context.Context, req dto.CreateFormReques
 	return SUCCESS_CREATE_FORMS_MESSAGE, nil
 }
 
-func (Forms *FormsServices) FindAll(ctx context.Context) ([]repository.FormsModel, error) {
+func (Forms *FormsServices) FindAll(ctx context.Context) ([]models.FormsModel, error) {
 
-	forms, err := Forms.Repository.Forms.GetAll(ctx)
+	forms, err := Forms.FormsStore.GetAll(ctx)
 	if err != nil {
 		return nil, errorService.New(ErrInternalForm, err)
 	}
@@ -53,15 +54,15 @@ func (Forms *FormsServices) FindAll(ctx context.Context) ([]repository.FormsMode
 	return forms, nil
 }
 
-func (Forms *FormsServices) FindById(ctx context.Context, id int) (repository.FormsModel, error) {
+func (Forms *FormsServices) FindById(ctx context.Context, id int) (models.FormsModel, error) {
 
-	form, err := Forms.Repository.Forms.GetById(ctx, id)
+	form, err := Forms.FormsStore.GetById(ctx, id)
 	if err != nil {
 		switch err {
 		case sql.ErrNoRows:
-			return repository.FormsModel{}, errorService.New(ErrNotFoundForm, err)
+			return models.FormsModel{}, errorService.New(ErrNotFoundForm, err)
 		default:
-			return repository.FormsModel{}, errorService.New(ErrInternalForm, err)
+			return models.FormsModel{}, errorService.New(ErrInternalForm, err)
 		}
 	}
 
@@ -76,7 +77,7 @@ func (Forms *FormsServices) Update(ctx context.Context, id int, req dto.UpdateFo
 	}
 	form.Name = req.Name
 
-	err = Forms.Repository.Forms.Update(ctx, form)
+	err = Forms.FormsStore.Update(ctx, form)
 	if err != nil {
 		if strings.Contains(err.Error(), CONFLICT_CODE) {
 			return errorService.New(ErrConflictForm, err)
@@ -95,7 +96,7 @@ func (Forms *FormsServices) Delete(ctx context.Context, id int) error {
 		return err
 	}
 
-	err = Forms.Repository.Forms.Delete(ctx, form.Id)
+	err = Forms.FormsStore.Delete(ctx, form.Id)
 	if err != nil {
 		return errorService.New(ErrInternalForm, err)
 	}
@@ -105,7 +106,7 @@ func (Forms *FormsServices) Delete(ctx context.Context, id int) error {
 
 func (Forms *FormsServices) Remove(ctx context.Context) error {
 
-	err := Forms.Repository.Forms.DestroyMany(ctx)
+	err := Forms.FormsStore.DestroyMany(ctx)
 	if err != nil {
 		switch err {
 		case sql.ErrNoRows:

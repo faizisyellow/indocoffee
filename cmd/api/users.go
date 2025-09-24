@@ -3,7 +3,7 @@ package main
 import (
 	"net/http"
 
-	"github.com/faizisyellow/indocoffee/internal/repository"
+	"github.com/faizisyellow/indocoffee/internal/models"
 	"github.com/faizisyellow/indocoffee/internal/utils"
 )
 
@@ -13,14 +13,14 @@ import (
 // @Accept			json
 // @Produce		json
 // @Security		JWT
-// @Success		200	{object}	main.Envelope{data=repository.UserModel,error=nil}
+// @Success		200	{object}	main.Envelope{data=models.User,error=nil}
 // @Failure		400	{object}	main.Envelope{data=nil,error=string}
 // @Failure		401	{object}	main.Envelope{data=nil,error=string}
 // @Failure		500	{object}	main.Envelope{data=nil,error=string}
 // @Router			/users/profile [get]
 func (app *Application) GetUserProfileHandler(w http.ResponseWriter, r *http.Request) {
 
-	user, err := utils.GetContentFromContext[*repository.UserModel](r, UsrCtx)
+	user, err := utils.GetContentFromContext[*models.User](r, UsrCtx)
 	if err != nil {
 		ResponseServerError(w, r, err, http.StatusInternalServerError)
 		return
@@ -42,7 +42,7 @@ func (app *Application) GetUserProfileHandler(w http.ResponseWriter, r *http.Req
 // @Router			/users/delete [delete]
 func (app *Application) DeleteAccountHandler(w http.ResponseWriter, r *http.Request) {
 
-	user, err := utils.GetContentFromContext[*repository.UserModel](r, UsrCtx)
+	user, err := utils.GetContentFromContext[*models.User](r, UsrCtx)
 	if err != nil {
 		ResponseServerError(w, r, err, http.StatusInternalServerError)
 		return
