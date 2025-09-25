@@ -15,8 +15,15 @@ type InMemoryUsers struct {
 
 func (u *InMemoryUsers) Insert(ctx context.Context, _ *sql.Tx, usr models.User) (int, error) {
 
+	nextID := 1
+	for _, user := range u.Users {
+		if user.Id >= nextID {
+			nextID = user.Id + 1
+		}
+	}
+
 	newUser := models.User{
-		Id:        1,
+		Id:        nextID,
 		Username:  usr.Username,
 		Email:     usr.Email,
 		Password:  usr.Password,
