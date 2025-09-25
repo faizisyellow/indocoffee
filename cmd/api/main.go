@@ -74,8 +74,7 @@ func main() {
 		&beans.BeansRepository{Db: dbs},
 		&forms.FormsRepository{Db: dbs},
 		&roles.RolesRepository{Db: dbs},
-		//TODO: add transactions
-		nil,
+		&db.TransactionDB{Db: dbs},
 	)
 
 	jwtTokenConfig := JwtConfig{

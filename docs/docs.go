@@ -2159,7 +2159,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/repository.UserModel"
+                                            "$ref": "#/definitions/models.User"
                                         },
                                         "error": {
                                             "type": "object"
@@ -2374,7 +2374,7 @@ const docTemplate = `{
                 }
             }
         },
-        "repository.UserModel": {
+        "models.User": {
             "type": "object",
             "properties": {
                 "created_at": {

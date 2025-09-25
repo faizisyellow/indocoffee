@@ -2157,7 +2157,7 @@
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/repository.UserModel"
+                                            "$ref": "#/definitions/models.User"
                                         },
                                         "error": {
                                             "type": "object"
@@ -2372,7 +2372,7 @@
                 }
             }
         },
-        "repository.UserModel": {
+        "models.User": {
             "type": "object",
             "properties": {
                 "created_at": {

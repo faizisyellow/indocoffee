@@ -19,14 +19,14 @@ type UsersRepository struct {
 func (u *UsersRepository) Insert(ctx context.Context, tx *sql.Tx, usr models.User) (int, error) {
 
 	query := `
-	INSERT INTO users(username,email,password)
-	VALUES(?,?,?)
+	INSERT INTO users(username,email,password,role_id)
+	VALUES(?,?,?,?)
 	`
 
 	ctx, cancel := context.WithTimeout(ctx, repository.QueryTimeout)
 	defer cancel()
 
-	res, err := tx.ExecContext(ctx, query, usr.Username, usr.Email, usr.Password.HashedText)
+	res, err := tx.ExecContext(ctx, query, usr.Username, usr.Email, usr.Password.HashedText, usr.RoleId)
 	if err != nil {
 		return -1, err
 	}

@@ -47,7 +47,10 @@ var (
 	ErrUserNotFound            = errors.New("user not found")
 	ErrUserNotActivated        = errors.New("user not activated, please activate first")
 	ErrUserAlreadyExist        = errors.New("this user already exists")
+	ErrUserInternal            = errors.New("server incounter internal error")
 )
+
+const CUSTOMER_ROLE = 3
 
 func (us *UsersServices) RegisterAccount(ctx context.Context, req RegisterRequest) (*RegisterResponse, error) {
 
@@ -55,7 +58,6 @@ func (us *UsersServices) RegisterAccount(ctx context.Context, req RegisterReques
 
 	err := utils.IsPasswordValid(req.Password)
 	if err != nil {
-		//Todo: handle error client
 		return nil, errorService.New(err, err)
 	}
 
@@ -64,9 +66,9 @@ func (us *UsersServices) RegisterAccount(ctx context.Context, req RegisterReques
 		var newAccount models.User
 		newAccount.Email = req.Email
 		newAccount.Username = req.Username
+		newAccount.RoleId = CUSTOMER_ROLE
 
 		if err = newAccount.Password.ParseFromPassword(req.Password); err != nil {
-			//Todo: handle error client
 			return errorService.New(err, err)
 		}
 
@@ -76,8 +78,7 @@ func (us *UsersServices) RegisterAccount(ctx context.Context, req RegisterReques
 			case strings.Contains(err.Error(), CONFLICT_CODE):
 				return errorService.New(ErrUserAlreadyExist, err)
 			default:
-				//Todo: handle error client
-				return errorService.New(err, err)
+				return errorService.New(ErrUserInternal, err)
 			}
 
 		}
@@ -92,8 +93,7 @@ func (us *UsersServices) RegisterAccount(ctx context.Context, req RegisterReques
 
 		err = us.InvitationsStore.Insert(ctx, tx, invt)
 		if err != nil {
-			//Todo: handle error client
-			return errorService.New(err, err)
+			return errorService.New(ErrUserInternal, err)
 		}
 
 		// register and invite success, send to response
@@ -122,14 +122,12 @@ func (us *UsersServices) ActivateAccount(ctx context.Context, token string) erro
 
 		err = us.UsersStore.Update(ctx, tx, user)
 		if err != nil {
-			//TODO: handle error to client
-			return errorService.New(err, err)
+			return errorService.New(ErrUserInternal, err)
 		}
 
 		err = us.InvitationsStore.DeleteByUserId(ctx, tx, user.Id)
 		if err != nil {
-			//TODO: handle error to client
-			return errorService.New(err, err)
+			return errorService.New(ErrUserInternal, err)
 		}
 
 		return nil
@@ -150,7 +148,6 @@ func (us *UsersServices) Login(ctx context.Context, req LoginRequest) (*models.U
 
 	err = user.Password.ComparePassword(req.Password)
 	if err != nil {
-		//TODO: handle error to client
 		return nil, errorService.New(err, err)
 	}
 
@@ -163,8 +160,7 @@ func (us *UsersServices) DeleteAccount(ctx context.Context, usrid int) error {
 
 		err := us.UsersStore.Delete(ctx, tx, usrid)
 		if err != nil {
-			//TODO: handle error to client
-			return errorService.New(err, err)
+			return errorService.New(ErrUserInternal, err)
 		}
 
 		return nil
@@ -180,8 +176,7 @@ func (us *UsersServices) FindUserById(ctx context.Context, usrid int) (*models.U
 		case sql.ErrNoRows:
 			return nil, errorService.New(ErrUserNotFound, err)
 		default:
-			//TODO: handle error to client
-			return nil, errorService.New(err, err)
+			return nil, errorService.New(ErrUserInternal, err)
 		}
 
 	}
