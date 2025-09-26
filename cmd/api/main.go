@@ -13,9 +13,11 @@ import (
 	"github.com/faizisyellow/indocoffee/internal/repository/beans"
 	"github.com/faizisyellow/indocoffee/internal/repository/forms"
 	"github.com/faizisyellow/indocoffee/internal/repository/invitations"
+	"github.com/faizisyellow/indocoffee/internal/repository/products"
 	"github.com/faizisyellow/indocoffee/internal/repository/roles"
 	"github.com/faizisyellow/indocoffee/internal/repository/users"
 	"github.com/faizisyellow/indocoffee/internal/service"
+	"github.com/faizisyellow/indocoffee/internal/uploader/local"
 	"github.com/joho/godotenv"
 	"go.uber.org/zap"
 )
@@ -40,7 +42,6 @@ import (
 // @host		localhost:8080
 // @BasePath	/v1
 func main() {
-
 	err := godotenv.Load()
 	if err != nil {
 		logger.Logger.Fatalw("error loading .env file", zap.Error(err))
@@ -74,6 +75,9 @@ func main() {
 		&beans.BeansRepository{Db: dbs},
 		&forms.FormsRepository{Db: dbs},
 		&roles.RolesRepository{Db: dbs},
+		// TODO: implement products
+		&products.InMemoryProducts{},
+		&local.TempUpload{},
 		&db.TransactionDB{Db: dbs},
 	)
 

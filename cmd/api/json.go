@@ -57,9 +57,8 @@ func ReadHttpJson(w http.ResponseWriter, r *http.Request, data any) error {
 
 }
 
+// ReadJsonMultiPartForm reads first value of the field
 func ReadJsonMultiPartForm(r *http.Request, field string, data any) error {
-
-	r.ParseMultipartForm(3 * 1045 * 1045)
 
 	if len(r.MultipartForm.Value[field]) == 0 {
 		return fmt.Errorf("no fields are found")

@@ -2,9 +2,15 @@ package uploader
 
 import (
 	"context"
-	"io"
 )
 
+type FileInput struct {
+	Name     string
+	Size     int64
+	MimeType string
+	Content  []byte
+}
+
 type Uploader interface {
-	UploadFile(ctx context.Context, key string, file io.ReadCloser, contentType string, errUpload chan<- error)
+	UploadFile(ctx context.Context, file FileInput) (string, error)
 }

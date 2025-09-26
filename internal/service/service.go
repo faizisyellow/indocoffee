@@ -8,9 +8,11 @@ import (
 	"github.com/faizisyellow/indocoffee/internal/repository/beans"
 	"github.com/faizisyellow/indocoffee/internal/repository/forms"
 	"github.com/faizisyellow/indocoffee/internal/repository/invitations"
+	"github.com/faizisyellow/indocoffee/internal/repository/products"
 	"github.com/faizisyellow/indocoffee/internal/repository/roles"
 	"github.com/faizisyellow/indocoffee/internal/repository/users"
 	"github.com/faizisyellow/indocoffee/internal/service/dto"
+	"github.com/faizisyellow/indocoffee/internal/uploader"
 	"github.com/faizisyellow/indocoffee/internal/utils"
 	"github.com/google/uuid"
 )
@@ -50,6 +52,10 @@ type Service struct {
 		Delete(ctx context.Context, id int) error
 		Remove(ctx context.Context) error
 	}
+
+	ProductsService interface {
+		Create(ctx context.Context, metReq dto.CreateProductMetadataRequest, file uploader.FileInput) error
+	}
 }
 
 var CONFLICT_CODE = "Error 1062 (23000)"
@@ -60,6 +66,8 @@ func New(
 	beansStore beans.Beans,
 	formsStore forms.Forms,
 	rolesStore roles.Roles,
+	productsStore products.Products,
+	uploadService uploader.Uploader,
 	tx db.Transactioner,
 ) *Service {
 	return &Service{
@@ -72,5 +80,9 @@ func New(
 		BeansService: &BeansServices{BeansStore: beansStore},
 		FormsService: &FormsServices{FormsStore: formsStore},
 		RolesService: &RolesServices{RolesStore: rolesStore},
+		ProductsService: &ProductsService{
+			ProductsStore: productsStore,
+			Uploader:      uploadService,
+		},
 	}
 }

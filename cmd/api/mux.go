@@ -12,6 +12,9 @@ func (app *Application) Mux() http.Handler {
 	r := chi.NewRouter()
 
 	r.Route("/v1", func(r chi.Router) {
+		r.Route("/health", func(r chi.Router) {
+			r.Get("/", app.HealthHandler)
+		})
 
 		r.Route("/users", func(r chi.Router) {
 			r.Get("/profile", NewHandlerFunc(app.AuthMiddleware)(app.GetUserProfileHandler))
@@ -52,6 +55,15 @@ func (app *Application) Mux() http.Handler {
 			r.Patch("/{id}", app.UpdateFormsHandler)
 			r.Delete("/{id}", app.DeleteFormsHandler)
 			r.Delete("/trash", app.TrashFormsHandler)
+		})
+
+		r.Route("/products", func(r chi.Router) {
+			r.Post("/", app.CreateProductsHandler)
+			// r.Get("/")
+			// r.Get("/{id}")
+			// r.Patch("/{id}")
+			// r.Delete("/{id}")
+
 		})
 	})
 
