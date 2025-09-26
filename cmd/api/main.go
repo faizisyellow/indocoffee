@@ -75,8 +75,8 @@ func main() {
 		&beans.BeansRepository{Db: dbs},
 		&forms.FormsRepository{Db: dbs},
 		&roles.RolesRepository{Db: dbs},
-		// TODO: implement products
-		&products.InMemoryProducts{},
+		&products.ProductRepository{Db: dbs},
+		// TODO: change to uploader service
 		&local.TempUpload{},
 		&db.TransactionDB{Db: dbs},
 	)

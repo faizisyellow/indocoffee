@@ -7,7 +7,7 @@ import (
 	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
-	"strings"
+	"os"
 	"testing"
 
 	"github.com/faizisyellow/indocoffee/internal/service/dto"
@@ -35,6 +35,7 @@ func TestProducts(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
+
 		jsonPart, err := writer.CreateFormField("metadata")
 		if err != nil {
 			t.Fatal(err)
@@ -44,18 +45,26 @@ func TestProducts(t *testing.T) {
 			t.Fatal(err)
 		}
 
+		imageFile, err := os.ReadFile("../../testdata/file/lizzy.jpeg")
+		if err != nil {
+			t.Errorf("failed to read test file: %v", err)
+			return
+		}
+
 		// Add the file field
-		filePart, err := writer.CreateFormFile("file", "test.txt")
+		filePart, err := writer.CreateFormFile("file", "lizzy.jpeg")
 		if err != nil {
 			t.Fatal(err)
 		}
-		_, err = io.Copy(filePart, strings.NewReader("this is a test file"))
+		_, err = io.Copy(filePart, bytes.NewBuffer(imageFile))
 		if err != nil {
 			t.Fatal(err)
 		}
 
 		// Close writer to set the terminating boundary
-		writer.Close()
+		if err := writer.Close(); err != nil {
+			t.Fatal(err)
+		}
 
 		req, err := http.NewRequest("POST", "/v1/products", buf)
 

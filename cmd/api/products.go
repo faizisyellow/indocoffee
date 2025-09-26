@@ -5,21 +5,25 @@ import (
 	"io"
 	"net/http"
 
+	"github.com/faizisyellow/indocoffee/internal/service"
 	"github.com/faizisyellow/indocoffee/internal/service/dto"
+	errorService "github.com/faizisyellow/indocoffee/internal/service/error"
 	"github.com/faizisyellow/indocoffee/internal/uploader"
 )
 
 // @Summary		Add new product
 // @Description	Create new coffee  product
-// @Tags			Beans
+// @Tags			Products
 // @Accept			mpfd
 // @Produce		json
-// @Param			metadata	formData	dto.CreateProductMetadataRequest	true	"Payload To Create New Blog"
+//
+// @Param			metadata	formData	string	true	"CreateVillaProp JSON string"	example({"roasted":"light","price":10.2,"quantity":,50,"bean":1,"form":1})
+//
 // @Param			file		formData	file	true	"Image file"
-// @Success		201		{object}	main.Envelope{data=string,error=nil}
-// @Failure		400		{object}	main.Envelope{data=nil,error=string}
-// @Failure		409		{object}	main.Envelope{data=nil,error=string}
-// @Failure		500		{object}	main.Envelope{data=nil,error=string}
+// @Success		201			{object}	main.Envelope{data=string,error=nil}
+// @Failure		400			{object}	main.Envelope{data=nil,error=string}
+// @Failure		409			{object}	main.Envelope{data=nil,error=string}
+// @Failure		500			{object}	main.Envelope{data=nil,error=string}
 // @Router			/products [post]
 func (app *Application) CreateProductsHandler(w http.ResponseWriter, r *http.Request) {
 
@@ -69,7 +73,19 @@ func (app *Application) CreateProductsHandler(w http.ResponseWriter, r *http.Req
 	}
 
 	if err := app.Services.ProductsService.Create(r.Context(), request, uploaded); err != nil {
-		ResponseClientError(w, r, err, http.StatusBadRequest)
+		errValue := errorService.GetError(err)
+		switch errValue.E {
+		case service.ErrFileNotSupportedProducts:
+			ResponseClientError(w, r, err, http.StatusBadRequest)
+		case service.ErrFileTooBigProducts:
+			ResponseClientError(w, r, err, http.StatusBadRequest)
+		case service.ErrReferenceFailedProducts:
+			ResponseClientError(w, r, err, http.StatusBadRequest)
+		case service.ErrConflictProducts:
+			ResponseClientError(w, r, err, http.StatusConflict)
+		default:
+			ResponseServerError(w, r, err, http.StatusInternalServerError)
+		}
 		return
 	}
 

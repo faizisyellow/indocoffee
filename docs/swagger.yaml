@@ -104,6 +104,8 @@ definitions:
         type: integer
       is_active:
         type: boolean
+      role_id:
+        type: integer
       username:
         type: string
     type: object
@@ -963,6 +965,73 @@ paths:
       summary: Delete coffee's forms
       tags:
       - Forms
+  /products:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Create new coffee  product
+      parameters:
+      - description: CreateVillaProp JSON string
+        example: '{"roasted":"light","price":10.2,"quantity",50,"bean":1,"form":1}'
+        in: formData
+        name: metadata
+        required: true
+        type: string
+      - description: Image file
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: string
+                error:
+                  type: object
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+        "409":
+          description: Conflict
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+      summary: Add new product
+      tags:
+      - Products
   /roles:
     get:
       description: Get All user roles

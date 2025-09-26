@@ -58,7 +58,10 @@ type Service struct {
 	}
 }
 
-var CONFLICT_CODE = "Error 1062 (23000)"
+var (
+	CONFLICT_CODE   = "Error 1062 (23000)"
+	REFERENCES_CODE = "Error 1452"
+)
 
 func New(
 	usersStore users.Users,

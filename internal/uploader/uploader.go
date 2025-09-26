@@ -13,4 +13,5 @@ type FileInput struct {
 
 type Uploader interface {
 	UploadFile(ctx context.Context, file FileInput) (string, error)
+	DeleteFile(ctx context.Context, filename string) error
 }

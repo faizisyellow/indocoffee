@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"errors"
+	"strings"
 
 	"github.com/faizisyellow/indocoffee/internal/models"
 	"github.com/faizisyellow/indocoffee/internal/repository/products"
@@ -16,16 +17,26 @@ type ProductsService struct {
 	Uploader      uploader.Uploader
 }
 
+const FILE_SUPPORTED_MAIN = "png"
+const FILE_SUPPORTED_SECOND = "jpeg"
+
 var (
-	ErrFileTooBigProducts  = errors.New("products: request upload image too big")
-	ErrUploadImageProducts = errors.New("products: error uploading image file")
+	ErrFileTooBigProducts       = errors.New("products: request upload image too big")
+	ErrUploadImageProducts      = errors.New("products: error uploading image file")
+	ErrFileNotSupportedProducts = errors.New("products: file not supported. Only png and jpeg files are supported")
+	ErrInternalProducts         = errors.New("products: internal error")
+	ErrConflictProducts         = errors.New("products: already exist")
+	ErrReferenceFailedProducts  = errors.New("products: form or beans not found")
 )
 
 func (p *ProductsService) Create(ctx context.Context, metadatReq dto.CreateProductMetadataRequest, file uploader.FileInput) error {
-
-	// max upload file 2mb
-	if file.Size > 2<<20<<20 {
+	// // max upload file 2mb
+	if file.Size > 2<<20 {
 		return errorService.New(ErrFileTooBigProducts, ErrFileTooBigProducts)
+	}
+
+	if !strings.Contains(file.MimeType, FILE_SUPPORTED_MAIN) && !strings.Contains(file.MimeType, FILE_SUPPORTED_SECOND) {
+		return errorService.New(ErrFileNotSupportedProducts, ErrFileNotSupportedProducts)
 	}
 
 	filename, err := p.Uploader.UploadFile(ctx, file)
@@ -36,11 +47,28 @@ func (p *ProductsService) Create(ctx context.Context, metadatReq dto.CreateProdu
 	newProduct := models.Product{
 		Roasted:  metadatReq.Roasted,
 		Price:    metadatReq.Price,
-		Quantity: int(metadatReq.Quantity),
-		BeanId:   int(metadatReq.Bean),
-		FormId:   int(metadatReq.Bean),
+		Quantity: metadatReq.Quantity,
+		BeanId:   metadatReq.Bean,
+		FormId:   metadatReq.Form,
 		Image:    filename,
 	}
 
-	return p.ProductsStore.Insert(ctx, newProduct)
+	if err := p.ProductsStore.Insert(ctx, newProduct); err != nil {
+		if err := p.Uploader.DeleteFile(ctx, filename); err != nil {
+			errorService.New(ErrInternalProducts, err)
+		}
+
+		if strings.Contains(err.Error(), CONFLICT_CODE) {
+			return errorService.New(ErrConflictProducts, err)
+		}
+
+		if strings.Contains(err.Error(), REFERENCES_CODE) {
+			return errorService.New(ErrReferenceFailedProducts, err)
+		}
+
+		return errorService.New(err, err)
+	}
+
+	return nil
+
 }
