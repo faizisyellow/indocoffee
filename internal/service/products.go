@@ -55,7 +55,7 @@ func (p *ProductsService) Create(ctx context.Context, metadatReq dto.CreateProdu
 
 	if err := p.ProductsStore.Insert(ctx, newProduct); err != nil {
 		if err := p.Uploader.DeleteFile(ctx, filename); err != nil {
-			errorService.New(ErrInternalProducts, err)
+			return errorService.New(ErrInternalProducts, err)
 		}
 
 		if strings.Contains(err.Error(), CONFLICT_CODE) {
