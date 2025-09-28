@@ -9,6 +9,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"strings"
 	"time"
 
 	"github.com/faizisyellow/indocoffee/internal/uploader"
@@ -26,6 +27,7 @@ type Uploadthing struct {
 	metaUrl       string
 	callbackUrl   string
 	deleteUrl     string
+	appId         string
 }
 
 type RegisterResponse struct {
@@ -68,7 +70,7 @@ const (
 	expiresIn          = 300
 )
 
-func New(apiKey, presign, poolUpload, acl, slg, act, mturl, cllbckurl, dltUrl string) *Uploadthing {
+func New(apiKey, presign, poolUpload, acl, slg, act, mturl, cllbckurl, dltUrl, appId string) *Uploadthing {
 
 	return &Uploadthing{
 		apiKey:        apiKey,
@@ -80,6 +82,7 @@ func New(apiKey, presign, poolUpload, acl, slg, act, mturl, cllbckurl, dltUrl st
 		metaUrl:       mturl,
 		callbackUrl:   cllbckurl,
 		deleteUrl:     dltUrl,
+		appId:         appId,
 	}
 }
 
@@ -156,7 +159,7 @@ func (u *Uploadthing) UploadFile(_ context.Context, file uploader.FileInput) (st
 		return "", errors.New("upload failed: upload not done")
 	}
 
-	return registerResult.FileKey, nil
+	return u.GetUrls(registerResult.FileKey), nil
 }
 
 func (u *Uploadthing) DeleteFile(_ context.Context, filekey string) error {
@@ -278,4 +281,18 @@ func (u *Uploadthing) PoolUpload(filekey string) (ResponsePoolUpload, error) {
 	}
 
 	return result, nil
+}
+
+func (u *Uploadthing) GetUrls(filekey string) string {
+	if filekey == "" {
+		return ""
+	}
+
+	urlBuilder := strings.Builder{}
+	urlBuilder.WriteString("https://")
+	urlBuilder.WriteString(u.appId)
+	urlBuilder.WriteString(".ufs.sh/f/")
+	urlBuilder.WriteString(filekey)
+
+	return urlBuilder.String()
 }

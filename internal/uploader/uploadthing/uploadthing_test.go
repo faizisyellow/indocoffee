@@ -193,6 +193,7 @@ func SetupUploadthing(t *testing.T) (*Uploadthing, error) {
 		os.Getenv("UPLOADTHING_META_URL"),
 		os.Getenv("UPLOADTHING_CALLBACK_URL"),
 		os.Getenv("UPLOADTHING_DELETE_URL"),
+		os.Getenv("UPLOADTHING_APP_ID"),
 	)
 
 	return upt, nil
