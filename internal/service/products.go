@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"strings"
 
@@ -27,6 +28,7 @@ var (
 	ErrInternalProducts         = errors.New("products: internal error")
 	ErrConflictProducts         = errors.New("products: already exist")
 	ErrReferenceFailedProducts  = errors.New("products: form or beans not found")
+	ErrNotFoundProduct          = errors.New("products: product not found")
 )
 
 func (p *ProductsService) Create(ctx context.Context, metadatReq dto.CreateProductMetadataRequest, file uploader.FileInput) error {
@@ -71,4 +73,19 @@ func (p *ProductsService) Create(ctx context.Context, metadatReq dto.CreateProdu
 
 	return nil
 
+}
+
+func (p *ProductsService) FindById(ctx context.Context, id int) (models.Product, error) {
+
+	product, err := p.ProductsStore.GetById(ctx, id)
+	if err != nil {
+		switch err {
+		case sql.ErrNoRows:
+			return models.Product{}, errorService.New(ErrNotFoundProduct, err)
+		default:
+			return models.Product{}, err
+		}
+	}
+
+	return product, nil
 }

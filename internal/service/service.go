@@ -54,6 +54,7 @@ type Service struct {
 
 	ProductsService interface {
 		Create(ctx context.Context, metReq dto.CreateProductMetadataRequest, file uploader.FileInput) error
+		FindById(ctx context.Context, id int) (models.Product, error)
 	}
 }
 

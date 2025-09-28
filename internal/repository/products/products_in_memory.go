@@ -37,3 +37,7 @@ func (p *InMemoryProducts) Insert(ctx context.Context, newProduct models.Product
 
 	return nil
 }
+
+func (p *InMemoryProducts) GetById(ctx context.Context, id int) (models.Product, error) {
+	return models.Product{}, nil
+}

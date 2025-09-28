@@ -32,3 +32,42 @@ func (p *ProductRepository) Insert(ctx context.Context, newProduct models.Produc
 
 	return err
 }
+
+func (p *ProductRepository) GetById(ctx context.Context, id int) (models.Product, error) {
+	qry := `
+	SELECT
+       products.id,
+       products.roasted,
+       products.price,
+       products.quantity,
+       products.image,
+       products.bean_id,
+       products.form_id,
+       beans.name  AS bean_name,
+       forms.name  AS form_name
+    FROM products
+    JOIN beans ON beans.id = products.bean_id
+    JOIN forms ON forms.id = products.form_id
+    WHERE products.id = ?;
+	`
+
+	ctx, cancel := context.WithTimeout(ctx, repository.QueryTimeout)
+	defer cancel()
+
+	product := models.Product{}
+	if err := p.Db.QueryRowContext(ctx, qry, id).Scan(
+		&product.Id,
+		&product.Roasted,
+		&product.Price,
+		&product.Quantity,
+		&product.Image,
+		&product.BeanId,
+		&product.FormId,
+		&product.BeansModel.Name,
+		&product.FormsModel.Name,
+	); err != nil {
+		return models.Product{}, err
+	}
+
+	return product, nil
+}

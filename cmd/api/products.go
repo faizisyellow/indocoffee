@@ -4,27 +4,29 @@ import (
 	"errors"
 	"io"
 	"net/http"
+	"strconv"
 
 	"github.com/faizisyellow/indocoffee/internal/service"
 	"github.com/faizisyellow/indocoffee/internal/service/dto"
 	errorService "github.com/faizisyellow/indocoffee/internal/service/error"
 	"github.com/faizisyellow/indocoffee/internal/uploader"
+	"github.com/go-chi/chi/v5"
 )
 
-// @Summary		Add new product
-// @Description	Create new coffee  product
-// @Tags			Products
-// @Accept			mpfd
-// @Produce		json
+//	@Summary		Add new product
+//	@Description	Create new coffee  product
+//	@Tags			Products
+//	@Accept			mpfd
+//	@Produce		json
 //
-// @Param			metadata	formData	string	true	"CreateVillaProp JSON string"	example({"roasted":"light","price":10.2,"quantity":,50,"bean":1,"form":1})
+//	@Param			metadata	formData	string	true	"CreateVillaProp JSON string"	example({"roasted":"light","price":10.2,"quantity":,50,"bean":1,"form":1})
 //
-// @Param			file		formData	file	true	"Image file"
-// @Success		201			{object}	main.Envelope{data=string,error=nil}
-// @Failure		400			{object}	main.Envelope{data=nil,error=string}
-// @Failure		409			{object}	main.Envelope{data=nil,error=string}
-// @Failure		500			{object}	main.Envelope{data=nil,error=string}
-// @Router			/products [post]
+//	@Param			file		formData	file	true	"Image file"
+//	@Success		201			{object}	main.Envelope{data=string,error=nil}
+//	@Failure		400			{object}	main.Envelope{data=nil,error=string}
+//	@Failure		409			{object}	main.Envelope{data=nil,error=string}
+//	@Failure		500			{object}	main.Envelope{data=nil,error=string}
+//	@Router			/products [post]
 func (app *Application) CreateProductsHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Limit request body to 3 MB
@@ -90,4 +92,52 @@ func (app *Application) CreateProductsHandler(w http.ResponseWriter, r *http.Req
 	}
 
 	ResponseSuccess(w, r, "success create new product", http.StatusCreated)
+}
+
+//	@Summary		Get product
+//	@Description	Get coffee  product by id
+//	@Tags			Products
+//	@Accept			json
+//	@Produce		json
+//
+//	@Param			id	path		int	true	"product id"
+//	@Success		200	{object}	main.Envelope{data=dto.GetProductResponse,error=nil}
+//	@Failure		400	{object}	main.Envelope{data=nil,error=string}
+//	@Failure		404	{object}	main.Envelope{data=nil,error=string}
+//	@Failure		500	{object}	main.Envelope{data=nil,error=string}
+//	@Router			/products/{id} [get]
+func (app *Application) GetProductHandler(w http.ResponseWriter, r *http.Request) {
+	idParam := chi.URLParam(r, "id")
+
+	id, err := strconv.Atoi(idParam)
+	if err != nil {
+		ResponseClientError(w, r, err, http.StatusBadRequest)
+		return
+	}
+
+	product, err := app.Services.ProductsService.FindById(r.Context(), id)
+	if err != nil {
+		errValue := errorService.GetError(err)
+		switch errValue.E {
+		case service.ErrNotFoundProduct:
+			ResponseClientError(w, r, err, http.StatusNotFound)
+		default:
+			ResponseServerError(w, r, err, http.StatusInternalServerError)
+		}
+		return
+	}
+
+	response := dto.GetProductResponse{
+		Id:       product.Id,
+		Roasted:  product.Roasted,
+		Price:    product.Price,
+		Quantity: product.Quantity,
+		Image:    product.Image,
+		BeanId:   product.BeanId,
+		FormId:   product.FormId,
+	}
+	response.Bean.Name = product.BeansModel.Name
+	response.Form.Name = product.FormsModel.Name
+
+	ResponseSuccess(w, r, response, http.StatusOK)
 }
