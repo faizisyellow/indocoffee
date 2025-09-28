@@ -16,6 +16,14 @@ func (app *Application) Mux() http.Handler {
 			r.Get("/", app.HealthHandler)
 		})
 
+		r.Route("/uploadthing", func(r chi.Router) {
+			// for callback upload before upload file
+			r.Post("/", func(w http.ResponseWriter, r *http.Request) {
+				w.WriteHeader(http.StatusOK)
+				w.Write([]byte("done"))
+			})
+		})
+
 		r.Route("/users", func(r chi.Router) {
 			r.Get("/profile", NewHandlerFunc(app.AuthMiddleware)(app.GetUserProfileHandler))
 			r.Delete("/delete", NewHandlerFunc(app.AuthMiddleware)(app.DeleteAccountHandler))

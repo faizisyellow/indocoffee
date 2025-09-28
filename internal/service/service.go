@@ -14,7 +14,6 @@ import (
 	"github.com/faizisyellow/indocoffee/internal/service/dto"
 	"github.com/faizisyellow/indocoffee/internal/uploader"
 	"github.com/faizisyellow/indocoffee/internal/utils"
-	"github.com/google/uuid"
 )
 
 type Service struct {
@@ -72,12 +71,13 @@ func New(
 	productsStore products.Products,
 	uploadService uploader.Uploader,
 	tx db.Transactioner,
+	uuid utils.Token,
 ) *Service {
 	return &Service{
 		UsersService: &UsersServices{
 			UsersStore:       usersStore,
 			InvitationsStore: invitationsStore,
-			Token:            utils.UUID{Plaintoken: uuid.New().String()},
+			Token:            uuid,
 			Transaction:      tx,
 		},
 		BeansService: &BeansServices{BeansStore: beansStore},

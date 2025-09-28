@@ -23,6 +23,7 @@ func setupTestApplication(t *testing.T) *Application {
 			&products.InMemoryProducts{},
 			&local.TempUpload{},
 			nil,
+			nil,
 		),
 	}
 }

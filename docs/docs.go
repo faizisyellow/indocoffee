@@ -1494,7 +1494,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "example": "{\"roasted\":\"light\",\"price\":10.2,\"quantity\",50,\"bean\":1,\"form\":1}",
+                        "example": "{\"roasted\":\"light\",\"price\":10.2,\"quantity\":,50,\"bean\":1,\"form\":1}",
                         "description": "CreateVillaProp JSON string",
                         "name": "metadata",
                         "in": "formData",

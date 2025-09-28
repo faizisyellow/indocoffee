@@ -17,7 +17,9 @@ import (
 	"github.com/faizisyellow/indocoffee/internal/repository/roles"
 	"github.com/faizisyellow/indocoffee/internal/repository/users"
 	"github.com/faizisyellow/indocoffee/internal/service"
-	"github.com/faizisyellow/indocoffee/internal/uploader/local"
+	"github.com/faizisyellow/indocoffee/internal/uploader/uploadthing"
+	"github.com/faizisyellow/indocoffee/internal/utils"
+	"github.com/google/uuid"
 	"github.com/joho/godotenv"
 	"go.uber.org/zap"
 )
@@ -69,6 +71,20 @@ func main() {
 	defer dbs.Close()
 	logger.Logger.Infow("database connection pool has established")
 
+	ud := utils.UUID{Plaintoken: uuid.New().String()}
+
+	upt := uploadthing.New(
+		os.Getenv("UPLOADTHING_API_KEY"),
+		os.Getenv("UPLOADTHING_PRESIGNED_URL"),
+		os.Getenv("UPLOADTHING_POOL_UPLOAD_URL"),
+		"public-read",
+		"imageUploader",
+		os.Getenv("UPLOADTHING_UPLOAD_BY"),
+		os.Getenv("UPLOADTHING_META_URL"),
+		os.Getenv("UPLOADTHING_CALLBACK_URL"),
+		os.Getenv("UPLOADTHING_DELETE_URL"),
+	)
+
 	services := service.New(
 		&users.UsersRepository{Db: dbs},
 		&invitations.InvitationRepository{Db: dbs},
@@ -76,9 +92,9 @@ func main() {
 		&forms.FormsRepository{Db: dbs},
 		&roles.RolesRepository{Db: dbs},
 		&products.ProductRepository{Db: dbs},
-		// TODO: change to uploader service
-		&local.TempUpload{},
+		upt,
 		&db.TransactionDB{Db: dbs},
+		ud,
 	)
 
 	jwtTokenConfig := JwtConfig{

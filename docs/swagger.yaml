@@ -972,7 +972,7 @@ paths:
       description: Create new coffee  product
       parameters:
       - description: CreateVillaProp JSON string
-        example: '{"roasted":"light","price":10.2,"quantity",50,"bean":1,"form":1}'
+        example: '{"roasted":"light","price":10.2,"quantity":,50,"bean":1,"form":1}'
         in: formData
         name: metadata
         required: true
