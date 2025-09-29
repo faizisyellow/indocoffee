@@ -5,6 +5,7 @@ import (
 
 	"github.com/faizisyellow/indocoffee/internal/db"
 	"github.com/faizisyellow/indocoffee/internal/models"
+	"github.com/faizisyellow/indocoffee/internal/repository"
 	"github.com/faizisyellow/indocoffee/internal/repository/beans"
 	"github.com/faizisyellow/indocoffee/internal/repository/forms"
 	"github.com/faizisyellow/indocoffee/internal/repository/invitations"
@@ -55,6 +56,7 @@ type Service struct {
 	ProductsService interface {
 		Create(ctx context.Context, metReq dto.CreateProductMetadataRequest, file uploader.FileInput) error
 		FindById(ctx context.Context, id int) (models.Product, error)
+		FindProducts(ctx context.Context, r repository.PaginatedProductsQuery) ([]models.Product, error)
 	}
 }
 

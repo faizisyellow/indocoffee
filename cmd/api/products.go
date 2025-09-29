@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/faizisyellow/indocoffee/internal/repository"
 	"github.com/faizisyellow/indocoffee/internal/service"
 	"github.com/faizisyellow/indocoffee/internal/service/dto"
 	errorService "github.com/faizisyellow/indocoffee/internal/service/error"
@@ -13,20 +14,20 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-//	@Summary		Add new product
-//	@Description	Create new coffee  product
-//	@Tags			Products
-//	@Accept			mpfd
-//	@Produce		json
+// @Summary		Add new product
+// @Description	Create new coffee  product
+// @Tags			Products
+// @Accept			mpfd
+// @Produce		json
 //
-//	@Param			metadata	formData	string	true	"CreateVillaProp JSON string"	example({"roasted":"light","price":10.2,"quantity":,50,"bean":1,"form":1})
+// @Param			metadata	formData	string	true	"CreateVillaProp JSON string"	example({"roasted":"light","price":10.2,"quantity":,50,"bean":1,"form":1})
 //
-//	@Param			file		formData	file	true	"Image file"
-//	@Success		201			{object}	main.Envelope{data=string,error=nil}
-//	@Failure		400			{object}	main.Envelope{data=nil,error=string}
-//	@Failure		409			{object}	main.Envelope{data=nil,error=string}
-//	@Failure		500			{object}	main.Envelope{data=nil,error=string}
-//	@Router			/products [post]
+// @Param			file		formData	file	true	"Image file"
+// @Success		201			{object}	main.Envelope{data=string,error=nil}
+// @Failure		400			{object}	main.Envelope{data=nil,error=string}
+// @Failure		409			{object}	main.Envelope{data=nil,error=string}
+// @Failure		500			{object}	main.Envelope{data=nil,error=string}
+// @Router			/products [post]
 func (app *Application) CreateProductsHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Limit request body to 3 MB
@@ -94,18 +95,18 @@ func (app *Application) CreateProductsHandler(w http.ResponseWriter, r *http.Req
 	ResponseSuccess(w, r, "success create new product", http.StatusCreated)
 }
 
-//	@Summary		Get product
-//	@Description	Get coffee  product by id
-//	@Tags			Products
-//	@Accept			json
-//	@Produce		json
+// @Summary		Get product
+// @Description	Get coffee  product by id
+// @Tags			Products
+// @Accept			json
+// @Produce		json
 //
-//	@Param			id	path		int	true	"product id"
-//	@Success		200	{object}	main.Envelope{data=dto.GetProductResponse,error=nil}
-//	@Failure		400	{object}	main.Envelope{data=nil,error=string}
-//	@Failure		404	{object}	main.Envelope{data=nil,error=string}
-//	@Failure		500	{object}	main.Envelope{data=nil,error=string}
-//	@Router			/products/{id} [get]
+// @Param			id	path		int	true	"product id"
+// @Success		200	{object}	main.Envelope{data=dto.GetProductResponse,error=nil}
+// @Failure		400	{object}	main.Envelope{data=nil,error=string}
+// @Failure		404	{object}	main.Envelope{data=nil,error=string}
+// @Failure		500	{object}	main.Envelope{data=nil,error=string}
+// @Router			/products/{id} [get]
 func (app *Application) GetProductHandler(w http.ResponseWriter, r *http.Request) {
 	idParam := chi.URLParam(r, "id")
 
@@ -142,14 +143,59 @@ func (app *Application) GetProductHandler(w http.ResponseWriter, r *http.Request
 	ResponseSuccess(w, r, response, http.StatusOK)
 }
 
-//	@Summary		Get products
-//	@Description	Get all coffee  products
-//	@Tags			Products
-//	@Accept			json
-//	@Produce		json
-//	@Success		200	{object}	main.Envelope{data=[]dto.GetProductsResponse,error=nil}
-//	@Failure		500	{object}	main.Envelope{data=nil,error=string}
-//	@Router			/products [get]
+// @Summary		Get products
+// @Description	Get all coffee  products
+// @Tags			Products
+// @Accept			json
+// @Produce		json
+// @Success		200	{object}	main.Envelope{data=[]dto.GetProductsResponse,error=nil}
+// @Success		400	{object}	main.Envelope{data=nil,error=string}
+// @Failure		500	{object}	main.Envelope{data=nil,error=string}
+// @Router			/products [get]
 func (app *Application) GetProductsHandler(w http.ResponseWriter, r *http.Request) {
+	queryValue := r.URL.Query()
+	query := repository.QueryProducts{
+		Limit:  queryValue.Get("limit"),
+		Offset: queryValue.Get("offset"),
+		Sort:   queryValue.Get("sort"),
+		Roast:  queryValue.Get("roast"),
+		Form:   queryValue.Get("form"),
+		Bean:   queryValue.Get("bean"),
+	}
 
+	paginateProductQuery, err := repository.PaginatedProductsQuery{Limit: 8, Sort: "asc"}.Parse(query)
+	if err != nil {
+		ResponseClientError(w, r, errorService.New(errors.New("invalid query value"), err), http.StatusBadRequest)
+		return
+	}
+
+	if err := Validate.Struct(paginateProductQuery); err != nil {
+		ResponseClientError(w, r, errorService.New(err, err), http.StatusBadRequest)
+		return
+	}
+
+	products, err := app.Services.ProductsService.FindProducts(r.Context(), paginateProductQuery)
+	if err != nil {
+		ResponseServerError(w, r, err, http.StatusInternalServerError)
+		return
+	}
+
+	var response []dto.GetProductsResponse
+	for _, product := range products {
+		res := dto.GetProductsResponse{
+			Id:       product.Id,
+			Roasted:  product.Roasted,
+			Price:    product.Price,
+			Quantity: product.Quantity,
+			Image:    product.Image,
+			BeanId:   product.BeanId,
+			FormId:   product.FormId,
+		}
+		res.Bean.Name = product.BeansModel.Name
+		res.Form.Name = product.FormsModel.Name
+
+		response = append(response, res)
+	}
+
+	ResponseSuccess(w, r, response, http.StatusOK)
 }

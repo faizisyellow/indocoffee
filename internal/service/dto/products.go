@@ -26,5 +26,18 @@ type GetProductResponse struct {
 }
 
 type GetProductsResponse struct {
-	GetProductResponse
+	Id       int     `json:"id"`
+	Roasted  string  `json:"roasted"`
+	Price    float64 `json:"price"`
+	Quantity int     `json:"quantity"`
+	Image    string  `json:"image"`
+	BeanId   int     `json:"bean_id"`
+	FormId   int     `json:"form_id"`
+	Bean     struct {
+		Name string `json:"name"`
+	} `json:"bean"`
+
+	Form struct {
+		Name string `json:"name"`
+	} `json:"form"`
 }

@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/faizisyellow/indocoffee/internal/models"
+	"github.com/faizisyellow/indocoffee/internal/repository"
 	"github.com/faizisyellow/indocoffee/internal/repository/products"
 	"github.com/faizisyellow/indocoffee/internal/service/dto"
 	errorService "github.com/faizisyellow/indocoffee/internal/service/error"
@@ -88,4 +89,9 @@ func (p *ProductsService) FindById(ctx context.Context, id int) (models.Product,
 	}
 
 	return product, nil
+}
+
+func (p *ProductsService) FindProducts(ctx context.Context, r repository.PaginatedProductsQuery) ([]models.Product, error) {
+
+	return nil, nil
 }
