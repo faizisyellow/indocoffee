@@ -93,5 +93,10 @@ func (p *ProductsService) FindById(ctx context.Context, id int) (models.Product,
 
 func (p *ProductsService) FindProducts(ctx context.Context, r repository.PaginatedProductsQuery) ([]models.Product, error) {
 
-	return nil, nil
+	products, err := p.ProductsStore.GetAll(ctx, r)
+	if err != nil {
+		return nil, errorService.New(ErrInternalProducts, err)
+	}
+
+	return products, nil
 }

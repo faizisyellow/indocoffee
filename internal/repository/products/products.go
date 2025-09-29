@@ -71,3 +71,10 @@ func (p *ProductRepository) GetById(ctx context.Context, id int) (models.Product
 
 	return product, nil
 }
+
+func (p *ProductRepository) GetAll(ctx context.Context, qry repository.PaginatedProductsQuery) ([]models.Product, error) {
+
+	products := make([]models.Product, 0)
+
+	return products, nil
+}

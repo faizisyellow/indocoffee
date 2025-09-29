@@ -1491,6 +1491,44 @@ const docTemplate = `{
                     "Products"
                 ],
                 "summary": "Get products",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "limit each page",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "skip rows",
+                        "name": "offset",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "sort product by alphabet",
+                        "name": "sort",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "roasted coffee",
+                        "name": "roast",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "what kind of form of the coffee (form id)",
+                        "name": "form",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "what kind of bean of the coffee (bean id)",
+                        "name": "bean",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -1510,6 +1548,27 @@ const docTemplate = `{
                                         },
                                         "error": {
                                             "type": "object"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/main.Envelope"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object"
+                                        },
+                                        "error": {
+                                            "type": "string"
                                         }
                                     }
                                 }

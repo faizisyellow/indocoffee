@@ -148,9 +148,15 @@ func (app *Application) GetProductHandler(w http.ResponseWriter, r *http.Request
 // @Tags			Products
 // @Accept			json
 // @Produce		json
-// @Success		200	{object}	main.Envelope{data=[]dto.GetProductsResponse,error=nil}
-// @Success		400	{object}	main.Envelope{data=nil,error=string}
-// @Failure		500	{object}	main.Envelope{data=nil,error=string}
+// @Param			limit	query		string	false	"limit each page"
+// @Param			offset	query		string	false	"skip rows"
+// @Param			sort	query		string	false	"sort product by alphabet"
+// @Param			roast	query		string	false	"roasted coffee"
+// @Param			form	query		string	false	"what kind of form of the coffee (form id)"
+// @Param			bean	query		string	false	"what kind of bean of the coffee (bean id)"
+// @Success		200		{object}	main.Envelope{data=[]dto.GetProductsResponse,error=nil}
+// @Success		400		{object}	main.Envelope{data=nil,error=string}
+// @Failure		500		{object}	main.Envelope{data=nil,error=string}
 // @Router			/products [get]
 func (app *Application) GetProductsHandler(w http.ResponseWriter, r *http.Request) {
 	queryValue := r.URL.Query()

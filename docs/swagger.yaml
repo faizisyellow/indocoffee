@@ -1024,6 +1024,31 @@ paths:
       consumes:
       - application/json
       description: Get all coffee  products
+      parameters:
+      - description: limit each page
+        in: query
+        name: limit
+        type: string
+      - description: skip rows
+        in: query
+        name: offset
+        type: string
+      - description: sort product by alphabet
+        in: query
+        name: sort
+        type: string
+      - description: roasted coffee
+        in: query
+        name: roast
+        type: string
+      - description: what kind of form of the coffee (form id)
+        in: query
+        name: form
+        type: string
+      - description: what kind of bean of the coffee (bean id)
+        in: query
+        name: bean
+        type: string
       produces:
       - application/json
       responses:
@@ -1039,6 +1064,17 @@ paths:
                   type: array
                 error:
                   type: object
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
               type: object
         "500":
           description: Internal Server Error

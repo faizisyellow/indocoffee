@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"github.com/faizisyellow/indocoffee/internal/models"
+	"github.com/faizisyellow/indocoffee/internal/repository"
 )
 
 type InMemoryProducts struct {
@@ -40,4 +41,8 @@ func (p *InMemoryProducts) Insert(ctx context.Context, newProduct models.Product
 
 func (p *InMemoryProducts) GetById(ctx context.Context, id int) (models.Product, error) {
 	return models.Product{}, nil
+}
+
+func (p *InMemoryProducts) GetAll(ctx context.Context, qry repository.PaginatedProductsQuery) ([]models.Product, error) {
+	return nil, nil
 }

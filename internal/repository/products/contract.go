@@ -5,11 +5,13 @@ import (
 	"testing"
 
 	"github.com/faizisyellow/indocoffee/internal/models"
+	"github.com/faizisyellow/indocoffee/internal/repository"
 )
 
 type Products interface {
 	Insert(ctx context.Context, newProduct models.Product) error
 	GetById(ctx context.Context, id int) (models.Product, error)
+	GetAll(ctx context.Context, r repository.PaginatedProductsQuery) ([]models.Product, error)
 }
 
 type Contract struct {

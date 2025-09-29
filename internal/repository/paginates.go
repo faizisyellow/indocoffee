@@ -8,9 +8,9 @@ type PaginatedProductsQuery struct {
 	Limit  int    `json:"limit" validate:"gte=1,lte=20"`
 	Offset int    `json:"offset" validate:"gte=0"`
 	Sort   string `json:"sort" validate:"oneof=asc desc"`
-	Roast  string `json:"roast" validate:"light,medium,dark"`
-	Form   int    `json:"form" validate:"gte=0"`
-	Bean   int    `json:"bean" validate:"gte=0"`
+	Roast  string `json:"roast"`
+	Form   int    `json:"form"`
+	Bean   int    `json:"bean"`
 }
 
 type QueryProducts struct {
