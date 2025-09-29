@@ -73,6 +73,33 @@ definitions:
       roasted:
         type: string
     type: object
+  dto.GetProductsResponse:
+    properties:
+      bean:
+        properties:
+          name:
+            type: string
+        type: object
+      bean_id:
+        type: integer
+      form:
+        properties:
+          name:
+            type: string
+        type: object
+      form_id:
+        type: integer
+      id:
+        type: integer
+      image:
+        type: string
+      price:
+        type: number
+      quantity:
+        type: integer
+      roasted:
+        type: string
+    type: object
   dto.RolesResponse:
     properties:
       id:
@@ -993,6 +1020,40 @@ paths:
       tags:
       - Forms
   /products:
+    get:
+      consumes:
+      - application/json
+      description: Get all coffee  products
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/dto.GetProductsResponse'
+                  type: array
+                error:
+                  type: object
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+      summary: Get products
+      tags:
+      - Products
     post:
       consumes:
       - multipart/form-data

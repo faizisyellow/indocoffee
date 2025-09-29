@@ -141,3 +141,15 @@ func (app *Application) GetProductHandler(w http.ResponseWriter, r *http.Request
 
 	ResponseSuccess(w, r, response, http.StatusOK)
 }
+
+//	@Summary		Get products
+//	@Description	Get all coffee  products
+//	@Tags			Products
+//	@Accept			json
+//	@Produce		json
+//	@Success		200	{object}	main.Envelope{data=[]dto.GetProductsResponse,error=nil}
+//	@Failure		500	{object}	main.Envelope{data=nil,error=string}
+//	@Router			/products [get]
+func (app *Application) GetProductsHandler(w http.ResponseWriter, r *http.Request) {
+
+}

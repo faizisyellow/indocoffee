@@ -24,3 +24,7 @@ type GetProductResponse struct {
 		Name string `json:"name"`
 	} `json:"form"`
 }
+
+type GetProductsResponse struct {
+	GetProductResponse
+}
