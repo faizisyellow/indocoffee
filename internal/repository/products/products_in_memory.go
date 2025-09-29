@@ -46,3 +46,8 @@ func (p *InMemoryProducts) GetById(ctx context.Context, id int) (models.Product,
 func (p *InMemoryProducts) GetAll(ctx context.Context, qry repository.PaginatedProductsQuery) ([]models.Product, error) {
 	return nil, nil
 }
+
+func (p *InMemoryProducts) DeleteMany(ctx context.Context) error {
+	p.Products = nil
+	return nil
+}

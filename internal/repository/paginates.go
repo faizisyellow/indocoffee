@@ -6,7 +6,7 @@ import (
 
 type PaginatedProductsQuery struct {
 	Limit  int    `json:"limit" validate:"gte=1,lte=20"`
-	Offset int    `json:"offset" validate:"gte=0"`
+	Offset int    `json:"offset" validate:"gte=0,lte=100"`
 	Sort   string `json:"sort" validate:"oneof=asc desc"`
 	Roast  string `json:"roast"`
 	Form   int    `json:"form"`
