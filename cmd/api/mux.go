@@ -69,7 +69,7 @@ func (app *Application) Mux() http.Handler {
 			r.Post("/", app.CreateProductsHandler)
 			r.Get("/{id}", app.GetProductHandler)
 			r.Get("/", app.GetProductsHandler)
-			// r.Patch("/{id}")
+			r.Patch("/{id}", app.UpdateProductHandler)
 			// r.Delete("/{id}")
 
 		})

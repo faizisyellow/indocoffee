@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"mime/multipart"
 	"net/http"
 	"strings"
 
@@ -70,4 +71,15 @@ func ReadJsonMultiPartForm(r *http.Request, field string, data any) error {
 	decoder.DisallowUnknownFields()
 
 	return decoder.Decode(data)
+}
+
+func GetOptionalFormFile(r *http.Request, field string) (multipart.File, *multipart.FileHeader, error) {
+	file, handler, err := r.FormFile(field)
+	if err != nil {
+		if err == http.ErrMissingFile {
+			return nil, nil, nil // gracefully no file
+		}
+		return nil, nil, err
+	}
+	return file, handler, nil
 }

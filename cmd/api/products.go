@@ -20,7 +20,7 @@ import (
 // @Accept			mpfd
 // @Produce		json
 //
-// @Param			metadata	formData	string	true	"CreateVillaProp JSON string"	example({"roasted":"light","price":10.2,"quantity":,50,"bean":1,"form":1})
+// @Param			metadata	formData	string	true	"Create product JSON string"	example({"roasted":"light","price":10.2,"quantity":50,"bean":1,"form":1})
 //
 // @Param			file		formData	file	true	"Image file"
 // @Success		201			{object}	main.Envelope{data=string,error=nil}
@@ -204,4 +204,88 @@ func (app *Application) GetProductsHandler(w http.ResponseWriter, r *http.Reques
 	}
 
 	ResponseSuccess(w, r, response, http.StatusOK)
+}
+
+// @Summary		Edit product
+// @Description	Update spesific product
+// @Tags			Products
+// @Accept			mpfd
+// @Produce		json
+//
+// @Param			metadata	formData	string	true	"Update product JSON string"	example({"roasted":"medium","quantity":50})
+//
+// @Param			file		formData	file	false	"Image file"
+// @Param			id			path		int		true	"Product id"
+// @Success		200			{object}	main.Envelope{data=string,error=nil}
+// @Failure		400			{object}	main.Envelope{data=nil,error=string}
+// @Failure		404			{object}	main.Envelope{data=nil,error=string}
+// @Failure		409			{object}	main.Envelope{data=nil,error=string}
+// @Failure		500			{object}	main.Envelope{data=nil,error=string}
+// @Router			/products/{id} [patch]
+func (app *Application) UpdateProductHandler(w http.ResponseWriter, r *http.Request) {
+
+	ctx := r.Context()
+
+	// Limit request body to 3 MB
+	r.Body = http.MaxBytesReader(w, r.Body, 3<<20+1024)
+
+	if err := r.ParseMultipartForm(3 << 20); err != nil {
+		ResponseClientError(w, r, errors.New("file too big"), http.StatusBadRequest)
+		return
+	}
+
+	var request dto.UpdateProductMetadataRequest
+	if err := ReadJsonMultiPartForm(r, "metadata", &request); err != nil {
+		ResponseClientError(w, r, err, http.StatusBadRequest)
+		return
+	}
+
+	if err := Validate.Struct(request); err != nil {
+		ResponseClientError(w, r, err, http.StatusBadRequest)
+		return
+	}
+
+	file, handler, err := GetOptionalFormFile(r, "file")
+	if err != nil {
+		ResponseClientError(w, r, err, http.StatusBadRequest)
+		return
+	}
+
+	var uploadInput uploader.FileInput
+
+	if file != nil && handler != nil {
+		defer file.Close()
+
+		if handler.Size > 2<<20 {
+			ResponseClientError(w, r, errors.New("file too big"), http.StatusBadRequest)
+			return
+		}
+
+		limitedReader := io.LimitReader(file, 2<<20)
+		fileBytes, err := io.ReadAll(limitedReader)
+		if err != nil {
+			ResponseClientError(w, r, err, http.StatusInternalServerError)
+			return
+		}
+
+		uploadInput.Name = handler.Filename
+		uploadInput.Size = int64(len(fileBytes))
+		uploadInput.MimeType = http.DetectContentType(fileBytes)
+		uploadInput.Content = fileBytes
+	}
+
+	if err := app.Services.ProductsService.Update(ctx, request, uploadInput); err != nil {
+		errValue := errorService.GetError(err)
+		switch errValue.E {
+		case service.ErrNotFoundProduct:
+			ResponseClientError(w, r, err, http.StatusNotFound)
+		case service.ErrConflictProducts:
+			ResponseClientError(w, r, err, http.StatusConflict)
+		default:
+			ResponseServerError(w, r, err, http.StatusInternalServerError)
+		}
+		return
+	}
+
+	ResponseSuccess(w, r, "success update product", http.StatusCreated)
 }

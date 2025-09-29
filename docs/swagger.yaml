@@ -1095,8 +1095,8 @@ paths:
       - multipart/form-data
       description: Create new coffee  product
       parameters:
-      - description: CreateVillaProp JSON string
-        example: '{"roasted":"light","price":10.2,"quantity":,50,"bean":1,"form":1}'
+      - description: Create product JSON string
+        example: '{"roasted":"light","price":10.2,"quantity":50,"bean":1,"form":1}'
         in: formData
         name: metadata
         required: true
@@ -1215,6 +1215,87 @@ paths:
                   type: string
               type: object
       summary: Get product
+      tags:
+      - Products
+    patch:
+      consumes:
+      - multipart/form-data
+      description: Update spesific product
+      parameters:
+      - description: Update product JSON string
+        example: '{"roasted":"medium","quantity":50}'
+        in: formData
+        name: metadata
+        required: true
+        type: string
+      - description: Image file
+        in: formData
+        name: file
+        type: file
+      - description: Product id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: string
+                error:
+                  type: object
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+        "404":
+          description: Not Found
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+        "409":
+          description: Conflict
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+      summary: Edit product
       tags:
       - Products
   /roles:
