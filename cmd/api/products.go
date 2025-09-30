@@ -274,18 +274,28 @@ func (app *Application) UpdateProductHandler(w http.ResponseWriter, r *http.Requ
 		uploadInput.Content = fileBytes
 	}
 
-	if err := app.Services.ProductsService.Update(ctx, request, uploadInput); err != nil {
+	idParam := chi.URLParam(r, "id")
+
+	id, err := strconv.Atoi(idParam)
+	if err != nil {
+		ResponseClientError(w, r, err, http.StatusBadRequest)
+		return
+	}
+
+	if err := app.Services.ProductsService.Update(ctx, id, request, uploadInput); err != nil {
 		errValue := errorService.GetError(err)
 		switch errValue.E {
 		case service.ErrNotFoundProduct:
 			ResponseClientError(w, r, err, http.StatusNotFound)
 		case service.ErrConflictProducts:
 			ResponseClientError(w, r, err, http.StatusConflict)
+		case service.ErrReferenceFailedProducts:
+			ResponseClientError(w, r, err, http.StatusBadRequest)
 		default:
 			ResponseServerError(w, r, err, http.StatusInternalServerError)
 		}
 		return
 	}
 
-	ResponseSuccess(w, r, "success update product", http.StatusCreated)
+	ResponseSuccess(w, r, "success update product", http.StatusOK)
 }

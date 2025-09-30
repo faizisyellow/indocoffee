@@ -164,6 +164,35 @@ func (p *ProductRepository) GetAll(ctx context.Context, qry repository.Paginated
 	return products, nil
 }
 
+func (p *ProductRepository) Update(ctx context.Context, product models.Product) error {
+	query := `UPDATE products SET
+		roasted = ?,
+		price = ?,
+		quantity = ?,
+		image = ?,
+		bean_id = ?,
+		form_id = ?
+		WHERE id = ?;
+	`
+
+	ctx, cancel := context.WithTimeout(ctx, repository.QueryTimeout)
+	defer cancel()
+
+	_, err := p.Db.ExecContext(
+		ctx,
+		query,
+		product.Roasted,
+		product.Price,
+		product.Quantity,
+		product.Image,
+		product.BeanId,
+		product.FormId,
+		product.Id,
+	)
+
+	return err
+}
+
 func (p *ProductRepository) DeleteMany(ctx context.Context) error {
 	query := `DELETE FROM products`
 

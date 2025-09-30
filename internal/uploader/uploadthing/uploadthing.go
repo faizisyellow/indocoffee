@@ -296,3 +296,16 @@ func (u *Uploadthing) GetUrls(filekey string) string {
 
 	return urlBuilder.String()
 }
+
+func GetFileKey(url string) string {
+	if url == "" {
+		return ""
+	}
+
+	_, filekey, found := strings.Cut(url, ".ufs.sh/f/")
+	if !found {
+		return ""
+	}
+
+	return filekey
+}

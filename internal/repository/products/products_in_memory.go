@@ -47,6 +47,10 @@ func (p *InMemoryProducts) GetAll(ctx context.Context, qry repository.PaginatedP
 	return nil, nil
 }
 
+func (p *InMemoryProducts) Update(ctx context.Context, product models.Product) error {
+	return nil
+}
+
 func (p *InMemoryProducts) DeleteMany(ctx context.Context) error {
 	p.Products = nil
 	return nil
