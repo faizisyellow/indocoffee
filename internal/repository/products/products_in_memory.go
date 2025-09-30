@@ -55,3 +55,8 @@ func (p *InMemoryProducts) DeleteMany(ctx context.Context) error {
 	p.Products = nil
 	return nil
 }
+
+func (p *InMemoryProducts) Delete(ctx context.Context, id int) error {
+
+	return nil
+}

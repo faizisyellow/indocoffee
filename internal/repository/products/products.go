@@ -203,3 +203,11 @@ func (p *ProductRepository) DeleteMany(ctx context.Context) error {
 
 	return nil
 }
+
+func (p *ProductRepository) Delete(ctx context.Context, id int) error {
+	query := `DELETE FROM products WHERE id = ?`
+
+	_, err := p.Db.ExecContext(ctx, query, id)
+
+	return err
+}

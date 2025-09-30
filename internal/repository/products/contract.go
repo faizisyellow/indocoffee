@@ -17,6 +17,7 @@ type Products interface {
 	GetAll(ctx context.Context, r repository.PaginatedProductsQuery) ([]models.Product, error)
 	Update(ctx context.Context, product models.Product) error
 	DeleteMany(ctx context.Context) error
+	Delete(ctx context.Context, id int) error
 }
 
 type Contract struct {

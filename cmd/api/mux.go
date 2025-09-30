@@ -70,7 +70,7 @@ func (app *Application) Mux() http.Handler {
 			r.Get("/{id}", app.GetProductHandler)
 			r.Get("/", app.GetProductsHandler)
 			r.Patch("/{id}", app.UpdateProductHandler)
-			// r.Delete("/{id}")
+			r.Delete("/{id}", app.DeleteProductHandler)
 
 		})
 	})

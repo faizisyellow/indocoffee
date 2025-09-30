@@ -58,6 +58,7 @@ type Service struct {
 		FindById(ctx context.Context, id int) (models.Product, error)
 		FindProducts(ctx context.Context, r repository.PaginatedProductsQuery) ([]models.Product, error)
 		Update(ctx context.Context, id int, req dto.UpdateProductMetadataRequest, file uploader.FileInput) error
+		Destroy(ctx context.Context, id int) error
 	}
 }
 

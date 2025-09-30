@@ -170,3 +170,22 @@ func (p *ProductsService) Update(ctx context.Context, id int, req dto.UpdateProd
 
 	return nil
 }
+
+func (p *ProductsService) Destroy(ctx context.Context, id int) error {
+	product, err := p.FindById(ctx, id)
+	if err != nil {
+		return err
+	}
+
+	err = p.ProductsStore.Delete(ctx, product.Id)
+	if err != nil {
+		return errorService.New(ErrInternalProducts, err)
+	}
+
+	err = p.Uploader.DeleteFile(ctx, uploadthing.GetFileKey(product.Image))
+	if err != nil {
+		return errorService.New(ErrInternalProducts, err)
+	}
+
+	return nil
+}
