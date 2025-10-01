@@ -76,6 +76,7 @@ func (app *Application) Mux() http.Handler {
 		r.Route("/carts", func(r chi.Router) {
 			r.Post("/", NewHandlerFunc(app.AuthMiddleware)(app.CreateCartsHandler))
 			r.Patch("/{id}/increment", NewHandlerFunc(app.AuthMiddleware, app.CheckOwnerCart)(app.IncrementCartsItemHandler))
+			r.Patch("/{id}/decrement", NewHandlerFunc(app.AuthMiddleware, app.CheckOwnerCart)(app.DecrementCartsHandler))
 		})
 	})
 

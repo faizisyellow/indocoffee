@@ -50,3 +50,14 @@ func (c *CartsRepository) IncrementQuantity(ctx context.Context, cartid int) err
 
 	return err
 }
+
+func (c *CartsRepository) DecrementQuantity(ctx context.Context, cartid int) error {
+	query := `UPDATE cart_items SET quantity = quantity - 1 WHERE id = ?`
+
+	ctx, cancel := context.WithTimeout(ctx, repository.QueryTimeout)
+	defer cancel()
+
+	_, err := c.Db.ExecContext(ctx, query, cartid)
+
+	return err
+}
