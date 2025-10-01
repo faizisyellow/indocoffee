@@ -16,6 +16,11 @@ definitions:
     required:
     - name
     type: object
+  dto.CreateCartRequest:
+    properties:
+      product_id:
+        type: integer
+    type: object
   dto.CreateFormRequest:
     properties:
       name:
@@ -707,6 +712,92 @@ paths:
       summary: Delete coffee's beans
       tags:
       - Beans
+  /carts:
+    post:
+      consumes:
+      - application/json
+      description: Add new cart
+      parameters:
+      - description: Payload create new cart
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateCartRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: string
+                error:
+                  type: object
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+        "404":
+          description: Not Found
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+        "409":
+          description: Conflict
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+      security:
+      - JWT: []
+      summary: Add cart
+      tags:
+      - Carts
   /forms:
     get:
       description: Get all coffee's form

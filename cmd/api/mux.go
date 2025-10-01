@@ -71,7 +71,10 @@ func (app *Application) Mux() http.Handler {
 			r.Get("/", app.GetProductsHandler)
 			r.Patch("/{id}", app.UpdateProductHandler)
 			r.Delete("/{id}", app.DeleteProductHandler)
+		})
 
+		r.Route("/carts", func(r chi.Router) {
+			r.Post("/", NewHandlerFunc(app.AuthMiddleware)(app.CreateCartsHandler))
 		})
 	})
 

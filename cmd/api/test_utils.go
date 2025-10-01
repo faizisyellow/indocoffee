@@ -24,6 +24,7 @@ func setupTestApplication(t *testing.T) *Application {
 			&local.TempUpload{},
 			nil,
 			nil,
+			nil,
 		),
 	}
 }
