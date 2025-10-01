@@ -798,11 +798,87 @@ paths:
       summary: Add cart
       tags:
       - Carts
+  /carts/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete cart by id
+      parameters:
+      - description: cart id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+        "403":
+          description: Forbidden
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+        "404":
+          description: Not Found
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+      security:
+      - JWT: []
+      summary: Delete cart
+      tags:
+      - Carts
   /carts/{id}/decrement:
     patch:
       consumes:
       - application/json
-      description: Decrement quantity's item
+      description: Decrement quantity
       parameters:
       - description: cart id
         in: path
@@ -880,14 +956,14 @@ paths:
               type: object
       security:
       - JWT: []
-      summary: Decrement cart's item
+      summary: Decrement cart
       tags:
       - Carts
   /carts/{id}/increment:
     patch:
       consumes:
       - application/json
-      description: Increment quantity's item
+      description: Increment quantity
       parameters:
       - description: cart id
         in: path
@@ -965,7 +1041,7 @@ paths:
               type: object
       security:
       - JWT: []
-      summary: Increment cart's item
+      summary: Increment cart
       tags:
       - Carts
   /forms:

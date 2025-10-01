@@ -12,6 +12,7 @@ type Carts interface {
 	GetById(ctx context.Context, cartid int) (models.Cart, error)
 	IncrementQuantity(ctx context.Context, cartId int) error
 	DecrementQuantity(ctx context.Context, cartId int) error
+	Delete(ctx context.Context, cartId int) error
 }
 
 type Contract struct {

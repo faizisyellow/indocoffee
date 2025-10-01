@@ -66,6 +66,7 @@ type CartsServiceInterface interface {
 	IncrementItem(ctx context.Context, cartId int) error
 	DecrementItem(ctx context.Context, cartId int) error
 	FindById(ctx context.Context, id int) (models.Cart, error)
+	Destroy(ctx context.Context, id int) error
 }
 
 type Service struct {

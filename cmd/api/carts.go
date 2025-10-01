@@ -60,8 +60,8 @@ func (app *Application) CreateCartsHandler(w http.ResponseWriter, r *http.Reques
 	ResponseSuccess(w, r, "success create cart", http.StatusCreated)
 }
 
-// @Summary		Increment cart's item
-// @Description	Increment quantity's item
+// @Summary		Increment cart
+// @Description	Increment quantity
 // @Tags			Carts
 // @Accept			json
 // @Produce		json
@@ -99,8 +99,8 @@ func (app *Application) IncrementCartsItemHandler(w http.ResponseWriter, r *http
 	ResponseSuccess(w, r, "success increment quantity item", http.StatusOK)
 }
 
-// @Summary		Decrement cart's item
-// @Description	Decrement quantity's item
+// @Summary		Decrement cart
+// @Description	Decrement quantity
 // @Tags			Carts
 // @Accept			json
 // @Produce		json
@@ -139,6 +139,39 @@ func (app *Application) DecrementCartsHandler(w http.ResponseWriter, r *http.Req
 
 }
 
+// @Summary		Delete cart
+// @Description	Delete cart by id
+// @Tags			Carts
+// @Accept			json
+// @Produce		json
+// @Security		JWT
+// @Param			id	path	int	true	"cart id"
+// @Success		204
+// @Failure		400	{object}	main.Envelope{data=nil,error=string}
+// @Failure		401	{object}	main.Envelope{data=nil,error=string}
+// @Failure		403	{object}	main.Envelope{data=nil,error=string}
+// @Failure		404	{object}	main.Envelope{data=nil,error=string}
+// @Failure		500	{object}	main.Envelope{data=nil,error=string}
+// @Router			/carts/{id} [delete]
 func (app *Application) DeleteCartsHandler(w http.ResponseWriter, r *http.Request) {
+	idParam := chi.URLParam(r, "id")
 
+	id, err := strconv.Atoi(idParam)
+	if err != nil {
+		ResponseClientError(w, r, err, http.StatusBadRequest)
+		return
+	}
+
+	if err := app.Services.CartsService.Destroy(r.Context(), id); err != nil {
+		errService := errorService.GetError(err)
+		switch errService.E {
+		case service.ErrCartNotFound:
+			ResponseClientError(w, r, err, http.StatusNotFound)
+		default:
+			ResponseServerError(w, r, err, http.StatusInternalServerError)
+		}
+		return
+	}
+
+	ResponseSuccess(w, r, nil, http.StatusNoContent)
 }

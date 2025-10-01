@@ -61,3 +61,13 @@ func (c *CartsRepository) DecrementQuantity(ctx context.Context, cartid int) err
 
 	return err
 }
+
+func (c *CartsRepository) Delete(ctx context.Context, cartid int) error {
+
+	qry := `DELETE FROM cart_items WHERE id = ?`
+	ctx, cancel := context.WithTimeout(ctx, repository.QueryTimeout)
+	defer cancel()
+
+	_, err := c.Db.ExecContext(ctx, qry, cartid)
+	return err
+}

@@ -103,3 +103,21 @@ func (c *CartsService) DecrementItem(ctx context.Context, cartId int) error {
 	return nil
 
 }
+
+func (c *CartsService) Destroy(ctx context.Context, id int) error {
+	cart, err := c.CartsStore.GetById(ctx, id)
+	if err != nil {
+		switch err {
+		case sql.ErrNoRows:
+			return errorService.New(ErrCartNotFound, err)
+		default:
+			return errorService.New(ErrInternalCart, err)
+		}
+	}
+
+	if err := c.CartsStore.Delete(ctx, cart.Id); err != nil {
+		return errorService.New(ErrInternalCart, err)
+	}
+
+	return nil
+}

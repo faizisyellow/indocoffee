@@ -1077,14 +1077,14 @@ const docTemplate = `{
                 }
             }
         },
-        "/carts/{id}/decrement": {
-            "patch": {
+        "/carts/{id}": {
+            "delete": {
                 "security": [
                     {
                         "JWT": []
                     }
                 ],
-                "description": "Decrement quantity's item",
+                "description": "Delete cart by id",
                 "consumes": [
                     "application/json"
                 ],
@@ -1094,7 +1094,146 @@ const docTemplate = `{
                 "tags": [
                     "Carts"
                 ],
-                "summary": "Decrement cart's item",
+                "summary": "Delete cart",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "cart id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/main.Envelope"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object"
+                                        },
+                                        "error": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/main.Envelope"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object"
+                                        },
+                                        "error": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/main.Envelope"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object"
+                                        },
+                                        "error": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/main.Envelope"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object"
+                                        },
+                                        "error": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/main.Envelope"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object"
+                                        },
+                                        "error": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/carts/{id}/decrement": {
+            "patch": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "Decrement quantity",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Carts"
+                ],
+                "summary": "Decrement cart",
                 "parameters": [
                     {
                         "type": "integer",
@@ -1241,7 +1380,7 @@ const docTemplate = `{
                         "JWT": []
                     }
                 ],
-                "description": "Increment quantity's item",
+                "description": "Increment quantity",
                 "consumes": [
                     "application/json"
                 ],
@@ -1251,7 +1390,7 @@ const docTemplate = `{
                 "tags": [
                     "Carts"
                 ],
-                "summary": "Increment cart's item",
+                "summary": "Increment cart",
                 "parameters": [
                     {
                         "type": "integer",
