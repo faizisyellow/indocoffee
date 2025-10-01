@@ -2,12 +2,18 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/faizisyellow/indocoffee/internal/keys"
+	"github.com/faizisyellow/indocoffee/internal/models"
 	"github.com/faizisyellow/indocoffee/internal/service"
+	errorService "github.com/faizisyellow/indocoffee/internal/service/error"
+	"github.com/faizisyellow/indocoffee/internal/utils"
+	"github.com/go-chi/chi/v5"
 	"github.com/golang-jwt/jwt/v5"
 )
 
@@ -25,7 +31,10 @@ func NewHandlerFunc(mw ...Middleware) func(http.HandlerFunc) http.HandlerFunc {
 	}
 }
 
-var UsrCtx keys.User = "user"
+var (
+	UsrCtx             keys.User = "user"
+	ErrForbiddenAction           = errors.New("you don’t have permission for this action.")
+)
 
 func (app *Application) AuthMiddleware(next http.Handler) http.HandlerFunc {
 
@@ -74,7 +83,8 @@ func (app *Application) AuthMiddleware(next http.Handler) http.HandlerFunc {
 
 		user, err := app.Services.UsersService.FindUserById(ctx, int(usrId))
 		if err != nil {
-			switch err {
+			errService := errorService.GetError(err)
+			switch errService.E {
 			case service.ErrUserNotFound:
 				ResponseClientError(w, r, err, http.StatusUnauthorized)
 			default:
@@ -87,5 +97,43 @@ func (app *Application) AuthMiddleware(next http.Handler) http.HandlerFunc {
 
 		next.ServeHTTP(w, r.WithContext(ctx))
 
+	}
+}
+
+func (app *Application) CheckOwnerCart(next http.Handler) http.HandlerFunc {
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		user, err := utils.GetContentFromContext[*models.User](r, UsrCtx)
+		if err != nil {
+			ResponseServerError(w, r, err, http.StatusInternalServerError)
+			return
+		}
+
+		idParam := chi.URLParam(r, "id")
+
+		id, err := strconv.Atoi(idParam)
+		if err != nil {
+			ResponseClientError(w, r, err, http.StatusBadRequest)
+			return
+		}
+
+		cart, err := app.Services.CartsService.FindById(r.Context(), id)
+		if err != nil {
+			errService := errorService.GetError(err)
+			switch errService.E {
+			case service.ErrCartNotFound:
+				ResponseClientError(w, r, err, http.StatusNotFound)
+			default:
+				ResponseServerError(w, r, err, http.StatusInternalServerError)
+			}
+			return
+		}
+
+		if user.Id != cart.UserId {
+			ResponseClientError(w, r, ErrForbiddenAction, http.StatusForbidden)
+			return
+		}
+
+		next.ServeHTTP(w, r)
 	}
 }

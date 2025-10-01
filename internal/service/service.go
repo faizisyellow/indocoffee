@@ -63,6 +63,8 @@ type ProductsServiceInterface interface {
 
 type CartsServiceInterface interface {
 	Create(ctx context.Context, req dto.CreateCartRequest, userId int) error
+	IncrementItem(ctx context.Context, cartId int) error
+	FindById(ctx context.Context, id int) (models.Cart, error)
 }
 
 type Service struct {

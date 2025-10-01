@@ -2,12 +2,14 @@ package main
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/faizisyellow/indocoffee/internal/models"
 	"github.com/faizisyellow/indocoffee/internal/service"
 	"github.com/faizisyellow/indocoffee/internal/service/dto"
 	errorService "github.com/faizisyellow/indocoffee/internal/service/error"
 	"github.com/faizisyellow/indocoffee/internal/utils"
+	"github.com/go-chi/chi/v5"
 )
 
 // @Summary		Add cart
@@ -56,6 +58,45 @@ func (app *Application) CreateCartsHandler(w http.ResponseWriter, r *http.Reques
 	}
 
 	ResponseSuccess(w, r, "success create cart", http.StatusCreated)
+}
+
+// @Summary		Increment cart's item
+// @Description	Increment quantity's item
+// @Tags			Carts
+// @Accept			json
+// @Produce		json
+// @Security		JWT
+// @Param			id	path		int	true	"cart id"
+// @Success		200	{object}	main.Envelope{data=string,error=nil}
+// @Failure		400	{object}	main.Envelope{data=nil,error=string}
+// @Failure		401	{object}	main.Envelope{data=nil,error=string}
+// @Failure		403	{object}	main.Envelope{data=nil,error=string}
+// @Failure		404	{object}	main.Envelope{data=nil,error=string}
+// @Failure		500	{object}	main.Envelope{data=nil,error=string}
+// @Router			/carts/{id}/increment [patch]
+func (app *Application) IncrementCartsItemHandler(w http.ResponseWriter, r *http.Request) {
+	idParam := chi.URLParam(r, "id")
+
+	id, err := strconv.Atoi(idParam)
+	if err != nil {
+		ResponseClientError(w, r, err, http.StatusBadRequest)
+		return
+	}
+
+	if err := app.Services.CartsService.IncrementItem(r.Context(), id); err != nil {
+		errService := errorService.GetError(err)
+		switch errService.E {
+		case service.ErrCartNotFound:
+			ResponseClientError(w, r, err, http.StatusNotFound)
+		case service.ErrCartOverflowQuantity:
+			ResponseClientError(w, r, err, http.StatusBadRequest)
+		default:
+			ResponseServerError(w, r, err, http.StatusInternalServerError)
+		}
+		return
+	}
+
+	ResponseSuccess(w, r, "success increment quantity item", http.StatusOK)
 }
 
 func (app *Application) DeleteCartsHandler(w http.ResponseWriter, r *http.Request) {
