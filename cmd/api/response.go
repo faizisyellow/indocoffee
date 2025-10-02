@@ -42,6 +42,10 @@ func validErrorService(err error) string {
 		return ""
 	}
 
+	if v.Internal == nil {
+		return "error is nill"
+	}
+
 	return v.InternalError()
 }
 

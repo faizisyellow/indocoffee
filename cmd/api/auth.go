@@ -100,7 +100,7 @@ type LoginResponse struct {
 // @Tags			Auth
 // @Accept			json
 // @Produce		json
-// @Param			payload	body		service.LoginRequest	true	"Token to Sign in Account"
+// @Param			payload	body		service.LoginRequest	true	"Email and Passoword to Sign in Account"
 // @Success		200		{object}	main.Envelope{data=main.LoginResponse,error=nil}
 // @Failure		400		{object}	main.Envelope{data=nil,error=string}
 // @Failure		404		{object}	main.Envelope{data=nil,error=string}

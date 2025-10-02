@@ -144,7 +144,7 @@ func (us *UsersServices) Login(ctx context.Context, req LoginRequest) (*models.U
 	}
 
 	if !*user.IsActive {
-		return nil, errorService.New(ErrUserNotActivated, err)
+		return nil, errorService.New(ErrUserNotActivated, ErrUserNotActivated)
 	}
 
 	err = user.Password.ComparePassword(req.Password)
