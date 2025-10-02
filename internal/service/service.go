@@ -24,6 +24,7 @@ type UsersServiceInterface interface {
 	Login(ctx context.Context, req LoginRequest) (*models.User, error)
 	DeleteAccount(ctx context.Context, id int) error
 	FindUserById(ctx context.Context, id int) (*models.User, error)
+	FindUsersCart(ctx context.Context, usrId int) (dto.GetUsersCartResponse, error)
 }
 
 type RolesServiceInterface interface {

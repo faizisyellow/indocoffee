@@ -15,6 +15,7 @@ type Users interface {
 	Insert(ctx context.Context, tx *sql.Tx, usr models.User) (int, error)
 	GetById(ctx context.Context, id int) (models.User, error)
 	GetByEmail(ctx context.Context, email string) (models.User, error)
+	GetUsersCart(ctx context.Context, id int) (models.User, error)
 	Update(ctx context.Context, tx *sql.Tx, usr models.User) error
 	Delete(ctx context.Context, tx *sql.Tx, id int) error
 }

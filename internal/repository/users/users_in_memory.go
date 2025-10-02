@@ -77,3 +77,8 @@ func (u *InMemoryUsers) Delete(ctx context.Context, _ *sql.Tx, id int) error {
 
 	return nil
 }
+
+func (u *InMemoryUsers) GetUsersCart(ctx context.Context, id int) (models.User, error) {
+
+	return models.User{}, nil
+}

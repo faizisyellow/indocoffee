@@ -26,6 +26,7 @@ func (app *Application) Mux() http.Handler {
 
 		r.Route("/users", func(r chi.Router) {
 			r.Get("/profile", NewHandlerFunc(app.AuthMiddleware)(app.GetUserProfileHandler))
+			r.Get("/cart", NewHandlerFunc(app.AuthMiddleware)(app.FindUsersCartHandler))
 			r.Delete("/delete", NewHandlerFunc(app.AuthMiddleware)(app.DeleteAccountHandler))
 		})
 

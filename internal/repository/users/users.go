@@ -125,3 +125,90 @@ func (u *UsersRepository) Delete(ctx context.Context, tx *sql.Tx, id int) error 
 
 	return nil
 }
+
+func (u *UsersRepository) GetUsersCart(ctx context.Context, id int) (models.User, error) {
+	query := `
+	SELECT
+		users.id,
+		users.username,
+		cart_items.id,
+		cart_items.quantity,
+		products.roasted,
+		products.price,
+		products.image,
+		products.quantity AS product_quantity,
+		beans.name AS bean,
+		forms.name AS form
+	FROM users
+	LEFT JOIN cart_items ON cart_items.user_id = users.id
+	LEFT JOIN products ON products.id = cart_items.product_id
+	LEFT JOIN beans ON beans.id = products.bean_id
+	LEFT JOIN forms ON forms.id = products.form_id
+	WHERE users.id = ?;
+	`
+
+	ctx, cancel := context.WithTimeout(ctx, repository.QueryTimeout)
+	defer cancel()
+
+	rows, err := u.Db.QueryContext(ctx, query, id)
+	if err != nil {
+		return models.User{}, err
+	}
+	defer rows.Close()
+
+	var user models.User
+	usersMap := make(map[int]*models.User)
+
+	for rows.Next() {
+		var (
+			cart            models.Cart
+			cartId          sql.NullInt64
+			quantity        sql.NullInt64
+			roasted         sql.NullString
+			price           sql.NullFloat64
+			image           sql.NullString
+			productQuantity sql.NullInt64
+			beanName        sql.NullString
+			formName        sql.NullString
+		)
+
+		if err := rows.Scan(
+			&user.Id,
+			&user.Username,
+			&cartId,
+			&quantity,
+			&roasted,
+			&price,
+			&image,
+			&productQuantity,
+			&beanName,
+			&formName,
+		); err != nil {
+			return models.User{}, err
+		}
+
+		if _, ok := usersMap[user.Id]; !ok {
+			usersMap[user.Id] = &user
+		}
+
+		// Only append cart if it exists (cartId is valid)
+		if cartId.Valid {
+			cart.Id = int(cartId.Int64)
+			cart.Quantity = int(quantity.Int64)
+			cart.Product.Roasted = roasted.String
+			cart.Product.Price = price.Float64
+			cart.Product.Image = image.String
+			cart.Product.Quantity = int(productQuantity.Int64)
+			cart.Product.BeansModel.Name = beanName.String
+			cart.Product.FormsModel.Name = formName.String
+
+			usersMap[user.Id].Carts = append(usersMap[user.Id].Carts, cart)
+		}
+	}
+
+	for _, usr := range usersMap {
+		user = *usr
+	}
+
+	return user, rows.Err()
+}

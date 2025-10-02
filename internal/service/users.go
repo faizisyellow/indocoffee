@@ -11,6 +11,7 @@ import (
 	"github.com/faizisyellow/indocoffee/internal/models"
 	"github.com/faizisyellow/indocoffee/internal/repository/invitations"
 	"github.com/faizisyellow/indocoffee/internal/repository/users"
+	"github.com/faizisyellow/indocoffee/internal/service/dto"
 	errorService "github.com/faizisyellow/indocoffee/internal/service/error"
 	"github.com/faizisyellow/indocoffee/internal/utils"
 )
@@ -182,4 +183,44 @@ func (us *UsersServices) FindUserById(ctx context.Context, usrid int) (*models.U
 	}
 
 	return &user, nil
+}
+
+func (us *UsersServices) FindUsersCart(ctx context.Context, usrId int) (dto.GetUsersCartResponse, error) {
+
+	userWithCart, err := us.UsersStore.GetUsersCart(ctx, usrId)
+	if err != nil {
+		return dto.GetUsersCartResponse{}, errorService.New(ErrUserInternal, err)
+	}
+
+	var (
+		carts      []dto.CartItemDetail
+		totalPrice float64
+	)
+
+	for _, crt := range userWithCart.Carts {
+		cart := dto.CartItemDetail{
+			Id:       crt.Id,
+			Quantity: crt.Quantity,
+			Product: dto.CartProductDTO{
+				Roasted: crt.Product.Roasted,
+				Image:   crt.Product.Image,
+				Stock:   crt.Product.Quantity,
+				Price:   crt.Product.Price,
+				Bean:    dto.CartBeanDTO{Name: crt.Product.BeansModel.Name},
+				Form:    dto.CartFormDTO{Name: crt.Product.FormsModel.Name},
+			},
+		}
+
+		totalPrice += float64(cart.Quantity) * cart.Product.Price
+		carts = append(carts, cart)
+	}
+
+	response := dto.GetUsersCartResponse{
+		Id:         userWithCart.Id,
+		Username:   userWithCart.Username,
+		Carts:      carts,
+		TotalPrice: totalPrice,
+	}
+
+	return response, nil
 }

@@ -15,6 +15,7 @@ type User struct {
 	IsActive  *bool     `json:"is_active"`
 	RoleId    int       `json:"role_id"`
 	CreatedAt time.Time `json:"created_at"`
+	Carts     []Cart    `json:"carts"`
 }
 
 type Hashed struct {
