@@ -14,7 +14,6 @@ import (
 	"github.com/faizisyellow/indocoffee/internal/auth"
 	"github.com/faizisyellow/indocoffee/internal/logger"
 	"github.com/faizisyellow/indocoffee/internal/service"
-	"github.com/faizisyellow/indocoffee/internal/uploader"
 	"go.uber.org/zap"
 )
 
@@ -44,7 +43,6 @@ type Application struct {
 	Services       service.Service
 	JwtAuth        JwtConfig
 	Authentication auth.Authenticator
-	Upload         uploader.Uploader
 	Logger         *zap.SugaredLogger
 }
 
