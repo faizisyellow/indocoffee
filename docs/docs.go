@@ -149,7 +149,7 @@ const docTemplate = `{
                 "summary": "Sign in Account",
                 "parameters": [
                     {
-                        "description": "Token to Sign in Account",
+                        "description": "Email and Passoword to Sign in Account",
                         "name": "payload",
                         "in": "body",
                         "required": true,

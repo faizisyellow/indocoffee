@@ -328,7 +328,7 @@ paths:
       - application/json
       description: Sign in  New Account
       parameters:
-      - description: Token to Sign in Account
+      - description: Email and Passoword to Sign in Account
         in: body
         name: payload
         required: true
