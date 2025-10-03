@@ -133,6 +133,7 @@ func (u *UsersRepository) GetUsersCart(ctx context.Context, id int) (models.User
 		users.username,
 		cart_items.id,
 		cart_items.quantity,
+		products.id,
 		products.roasted,
 		products.price,
 		products.image,
@@ -164,6 +165,7 @@ func (u *UsersRepository) GetUsersCart(ctx context.Context, id int) (models.User
 			cart            models.Cart
 			cartId          sql.NullInt64
 			quantity        sql.NullInt64
+			productId       sql.NullInt64
 			roasted         sql.NullString
 			price           sql.NullFloat64
 			image           sql.NullString
@@ -177,6 +179,7 @@ func (u *UsersRepository) GetUsersCart(ctx context.Context, id int) (models.User
 			&user.Username,
 			&cartId,
 			&quantity,
+			&productId,
 			&roasted,
 			&price,
 			&image,

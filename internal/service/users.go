@@ -193,8 +193,7 @@ func (us *UsersServices) FindUsersCart(ctx context.Context, usrId int) (dto.GetU
 	}
 
 	var (
-		carts      []dto.CartItemDetail
-		totalPrice float64
+		carts []dto.CartItemDetail
 	)
 
 	for _, crt := range userWithCart.Carts {
@@ -202,6 +201,7 @@ func (us *UsersServices) FindUsersCart(ctx context.Context, usrId int) (dto.GetU
 			Id:       crt.Id,
 			Quantity: crt.Quantity,
 			Product: dto.CartProductDTO{
+				Id:      crt.Product.Id,
 				Roasted: crt.Product.Roasted,
 				Image:   crt.Product.Image,
 				Stock:   crt.Product.Quantity,
@@ -211,15 +211,13 @@ func (us *UsersServices) FindUsersCart(ctx context.Context, usrId int) (dto.GetU
 			},
 		}
 
-		totalPrice += float64(cart.Quantity) * cart.Product.Price
 		carts = append(carts, cart)
 	}
 
 	response := dto.GetUsersCartResponse{
-		Id:         userWithCart.Id,
-		Username:   userWithCart.Username,
-		Carts:      carts,
-		TotalPrice: totalPrice,
+		Id:       userWithCart.Id,
+		Username: userWithCart.Username,
+		Carts:    carts,
 	}
 
 	return response, nil

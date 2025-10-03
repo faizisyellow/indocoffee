@@ -70,6 +70,10 @@ type CartsServiceInterface interface {
 	Destroy(ctx context.Context, id int) error
 }
 
+type OrdersServiceInterface interface {
+	Create(ctx context.Context, req dto.CreateOrderRequest, usrId int) error
+}
+
 type Service struct {
 	UsersService    UsersServiceInterface
 	RolesService    RolesServiceInterface
@@ -77,6 +81,7 @@ type Service struct {
 	FormsService    FormsServiceInterface
 	ProductsService ProductsServiceInterface
 	CartsService    CartsServiceInterface
+	OrdersService   OrdersServiceInterface
 }
 
 var (

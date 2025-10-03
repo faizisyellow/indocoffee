@@ -11,10 +11,9 @@ type GetUsersProfileResponse struct {
 }
 
 type GetUsersCartResponse struct {
-	Id         int              `json:"id"`
-	Username   string           `json:"username"`
-	Carts      []CartItemDetail `json:"carts"`
-	TotalPrice float64          `json:"total_price"`
+	Id       int              `json:"id"`
+	Username string           `json:"username"`
+	Carts    []CartItemDetail `json:"carts"`
 }
 
 type CartItemDetail struct {
@@ -24,6 +23,7 @@ type CartItemDetail struct {
 }
 
 type CartProductDTO struct {
+	Id      int         `json:"id"`
 	Roasted string      `json:"roasted"`
 	Image   string      `json:"image"`
 	Stock   int         `json:"stock"` // (quantity)
