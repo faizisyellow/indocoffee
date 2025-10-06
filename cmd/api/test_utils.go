@@ -25,6 +25,7 @@ func setupTestApplication(t *testing.T) *Application {
 			nil,
 			nil,
 			nil,
+			nil,
 		),
 	}
 }

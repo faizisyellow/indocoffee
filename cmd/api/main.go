@@ -14,6 +14,7 @@ import (
 	"github.com/faizisyellow/indocoffee/internal/repository/carts"
 	"github.com/faizisyellow/indocoffee/internal/repository/forms"
 	"github.com/faizisyellow/indocoffee/internal/repository/invitations"
+	"github.com/faizisyellow/indocoffee/internal/repository/orders"
 	"github.com/faizisyellow/indocoffee/internal/repository/products"
 	"github.com/faizisyellow/indocoffee/internal/repository/roles"
 	"github.com/faizisyellow/indocoffee/internal/repository/users"
@@ -98,6 +99,7 @@ func main() {
 		&db.TransactionDB{Db: dbs},
 		ud,
 		&carts.CartsRepository{Db: dbs},
+		&orders.OrdersRepository{Db: dbs},
 	)
 
 	jwtTokenConfig := JwtConfig{

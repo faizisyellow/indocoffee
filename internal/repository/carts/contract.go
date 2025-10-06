@@ -2,6 +2,7 @@ package carts
 
 import (
 	"context"
+	"database/sql"
 	"testing"
 
 	"github.com/faizisyellow/indocoffee/internal/models"
@@ -13,6 +14,7 @@ type Carts interface {
 	IncrementQuantity(ctx context.Context, cartId int) error
 	DecrementQuantity(ctx context.Context, cartId int) error
 	Delete(ctx context.Context, cartId int) error
+	DeleteWithTx(ctx context.Context, tx *sql.Tx, cartId int) error
 }
 
 type Contract struct {

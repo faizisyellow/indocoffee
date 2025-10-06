@@ -1,9 +1,12 @@
 package main
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
 	"strconv"
 	"strings"
@@ -11,6 +14,7 @@ import (
 	"github.com/faizisyellow/indocoffee/internal/keys"
 	"github.com/faizisyellow/indocoffee/internal/models"
 	"github.com/faizisyellow/indocoffee/internal/service"
+	"github.com/faizisyellow/indocoffee/internal/service/dto"
 	errorService "github.com/faizisyellow/indocoffee/internal/service/error"
 	"github.com/faizisyellow/indocoffee/internal/utils"
 	"github.com/go-chi/chi/v5"
@@ -135,5 +139,53 @@ func (app *Application) CheckOwnerCart(next http.Handler) http.HandlerFunc {
 		}
 
 		next.ServeHTTP(w, r)
+	}
+}
+
+func (app *Application) CheckOwnerCartsToOrders(next http.Handler) http.HandlerFunc {
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		user, err := utils.GetContentFromContext[*models.User](r, UsrCtx)
+		if err != nil {
+			ResponseServerError(w, r, err, http.StatusInternalServerError)
+			return
+		}
+
+		bodyBytes, err := io.ReadAll(r.Body)
+		if err != nil {
+			ResponseClientError(w, r, err, http.StatusBadRequest)
+			return
+		}
+
+		// Restore the body so the next handler can read it again
+		r.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
+
+		var req dto.CreateOrderRequest
+		if err := json.Unmarshal(bodyBytes, &req); err != nil {
+			ResponseClientError(w, r, err, http.StatusBadRequest)
+			return
+		}
+
+		for _, cartId := range req.CartIds {
+			cart, err := app.Services.CartsService.FindById(r.Context(), cartId)
+			if err != nil {
+				errService := errorService.GetError(err)
+				switch errService.E {
+				case service.ErrCartNotFound:
+					ResponseClientError(w, r, err, http.StatusNotFound)
+				default:
+					ResponseServerError(w, r, err, http.StatusInternalServerError)
+				}
+				return
+			}
+
+			if user.Id != cart.UserId {
+				ResponseClientError(w, r, ErrForbiddenAction, http.StatusForbidden)
+				return
+			}
+		}
+
+		next.ServeHTTP(w, r)
+
 	}
 }

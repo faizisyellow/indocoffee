@@ -82,7 +82,7 @@ func (app *Application) Mux() http.Handler {
 		})
 
 		r.Route("/orders", func(r chi.Router) {
-			r.Post("/", app.CreateOrdersHandler)
+			r.Post("/", NewHandlerFunc(app.AuthMiddleware, app.CheckOwnerCartsToOrders)(app.CreateOrdersHandler))
 		})
 
 	})

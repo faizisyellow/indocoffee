@@ -10,6 +10,7 @@ import (
 	"github.com/faizisyellow/indocoffee/internal/repository/carts"
 	"github.com/faizisyellow/indocoffee/internal/repository/forms"
 	"github.com/faizisyellow/indocoffee/internal/repository/invitations"
+	"github.com/faizisyellow/indocoffee/internal/repository/orders"
 	"github.com/faizisyellow/indocoffee/internal/repository/products"
 	"github.com/faizisyellow/indocoffee/internal/repository/roles"
 	"github.com/faizisyellow/indocoffee/internal/repository/users"
@@ -71,7 +72,7 @@ type CartsServiceInterface interface {
 }
 
 type OrdersServiceInterface interface {
-	Create(ctx context.Context, req dto.CreateOrderRequest, usrId int) error
+	Create(ctx context.Context, idempKey string, req dto.CreateOrderRequest, usrId int) error
 }
 
 type Service struct {
@@ -100,25 +101,39 @@ func New(
 	tx db.Transactioner,
 	uuid utils.Token,
 	cartsStore carts.Carts,
+	ordersStore orders.Orders,
 ) *Service {
 	productsService := &ProductsService{
 		ProductsStore: productsStore,
 		Uploader:      uploadService,
 	}
+
+	cartsService := &CartsService{
+		CartsStore:      cartsStore,
+		ProductsService: productsService,
+	}
+
+	usersService := &UsersServices{
+		UsersStore:       usersStore,
+		InvitationsStore: invitationsStore,
+		Token:            uuid,
+		Transaction:      tx,
+	}
+
 	return &Service{
-		UsersService: &UsersServices{
-			UsersStore:       usersStore,
-			InvitationsStore: invitationsStore,
-			Token:            uuid,
-			Transaction:      tx,
-		},
+		UsersService:    usersService,
 		BeansService:    &BeansServices{BeansStore: beansStore},
 		FormsService:    &FormsServices{FormsStore: formsStore},
 		RolesService:    &RolesServices{RolesStore: rolesStore},
 		ProductsService: productsService,
-		CartsService: &CartsService{
+		CartsService:    cartsService,
+		OrdersService: &OrdersService{
 			CartsStore:      cartsStore,
 			ProductsService: productsService,
+			UsersService:    usersService,
+			OrderStore:      ordersStore,
+			Transaction:     tx,
+			Uuid:            uuid,
 		},
 	}
 }

@@ -1,0 +1,1 @@
+ALTER TABLE orders MODIFY phone_number VARCHAR(255) NOT NULL;

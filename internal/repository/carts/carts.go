@@ -71,3 +71,13 @@ func (c *CartsRepository) Delete(ctx context.Context, cartid int) error {
 	_, err := c.Db.ExecContext(ctx, qry, cartid)
 	return err
 }
+
+func (c *CartsRepository) DeleteWithTx(ctx context.Context, tx *sql.Tx, cartId int) error {
+
+	qry := `DELETE FROM cart_items WHERE id = ?`
+	ctx, cancel := context.WithTimeout(ctx, repository.QueryTimeout)
+	defer cancel()
+
+	_, err := tx.ExecContext(ctx, qry, cartId)
+	return err
+}
