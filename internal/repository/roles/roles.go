@@ -68,6 +68,20 @@ func (Roles *RolesRepository) GetById(ctx context.Context, id int) (models.Roles
 	return role, result.Scan(&role.Id, &role.Name, &role.Level)
 }
 
+func (Roles *RolesRepository) GetByName(ctx context.Context, rolename string) (models.RolesModel, error) {
+
+	qry := `SELECT id,name,level FROM roles WHERE name  = ?  AND is_delete = FALSE`
+
+	ctx, cancel := context.WithTimeout(ctx, repository.QueryTimeout)
+	defer cancel()
+
+	result := Roles.Db.QueryRowContext(ctx, qry, rolename)
+
+	var role models.RolesModel
+
+	return role, result.Scan(&role.Id, &role.Name, &role.Level)
+}
+
 func (Roles *RolesRepository) Update(ctx context.Context, nw models.RolesModel) error {
 
 	qry := `UPDATE roles SET name = ?, level = ? WHERE id  = ? AND is_delete = FALSE`

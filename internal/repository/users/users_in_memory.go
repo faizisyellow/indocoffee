@@ -42,6 +42,7 @@ func (u *InMemoryUsers) GetById(ctx context.Context, id int) (models.User, error
 			usr = user
 		}
 	}
+	usr.Id = 1
 
 	return usr, nil
 }

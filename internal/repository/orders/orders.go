@@ -72,7 +72,29 @@ func (o *OrdersRepository) GetIdempotencyKey(ctx context.Context, idemKey string
 	return idempotencyKey, err
 }
 
-func (o *OrdersRepository) UpdateOrdersStatus(ctx context.Context, tx *sql.Tx, orderId int, status OrderStatus) error {
+func (o *OrdersRepository) GetOrderStatusById(ctx context.Context, orderId string) (string, error) {
+	query := `SELECT status FROM orders WHERE id = ?`
+
+	ctx, cancel := context.WithTimeout(ctx, repository.QueryTimeout)
+	defer cancel()
+
+	var statusOrder string
+	err := o.Db.QueryRowContext(ctx, query, orderId).Scan(&statusOrder)
+
+	return statusOrder, err
+}
+
+func (o *OrdersRepository) UpdateOrdersStatus(ctx context.Context, orderId string, status OrderStatus) error {
+	query := `UPDATE orders SET status  = ? WHERE id = ?`
+
+	ctx, cancel := context.WithTimeout(ctx, repository.QueryTimeout)
+	defer cancel()
+
+	_, err := o.Db.ExecContext(ctx, query, status.String(), orderId)
+	return err
+}
+
+func (o *OrdersRepository) UpdateOrdersStatusWithTx(ctx context.Context, tx *sql.Tx, orderId int, status OrderStatus) error {
 	query := `UPDATE orders SET status  = ? WHERE id = ?`
 
 	ctx, cancel := context.WithTimeout(ctx, repository.QueryTimeout)
@@ -94,5 +116,5 @@ const (
 
 func (o OrderStatus) String() string {
 
-	return []string{"confirm", "roasted", "shipped", "complete", "cancelled"}[o]
+	return []string{"confirm", "roasting", "shipped", "complete", "cancelled"}[o]
 }

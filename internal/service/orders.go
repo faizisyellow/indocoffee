@@ -31,9 +31,11 @@ const (
 
 var (
 	ErrOrdersInternal      = errors.New("orders: encounter internal error")
+	ErrOrdersNotFound      = errors.New("orders: no such as order")
 	ErrOrdersItemEmpty     = errors.New("orders: items empty")
 	ErrOrdersConflict      = errors.New("orders: already exist")
 	ErrOrdersQuantityIssue = errors.New("orders: one of the item is not available")
+	ErrOrdersInvalidStatus = errors.New("orders: has already been cancelled or is complete")
 )
 
 func (o *OrdersService) Create(ctx context.Context, idemKey string, req dto.CreateOrderRequest, usrId int) error {
@@ -157,4 +159,26 @@ func (o *OrdersService) Create(ctx context.Context, idemKey string, req dto.Crea
 
 		return nil
 	})
+}
+
+func (o *OrdersService) ExecuteItems(ctx context.Context, orderId string) error {
+	statusOrder, err := o.OrderStore.GetOrderStatusById(ctx, orderId)
+	if err != nil {
+		switch err {
+		case sql.ErrNoRows:
+			return errorService.New(ErrOrdersNotFound, err)
+		default:
+			return errorService.New(ErrOrdersInternal, err)
+		}
+	}
+
+	if statusOrder != orders.Confirm.String() && statusOrder != orders.Roasting.String() {
+		return errorService.New(ErrOrdersInvalidStatus, ErrOrdersInvalidStatus)
+	}
+
+	if err := o.OrderStore.UpdateOrdersStatus(ctx, orderId, orders.Roasting); err != nil {
+		return errorService.New(ErrOrdersInternal, err)
+	}
+
+	return nil
 }

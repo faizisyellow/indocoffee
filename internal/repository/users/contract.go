@@ -57,6 +57,7 @@ func (u Contract) Test(t *testing.T) {
 				Email:     "lizzy@test.test",
 				IsActive:  utils.BoolToPoint(false),
 				CreatedAt: time.Time{},
+				RoleId:    1,
 			}
 		)
 		t.Cleanup(cleanup)

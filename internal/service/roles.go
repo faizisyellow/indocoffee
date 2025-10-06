@@ -71,6 +71,21 @@ func (Roles *RolesServices) FindById(ctx context.Context, id int) (models.RolesM
 	return role, nil
 }
 
+func (Roles *RolesServices) FindByName(ctx context.Context, rolename string) (models.RolesModel, error) {
+
+	role, err := Roles.RolesStore.GetByName(ctx, rolename)
+	if err != nil {
+		switch err {
+		case sql.ErrNoRows:
+			return models.RolesModel{}, errorService.New(ErrNotFoundRole, err)
+		default:
+			return models.RolesModel{}, errorService.New(ErrInternalRole, err)
+		}
+	}
+
+	return role, nil
+}
+
 func (Roles *RolesServices) Update(ctx context.Context, id int, req dto.UpdateRoleRequest) error {
 
 	existingRole, err := Roles.FindById(ctx, id)

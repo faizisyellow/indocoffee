@@ -151,6 +151,17 @@ func (app *Application) CheckOwnerCartsToOrders(next http.Handler) http.HandlerF
 			return
 		}
 
+		allowed, err := app.checkRolePresedence(r.Context(), user, "customer", "customer_only")
+		if err != nil {
+			ResponseServerError(w, r, err, http.StatusBadRequest)
+			return
+		}
+
+		if !allowed {
+			ResponseClientError(w, r, ErrForbiddenAction, http.StatusForbidden)
+			return
+		}
+
 		bodyBytes, err := io.ReadAll(r.Body)
 		if err != nil {
 			ResponseClientError(w, r, err, http.StatusBadRequest)
@@ -188,4 +199,45 @@ func (app *Application) CheckOwnerCartsToOrders(next http.Handler) http.HandlerF
 		next.ServeHTTP(w, r)
 
 	}
+}
+
+func (app *Application) AuthorizeManageOrder(next http.Handler) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		user, err := utils.GetContentFromContext[*models.User](r, UsrCtx)
+		if err != nil {
+			ResponseServerError(w, r, err, http.StatusInternalServerError)
+			return
+		}
+		allowed, err := app.checkRolePresedence(r.Context(), user, "admin", "")
+		if err != nil {
+			ResponseServerError(w, r, err, http.StatusBadRequest)
+			return
+		}
+
+		if !allowed {
+			ResponseClientError(w, r, ErrForbiddenAction, http.StatusForbidden)
+			return
+		}
+
+		next.ServeHTTP(w, r)
+	}
+}
+
+func (app *Application) checkRolePresedence(ctx context.Context, user *models.User, rolename string, event string) (bool, error) {
+	role, err := app.Services.RolesService.FindByName(ctx, rolename)
+	if err != nil {
+		return false, err
+	}
+
+	userRole, err := app.Services.RolesService.FindById(ctx, user.RoleId)
+	if err != nil {
+		return false, err
+	}
+
+	if event == "customer_only" {
+		return userRole.Level <= role.Level, nil
+	}
+
+	// default
+	return userRole.Level >= role.Level, nil
 }

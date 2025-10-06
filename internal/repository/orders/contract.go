@@ -11,7 +11,9 @@ import (
 type Orders interface {
 	Create(ctx context.Context, tx *sql.Tx, nw models.Order) error
 	GetIdempotencyKey(ctx context.Context, idemKey string) (string, error)
-	UpdateOrdersStatus(ctx context.Context, tx *sql.Tx, orderId int, status OrderStatus) error
+	UpdateOrdersStatus(ctx context.Context, orderId string, status OrderStatus) error
+	UpdateOrdersStatusWithTx(ctx context.Context, tx *sql.Tx, orderId int, status OrderStatus) error
+	GetOrderStatusById(ctx context.Context, orderId string) (string, error)
 }
 
 type Contract struct {

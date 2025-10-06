@@ -10,6 +10,7 @@ import (
 	"github.com/faizisyellow/indocoffee/internal/service/dto"
 	errorService "github.com/faizisyellow/indocoffee/internal/service/error"
 	"github.com/faizisyellow/indocoffee/internal/utils"
+	"github.com/go-chi/chi/v5"
 )
 
 // @Summary		Create new order
@@ -77,4 +78,35 @@ func (app *Application) CreateOrdersHandler(w http.ResponseWriter, r *http.Reque
 	}
 
 	ResponseSuccess(w, r, "create order success", http.StatusCreated)
+}
+
+// @Summary		Roast Order
+// @Description	Perform the roasting process for an order
+// @Tags			Orders
+// @Accept			json
+// @Produce		json
+// @Param			id	path	string	true	"Order id"
+// @Security		JWT
+// @Success		200	{object}	main.Envelope{data=string,error=nil}
+// @Failure		400	{object}	main.Envelope{data=nil,error=string}
+// @Failure		403	{object}	main.Envelope{data=nil,error=string}
+// @Failure		404	{object}	main.Envelope{data=nil,error=string}
+// @Failure		500	{object}	main.Envelope{data=nil,error=string}
+// @Router			/orders/{id}/roast [patch]
+func (app *Application) ExecuteItemsHandler(w http.ResponseWriter, r *http.Request) {
+
+	if err := app.Services.OrdersService.ExecuteItems(r.Context(), chi.URLParam(r, "id")); err != nil {
+		errValue := errorService.GetError(err)
+		switch errValue.E {
+		case service.ErrOrdersNotFound:
+			ResponseClientError(w, r, err, http.StatusNotFound)
+		case service.ErrOrdersInvalidStatus:
+			ResponseClientError(w, r, err, http.StatusBadRequest)
+		default:
+			ResponseServerError(w, r, err, http.StatusInternalServerError)
+		}
+		return
+	}
+
+	ResponseSuccess(w, r, "success update order to be roasting", http.StatusOK)
 }

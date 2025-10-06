@@ -45,7 +45,7 @@ func (u *UsersRepository) GetById(ctx context.Context, id int) (models.User, err
 
 	var user models.User
 
-	query := `SELECT id,username,email,is_active,password,created_at FROM users WHERE id = ?`
+	query := `SELECT id,username,email,is_active,password,role_id,created_at FROM users WHERE id = ?`
 
 	ctx, cancel := context.WithTimeout(ctx, repository.QueryTimeout)
 	defer cancel()
@@ -56,6 +56,7 @@ func (u *UsersRepository) GetById(ctx context.Context, id int) (models.User, err
 		&user.Email,
 		&user.IsActive,
 		&user.Password.HashedText,
+		&user.RoleId,
 		&user.CreatedAt,
 	)
 	if err != nil {

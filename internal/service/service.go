@@ -33,6 +33,7 @@ type RolesServiceInterface interface {
 	Create(ctx context.Context, req dto.CreateRoleRequest) (string, error)
 	FindAll(ctx context.Context) ([]models.RolesModel, error)
 	FindById(ctx context.Context, id int) (models.RolesModel, error)
+	FindByName(ctx context.Context, rolename string) (models.RolesModel, error)
 	Update(ctx context.Context, id int, req dto.UpdateRoleRequest) error
 	Delete(ctx context.Context, id int) error
 	Remove(ctx context.Context) error
@@ -76,6 +77,7 @@ type CartsServiceInterface interface {
 
 type OrdersServiceInterface interface {
 	Create(ctx context.Context, idempKey string, req dto.CreateOrderRequest, usrId int) error
+	ExecuteItems(ctx context.Context, orderId string) error
 }
 
 type Service struct {

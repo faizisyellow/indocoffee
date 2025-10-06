@@ -70,21 +70,42 @@ definitions:
   dto.CreateOrderRequest:
     properties:
       alternative_phone_number:
+        maxLength: 15
+        minLength: 10
         type: string
       cart_ids:
         items:
           type: integer
+        maxItems: 16
+        minItems: 1
         type: array
       city:
+        maxLength: 32
+        minLength: 5
         type: string
       customer_email:
+        maxLength: 32
+        minLength: 6
         type: string
       customer_name:
+        maxLength: 32
+        minLength: 1
         type: string
       phone_number:
+        maxLength: 15
+        minLength: 10
         type: string
       street:
+        maxLength: 32
+        minLength: 5
         type: string
+    required:
+    - cart_ids
+    - city
+    - customer_email
+    - customer_name
+    - phone_number
+    - street
     type: object
   dto.CreateRoleRequest:
     properties:
@@ -1510,6 +1531,80 @@ paths:
       security:
       - JWT: []
       summary: Create new order
+      tags:
+      - Orders
+  /orders/{id}/roast:
+    patch:
+      consumes:
+      - application/json
+      description: Perform the roasting process for an order
+      parameters:
+      - description: Order id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: string
+                error:
+                  type: object
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+        "403":
+          description: Forbidden
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+        "404":
+          description: Not Found
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+      security:
+      - JWT: []
+      summary: Roast Order
       tags:
       - Orders
   /products:
