@@ -7,6 +7,7 @@ import (
 	"fmt"
 
 	"github.com/faizisyellow/indocoffee/internal/models"
+	"github.com/faizisyellow/indocoffee/internal/repository"
 )
 
 type OrdersRepository struct {
@@ -35,6 +36,9 @@ func (o *OrdersRepository) Create(ctx context.Context, tx *sql.Tx, newOrder mode
 		return fmt.Errorf("failed to marshal items: %w", err)
 	}
 
+	ctx, cancel := context.WithTimeout(ctx, repository.QueryTimeout)
+	defer cancel()
+
 	_, err = tx.ExecContext(
 		ctx,
 		qry,
@@ -60,8 +64,22 @@ func (o *OrdersRepository) GetIdempotencyKey(ctx context.Context, idemKey string
 	query := `SELECT idempotency_key FROM orders WHERE idempotency_key = ?`
 
 	var idempotencyKey string
+
+	ctx, cancel := context.WithTimeout(ctx, repository.QueryTimeout)
+	defer cancel()
+
 	err := o.Db.QueryRowContext(ctx, query, idemKey).Scan(&idempotencyKey)
 	return idempotencyKey, err
+}
+
+func (o *OrdersRepository) UpdateOrdersStatus(ctx context.Context, tx *sql.Tx, orderId int, status OrderStatus) error {
+	query := `UPDATE orders SET status  = ? WHERE id = ?`
+
+	ctx, cancel := context.WithTimeout(ctx, repository.QueryTimeout)
+	defer cancel()
+
+	_, err := tx.ExecContext(ctx, query, status.String(), orderId)
+	return err
 }
 
 type OrderStatus int
