@@ -171,6 +171,16 @@ func (p *ProductsService) Update(ctx context.Context, id int, req dto.UpdateProd
 	return nil
 }
 
+func (p *ProductsService) DecreaseQuantityProduct(ctx context.Context, tx *sql.Tx, prdId, quantity int) error {
+
+	return p.ProductsStore.DecrementQuantity(ctx, tx, prdId, quantity)
+}
+
+func (p *ProductsService) IncreaseQuantityProduct(ctx context.Context, tx *sql.Tx, prdId, quantity int) error {
+
+	return p.ProductsStore.IncrementQuantity(ctx, tx, prdId, quantity)
+}
+
 func (p *ProductsService) Destroy(ctx context.Context, id int) error {
 	product, err := p.FindById(ctx, id)
 	if err != nil {

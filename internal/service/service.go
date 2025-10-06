@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"database/sql"
 
 	"github.com/faizisyellow/indocoffee/internal/db"
 	"github.com/faizisyellow/indocoffee/internal/models"
@@ -61,6 +62,8 @@ type ProductsServiceInterface interface {
 	FindProducts(ctx context.Context, r repository.PaginatedProductsQuery) ([]models.Product, error)
 	Update(ctx context.Context, id int, req dto.UpdateProductMetadataRequest, file uploader.FileInput) error
 	Destroy(ctx context.Context, id int) error
+	DecreaseQuantityProduct(ctx context.Context, tx *sql.Tx, prdId, quantity int) error
+	IncreaseQuantityProduct(ctx context.Context, tx *sql.Tx, prdId, quantity int) error
 }
 
 type CartsServiceInterface interface {

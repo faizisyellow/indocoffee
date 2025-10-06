@@ -15,6 +15,8 @@ type Carts interface {
 	DecrementQuantity(ctx context.Context, cartId int) error
 	Delete(ctx context.Context, cartId int) error
 	DeleteWithTx(ctx context.Context, tx *sql.Tx, cartId int) error
+	UpdateCartStatus(ctx context.Context, tx *sql.Tx, cartId int, state CartStatus) error
+	GetCartStatus(ctx context.Context, cartId int) (string, error)
 }
 
 type Contract struct {

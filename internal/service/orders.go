@@ -25,20 +25,15 @@ type OrdersService struct {
 	Uuid            utils.Token
 }
 
-/*
- * STATE: CONFIRM(officer_start_roast,customer_cancel)
- * STATE: ROASTING(officer_shipped_product)
- * STATE: SHIPPED(customer_confirm_complete)
- */
-
 const (
 	ORDER_ID_PREFIX = "ORD"
 )
 
 var (
-	ErrOrdersInternal  = errors.New("orders: encounter internal error")
-	ErrOrdersItemEmpty = errors.New("orders: items empty")
-	ErrOrdersConflict  = errors.New("orders: already exist")
+	ErrOrdersInternal      = errors.New("orders: encounter internal error")
+	ErrOrdersItemEmpty     = errors.New("orders: items empty")
+	ErrOrdersConflict      = errors.New("orders: already exist")
+	ErrOrdersQuantityIssue = errors.New("orders: one of the item is not available")
 )
 
 func (o *OrdersService) Create(ctx context.Context, idemKey string, req dto.CreateOrderRequest, usrId int) error {
@@ -83,6 +78,10 @@ func (o *OrdersService) Create(ctx context.Context, idemKey string, req dto.Crea
 		if err != nil {
 			log.Printf("error getting product: %v", err.Error())
 			continue
+		}
+
+		if item.Quantity >= product.Quantity || product.Quantity <= 0 {
+			return ErrOrdersQuantityIssue
 		}
 
 		totalPrice += product.Price * float64(item.Quantity)
@@ -140,8 +139,18 @@ func (o *OrdersService) Create(ctx context.Context, idemKey string, req dto.Crea
 		}
 
 		for _, cartId := range req.CartIds {
-			err := o.CartsStore.DeleteWithTx(ctx, tx, cartId)
+			err := o.CartsStore.UpdateCartStatus(ctx, tx, cartId, carts.Ordered)
 			if err != nil {
+				return errorService.New(ErrOrdersInternal, err)
+			}
+		}
+
+		for _, item := range cartItems {
+			err := o.ProductsService.DecreaseQuantityProduct(ctx, tx, item.ProductId, item.Quantity)
+			if err != nil {
+				if strings.Contains(err.Error(), "quantity_non_negative") {
+					return errorService.New(ErrCartMinQuantity, err)
+				}
 				return errorService.New(ErrOrdersInternal, err)
 			}
 		}

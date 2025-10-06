@@ -2,6 +2,7 @@ package products
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"testing"
 
@@ -16,6 +17,8 @@ type Products interface {
 	GetById(ctx context.Context, id int) (models.Product, error)
 	GetAll(ctx context.Context, r repository.PaginatedProductsQuery) ([]models.Product, error)
 	Update(ctx context.Context, product models.Product) error
+	DecrementQuantity(ctx context.Context, tx *sql.Tx, productId, quantity int) error
+	IncrementQuantity(ctx context.Context, tx *sql.Tx, productId, quantity int) error
 	DeleteMany(ctx context.Context) error
 	Delete(ctx context.Context, id int) error
 }

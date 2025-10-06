@@ -2,6 +2,7 @@ package products
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 
 	"github.com/faizisyellow/indocoffee/internal/models"
@@ -48,6 +49,14 @@ func (p *InMemoryProducts) GetAll(ctx context.Context, qry repository.PaginatedP
 }
 
 func (p *InMemoryProducts) Update(ctx context.Context, product models.Product) error {
+	return nil
+}
+
+func (p *InMemoryProducts) DecrementQuantity(ctx context.Context, tx *sql.Tx, productId, quantity int) error {
+	return nil
+}
+
+func (p *InMemoryProducts) IncrementQuantity(ctx context.Context, tx *sql.Tx, productId, quantity int) error {
 	return nil
 }
 

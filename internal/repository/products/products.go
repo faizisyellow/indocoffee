@@ -193,8 +193,31 @@ func (p *ProductRepository) Update(ctx context.Context, product models.Product) 
 	return err
 }
 
+func (p *ProductRepository) DecrementQuantity(ctx context.Context, tx *sql.Tx, productId, quantity int) error {
+	query := `UPDATE products SET quantity = quantity - ? WHERE id = ?`
+
+	ctx, cancel := context.WithTimeout(ctx, repository.QueryTimeout)
+	defer cancel()
+
+	_, err := tx.ExecContext(ctx, query, quantity, productId)
+	return err
+}
+
+func (p *ProductRepository) IncrementQuantity(ctx context.Context, tx *sql.Tx, productId, quantity int) error {
+	query := `UPDATE products SET quantity = quantity + ? WHERE id = ?`
+
+	ctx, cancel := context.WithTimeout(ctx, repository.QueryTimeout)
+	defer cancel()
+
+	_, err := tx.ExecContext(ctx, query, quantity, productId)
+	return err
+}
+
 func (p *ProductRepository) DeleteMany(ctx context.Context) error {
 	query := `DELETE FROM products`
+
+	ctx, cancel := context.WithTimeout(ctx, repository.QueryTimeout)
+	defer cancel()
 
 	_, err := p.Db.ExecContext(ctx, query)
 	if err != nil {
@@ -206,6 +229,9 @@ func (p *ProductRepository) DeleteMany(ctx context.Context) error {
 
 func (p *ProductRepository) Delete(ctx context.Context, id int) error {
 	query := `DELETE FROM products WHERE id = ?`
+
+	ctx, cancel := context.WithTimeout(ctx, repository.QueryTimeout)
+	defer cancel()
 
 	_, err := p.Db.ExecContext(ctx, query, id)
 
