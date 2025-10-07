@@ -51,7 +51,7 @@ var (
 	ErrUserInternal            = errors.New("server incounter internal error")
 )
 
-const CUSTOMER_ROLE = 1
+const CUSTOMER_ROLE = 3
 
 func (us *UsersServices) RegisterAccount(ctx context.Context, req RegisterRequest) (*RegisterResponse, error) {
 

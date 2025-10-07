@@ -223,7 +223,7 @@ func (app *Application) AuthorizeManageOrder(next http.Handler) http.HandlerFunc
 	}
 }
 
-func (app *Application) CheckOwnerCartsToCancel(next http.Handler) http.HandlerFunc {
+func (app *Application) CheckOwnerOrder(next http.Handler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		user, err := utils.GetContentFromContext[*models.User](r, UsrCtx)

@@ -80,6 +80,8 @@ type OrdersServiceInterface interface {
 	ExecuteItems(ctx context.Context, orderId string) error
 	FindById(ctx context.Context, orderId string) (models.Order, error)
 	CancelOrder(ctx context.Context, orderId string) error
+	ShipOrder(ctx context.Context, orderId string) error
+	CompleteOrder(ctx context.Context, orderId string) error
 }
 
 type Service struct {

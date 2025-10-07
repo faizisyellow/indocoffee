@@ -8,12 +8,15 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/faizisyellow/indocoffee/internal/service/dto"
 )
 
 func TestProducts(t *testing.T) {
+	const FILE_NAME = "lizzy.jpeg"
+
 	t.Run("create new product", func(t *testing.T) {
 
 		var (
@@ -52,7 +55,7 @@ func TestProducts(t *testing.T) {
 		}
 
 		// Add the file field
-		filePart, err := writer.CreateFormFile("file", "lizzy.jpeg")
+		filePart, err := writer.CreateFormFile("file", FILE_NAME)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -76,5 +79,13 @@ func TestProducts(t *testing.T) {
 		if rr.Code != 201 {
 			t.Errorf("should be success, got: %v", rr.Code)
 		}
+
+		t.Cleanup(func() {
+			filePath := filepath.Join("..", "..", "cmd", "api", FILE_NAME)
+			err := os.Remove(filePath)
+			if err != nil && !os.IsNotExist(err) {
+				t.Fatalf("cleanup failed: %v", err)
+			}
+		})
 	})
 }

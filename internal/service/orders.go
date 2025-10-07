@@ -133,6 +133,7 @@ func (o *OrdersService) Create(ctx context.Context, idemKey string, req dto.Crea
 		AlternativePhoneNumber: alternativePhone,
 		Items:                  items,
 		TotalPrice:             totalPrice,
+		CartIds:                req.CartIds,
 	}
 
 	return o.Transaction.WithTx(ctx, func(tx *sql.Tx) error {
@@ -233,17 +234,56 @@ func (o *OrdersService) CancelOrder(ctx context.Context, orderId string) error {
 			}
 		}
 
-		for _, cartId := range orderWithItems.OrderIds {
+		for _, cartId := range orderWithItems.CartIds {
 			if err := o.CartsStore.DeleteWithTx(ctx, tx, cartId); err != nil {
-				switch err {
-				case sql.ErrNoRows:
-					return errorService.New(ErrCartNotFound, err)
-				default:
-					return errorService.New(ErrOrdersInternal, err)
-				}
+				return errorService.New(ErrOrdersInternal, err)
 			}
 		}
 
 		return nil
 	})
+}
+
+func (o *OrdersService) ShipOrder(ctx context.Context, orderId string) error {
+	statusOrder, err := o.OrderStore.GetOrderStatusById(ctx, orderId)
+	if err != nil {
+		switch err {
+		case sql.ErrNoRows:
+			return errorService.New(ErrOrdersNotFound, err)
+		default:
+			return errorService.New(ErrOrdersInternal, err)
+		}
+	}
+
+	if statusOrder != orders.Roasting.String() && statusOrder != orders.Shipped.String() {
+		return errorService.New(ErrOrdersInvalidStatus, ErrOrdersInvalidStatus)
+	}
+
+	if err := o.OrderStore.UpdateOrdersStatus(ctx, orderId, orders.Shipped); err != nil {
+		return errorService.New(ErrOrdersInternal, err)
+	}
+
+	return nil
+}
+
+func (o *OrdersService) CompleteOrder(ctx context.Context, orderId string) error {
+	statusOrder, err := o.OrderStore.GetOrderStatusById(ctx, orderId)
+	if err != nil {
+		switch err {
+		case sql.ErrNoRows:
+			return errorService.New(ErrOrdersNotFound, err)
+		default:
+			return errorService.New(ErrOrdersInternal, err)
+		}
+	}
+
+	if statusOrder != orders.Shipped.String() && statusOrder != orders.Complete.String() {
+		return errorService.New(ErrOrdersInvalidStatus, ErrOrdersInvalidStatus)
+	}
+
+	if err := o.OrderStore.UpdateOrdersStatus(ctx, orderId, orders.Shipped); err != nil {
+		return errorService.New(ErrOrdersInternal, err)
+	}
+
+	return nil
 }

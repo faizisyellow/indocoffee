@@ -19,7 +19,7 @@ func TestProductsService(t *testing.T) {
 	t.Run("run in memory store and in local upload file", func(t *testing.T) {
 		ProductsServiceTest{
 			CreateDependencies: func() (products.Products, uploader.Uploader, Cleanup) {
-				savePath := "file_test/temp/"
+				savePath := "file_test/temp"
 
 				return &products.InMemoryProducts{}, &local.TempUpload{
 						LocSavePath: savePath,

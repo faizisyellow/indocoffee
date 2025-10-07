@@ -49,10 +49,12 @@ func (app *Application) CreateOrdersHandler(w http.ResponseWriter, r *http.Reque
 	idempotencyHeader := r.Header.Get("X-Idempotency-Key")
 	if idempotencyHeader == "" {
 		ResponseClientError(w, r, errors.New("require an idempotency key"), http.StatusBadRequest)
+		return
 	}
 
-	if len(idempotencyHeader) != 64 {
-		ResponseClientError(w, r, errors.New("idempotency key is malformed: require 32 bytes string"), http.StatusBadRequest)
+	if valid := utils.ValidateIdempotencyKey(idempotencyHeader); !valid {
+		ResponseClientError(w, r, errors.New("idempotency key malformed: must be UUIDv4"), http.StatusBadRequest)
+		return
 	}
 
 	if err := app.Services.OrdersService.Create(r.Context(), idempotencyHeader, req, user.Id); err != nil {
@@ -139,4 +141,64 @@ func (app *Application) CancelOrderHandler(w http.ResponseWriter, r *http.Reques
 	}
 
 	ResponseSuccess(w, r, "success update order to be cancelled", http.StatusOK)
+}
+
+// @Summary		Ship Order
+// @Description	Perform ship for an order
+// @Tags			Orders
+// @Accept			json
+// @Produce		json
+// @Param			id	path	string	true	"Order id"
+// @Security		JWT
+// @Success		200	{object}	main.Envelope{data=string,error=nil}
+// @Failure		400	{object}	main.Envelope{data=nil,error=string}
+// @Failure		403	{object}	main.Envelope{data=nil,error=string}
+// @Failure		404	{object}	main.Envelope{data=nil,error=string}
+// @Failure		500	{object}	main.Envelope{data=nil,error=string}
+// @Router			/orders/{id}/ship [patch]
+func (app *Application) ShipOrderHandler(w http.ResponseWriter, r *http.Request) {
+	if err := app.Services.OrdersService.ShipOrder(r.Context(), chi.URLParam(r, "id")); err != nil {
+		errValue := errorService.GetError(err)
+		switch errValue.E {
+		case service.ErrOrdersNotFound:
+			ResponseClientError(w, r, err, http.StatusNotFound)
+		case service.ErrOrdersInvalidStatus:
+			ResponseClientError(w, r, err, http.StatusBadRequest)
+		default:
+			ResponseServerError(w, r, err, http.StatusInternalServerError)
+		}
+		return
+	}
+
+	ResponseSuccess(w, r, "success update order to be shipped", http.StatusOK)
+}
+
+// @Summary		Complete Order
+// @Description	Perform complete for an order
+// @Tags			Orders
+// @Accept			json
+// @Produce		json
+// @Param			id	path	string	true	"Order id"
+// @Security		JWT
+// @Success		200	{object}	main.Envelope{data=string,error=nil}
+// @Failure		400	{object}	main.Envelope{data=nil,error=string}
+// @Failure		403	{object}	main.Envelope{data=nil,error=string}
+// @Failure		404	{object}	main.Envelope{data=nil,error=string}
+// @Failure		500	{object}	main.Envelope{data=nil,error=string}
+// @Router			/orders/{id}/complete [patch]
+func (app *Application) CompleteOrderHandler(w http.ResponseWriter, r *http.Request) {
+	if err := app.Services.OrdersService.CompleteOrder(r.Context(), chi.URLParam(r, "id")); err != nil {
+		errValue := errorService.GetError(err)
+		switch errValue.E {
+		case service.ErrOrdersNotFound:
+			ResponseClientError(w, r, err, http.StatusNotFound)
+		case service.ErrOrdersInvalidStatus:
+			ResponseClientError(w, r, err, http.StatusBadRequest)
+		default:
+			ResponseServerError(w, r, err, http.StatusInternalServerError)
+		}
+		return
+	}
+
+	ResponseSuccess(w, r, "success order complete", http.StatusOK)
 }

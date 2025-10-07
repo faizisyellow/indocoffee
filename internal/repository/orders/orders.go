@@ -42,11 +42,17 @@ func (o *OrdersRepository) Create(ctx context.Context, tx *sql.Tx, newOrder mode
 			phone_number,
 			alternative_phone_number,
 			street,
-			city
-		) VALUES(?,?,?,?,?,?,CAST(? AS JSON),?,?,?,?)
+			city,
+			cart_ids
+		) VALUES(?,?,?,?,?,?,CAST(? AS JSON),?,?,?,?,?)
 	`
 
 	itemsJSON, err := json.Marshal(newOrder.Items)
+	if err != nil {
+		return fmt.Errorf("failed to marshal items: %w", err)
+	}
+
+	cartIdsJSON, err := json.Marshal(newOrder.CartIds)
 	if err != nil {
 		return fmt.Errorf("failed to marshal items: %w", err)
 	}
@@ -68,6 +74,7 @@ func (o *OrdersRepository) Create(ctx context.Context, tx *sql.Tx, newOrder mode
 		newOrder.AlternativePhoneNumber,
 		newOrder.Street,
 		newOrder.City,
+		string(cartIdsJSON),
 	)
 
 	return err
@@ -134,7 +141,8 @@ func (o *OrdersRepository) GetOrderById(ctx context.Context, orderId string) (mo
 			street,
 			city,
 			created_at,
-			items
+			items,
+			cart_ids
 		FROM
 		 orders where id = ?
 	`
@@ -142,8 +150,11 @@ func (o *OrdersRepository) GetOrderById(ctx context.Context, orderId string) (mo
 	ctx, cancel := context.WithTimeout(ctx, repository.QueryTimeout)
 	defer cancel()
 
-	var order models.Order
-	var itemsJSON sql.NullString
+	var (
+		order       models.Order
+		itemsJSON   sql.NullString
+		cartIdsJSON sql.NullString
+	)
 
 	err := o.Db.QueryRowContext(ctx, query, orderId).Scan(
 		&order.Id,
@@ -159,6 +170,7 @@ func (o *OrdersRepository) GetOrderById(ctx context.Context, orderId string) (mo
 		&order.City,
 		&order.CreatedAt,
 		&itemsJSON,
+		&cartIdsJSON,
 	)
 
 	if err != nil {
@@ -168,6 +180,13 @@ func (o *OrdersRepository) GetOrderById(ctx context.Context, orderId string) (mo
 	// Unmarshal only if not NULL
 	if itemsJSON.Valid && itemsJSON.String != "" {
 		err = json.Unmarshal([]byte(itemsJSON.String), &order.Items)
+		if err != nil {
+			return order, fmt.Errorf("failed to unmarshal items: %w", err)
+		}
+	}
+
+	if cartIdsJSON.Valid && cartIdsJSON.String != "" {
+		err = json.Unmarshal([]byte(cartIdsJSON.String), &order.CartIds)
 		if err != nil {
 			return order, fmt.Errorf("failed to unmarshal items: %w", err)
 		}
