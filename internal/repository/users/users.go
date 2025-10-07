@@ -3,6 +3,8 @@ package users
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
+	"fmt"
 
 	"github.com/faizisyellow/indocoffee/internal/models"
 	"github.com/faizisyellow/indocoffee/internal/repository"
@@ -199,6 +201,7 @@ func (u *UsersRepository) GetUsersCart(ctx context.Context, id int) (models.User
 		if cartId.Valid {
 			cart.Id = int(cartId.Int64)
 			cart.Quantity = int(quantity.Int64)
+			cart.ProductId = int(productId.Int64)
 			cart.Product.Roasted = roasted.String
 			cart.Product.Price = price.Float64
 			cart.Product.Image = image.String
@@ -215,4 +218,104 @@ func (u *UsersRepository) GetUsersCart(ctx context.Context, id int) (models.User
 	}
 
 	return user, rows.Err()
+}
+
+func (o *UsersRepository) GetUsersOrders(ctx context.Context, qry repository.PaginatedOrdersQuery, usrid int) ([]models.Order, error) {
+	query := `
+		SELECT
+			id,
+			idempotency_key,
+			customer_id,
+			customer_name,
+			customer_email,
+			status,
+			total_price,
+			phone_number,
+			alternative_phone_number,
+			street,
+			city,
+			created_at,
+			items,
+			cart_ids
+		FROM (
+			SELECT
+				id,
+				idempotency_key,
+				customer_id,
+				customer_name,
+				customer_email,
+				status,
+				total_price,
+				phone_number,
+				alternative_phone_number,
+				street,
+				city,
+				created_at,
+				items,
+				cart_ids
+			FROM orders
+			WHERE status LIKE concat("%",?,"%") AND customer_id = ?
+		) AS filtered_orders
+		ORDER BY created_at ` + qry.Sort + `
+		LIMIT ?
+		OFFSET ?
+	`
+
+	ctx, cancel := context.WithTimeout(ctx, repository.QueryTimeout)
+	defer cancel()
+
+	rowsResult, err := o.Db.QueryContext(ctx, query, qry.Status, usrid, qry.Limit, qry.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rowsResult.Close()
+
+	var orders []models.Order
+
+	for rowsResult.Next() {
+		var (
+			order       models.Order
+			itemsJSON   sql.NullString
+			cartIdsJSON sql.NullString
+		)
+
+		if err := rowsResult.Scan(
+			&order.Id,
+			&order.IdempotencyKey,
+			&order.CustomerId,
+			&order.CustomerName,
+			&order.CustomerEmail,
+			&order.Status,
+			&order.TotalPrice,
+			&order.PhoneNumber,
+			&order.AlternativePhoneNumber,
+			&order.Street,
+			&order.City,
+			&order.CreatedAt,
+			&itemsJSON,
+			&cartIdsJSON,
+		); err != nil {
+			return nil, err
+		}
+
+		// Unmarshal only if not NULL
+		if itemsJSON.Valid && itemsJSON.String != "" {
+			err = json.Unmarshal([]byte(itemsJSON.String), &order.Items)
+			if err != nil {
+				return nil, fmt.Errorf("failed to unmarshal items: %w", err)
+			}
+		}
+
+		if cartIdsJSON.Valid && cartIdsJSON.String != "" {
+			err = json.Unmarshal([]byte(cartIdsJSON.String), &order.CartIds)
+			if err != nil {
+				return nil, fmt.Errorf("failed to unmarshal items: %w", err)
+			}
+		}
+
+		orders = append(orders, order)
+
+	}
+
+	return orders, rowsResult.Err()
 }

@@ -27,6 +27,7 @@ type UsersServiceInterface interface {
 	DeleteAccount(ctx context.Context, id int) error
 	FindUserById(ctx context.Context, id int) (*models.User, error)
 	FindUsersCart(ctx context.Context, usrId int) (dto.GetUsersCartResponse, error)
+	FindUsersOrders(ctx context.Context, r repository.PaginatedOrdersQuery, usrId int) ([]models.Order, error)
 }
 
 type RolesServiceInterface interface {
@@ -82,6 +83,7 @@ type OrdersServiceInterface interface {
 	CancelOrder(ctx context.Context, orderId string) error
 	ShipOrder(ctx context.Context, orderId string) error
 	CompleteOrder(ctx context.Context, orderId string) error
+	FindOrders(ctx context.Context, r repository.PaginatedOrdersQuery) ([]models.Order, error)
 }
 
 type Service struct {

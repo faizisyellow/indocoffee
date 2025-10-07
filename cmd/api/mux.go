@@ -27,6 +27,7 @@ func (app *Application) Mux() http.Handler {
 		r.Route("/users", func(r chi.Router) {
 			r.Get("/profile", NewHandlerFunc(app.AuthMiddleware)(app.GetUserProfileHandler))
 			r.Get("/cart", NewHandlerFunc(app.AuthMiddleware)(app.FindUsersCartHandler))
+			r.Get("/orders", NewHandlerFunc(app.AuthMiddleware)(app.FindUsersOrdersHandler))
 			r.Delete("/delete", NewHandlerFunc(app.AuthMiddleware)(app.DeleteAccountHandler))
 		})
 
@@ -75,7 +76,7 @@ func (app *Application) Mux() http.Handler {
 		})
 
 		r.Route("/carts", func(r chi.Router) {
-			r.Post("/", NewHandlerFunc(app.AuthMiddleware)(app.CreateCartsHandler))
+			r.Post("/", NewHandlerFunc(app.AuthMiddleware, app.OnlyActionByCustomer)(app.CreateCartsHandler))
 			r.Patch("/{id}/increment", NewHandlerFunc(app.AuthMiddleware, app.CheckOwnerCart)(app.IncrementCartsItemHandler))
 			r.Patch("/{id}/decrement", NewHandlerFunc(app.AuthMiddleware, app.CheckOwnerCart)(app.DecrementCartsHandler))
 			r.Delete("/{id}", NewHandlerFunc(app.AuthMiddleware, app.CheckOwnerCart)(app.DeleteCartsHandler))
@@ -87,6 +88,8 @@ func (app *Application) Mux() http.Handler {
 			r.Patch("/{id}/cancel", NewHandlerFunc(app.AuthMiddleware, app.CheckOwnerOrder)(app.CancelOrderHandler))
 			r.Patch("/{id}/ship", NewHandlerFunc(app.AuthMiddleware, app.AuthorizeManageOrder)(app.ShipOrderHandler))
 			r.Patch("/{id}/complete", NewHandlerFunc(app.AuthMiddleware, app.CheckOwnerOrder)(app.CompleteOrderHandler))
+			r.Get("/{id}", NewHandlerFunc(app.AuthMiddleware, app.CheckOwnerOrder)(app.GetOrderHandler))
+			r.Get("/", NewHandlerFunc(app.AuthMiddleware, app.AuthorizeManageOrder)(app.GetOrdersHandler))
 		})
 
 	})

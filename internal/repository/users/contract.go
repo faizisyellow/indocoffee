@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/faizisyellow/indocoffee/internal/models"
+	"github.com/faizisyellow/indocoffee/internal/repository"
 	"github.com/faizisyellow/indocoffee/internal/utils"
 )
 
@@ -16,6 +17,7 @@ type Users interface {
 	GetById(ctx context.Context, id int) (models.User, error)
 	GetByEmail(ctx context.Context, email string) (models.User, error)
 	GetUsersCart(ctx context.Context, id int) (models.User, error)
+	GetUsersOrders(ctx context.Context, r repository.PaginatedOrdersQuery, usrId int) ([]models.Order, error)
 	Update(ctx context.Context, tx *sql.Tx, usr models.User) error
 	Delete(ctx context.Context, tx *sql.Tx, id int) error
 }

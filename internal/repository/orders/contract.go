@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/faizisyellow/indocoffee/internal/models"
+	"github.com/faizisyellow/indocoffee/internal/repository"
 )
 
 type Orders interface {
@@ -15,6 +16,7 @@ type Orders interface {
 	UpdateOrdersStatusWithTx(ctx context.Context, tx *sql.Tx, orderId string, status OrderStatus) error
 	GetOrderStatusById(ctx context.Context, orderId string) (string, error)
 	GetOrderById(ctx context.Context, orderId string) (models.Order, error)
+	GetOrders(ctx context.Context, r repository.PaginatedOrdersQuery) ([]models.Order, error)
 }
 
 type Contract struct {

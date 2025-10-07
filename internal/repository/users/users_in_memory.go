@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/faizisyellow/indocoffee/internal/models"
+	"github.com/faizisyellow/indocoffee/internal/repository"
 	"github.com/faizisyellow/indocoffee/internal/utils"
 )
 
@@ -82,4 +83,9 @@ func (u *InMemoryUsers) Delete(ctx context.Context, _ *sql.Tx, id int) error {
 func (u *InMemoryUsers) GetUsersCart(ctx context.Context, id int) (models.User, error) {
 
 	return models.User{}, nil
+}
+
+func (u *InMemoryUsers) GetUsersOrders(ctx context.Context, r repository.PaginatedOrdersQuery, usrId int) ([]models.Order, error) {
+
+	return []models.Order{}, nil
 }

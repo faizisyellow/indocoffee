@@ -9,6 +9,7 @@ import (
 
 	"github.com/faizisyellow/indocoffee/internal/db"
 	"github.com/faizisyellow/indocoffee/internal/models"
+	"github.com/faizisyellow/indocoffee/internal/repository"
 	"github.com/faizisyellow/indocoffee/internal/repository/invitations"
 	"github.com/faizisyellow/indocoffee/internal/repository/users"
 	"github.com/faizisyellow/indocoffee/internal/service/dto"
@@ -221,4 +222,13 @@ func (us *UsersServices) FindUsersCart(ctx context.Context, usrId int) (dto.GetU
 	}
 
 	return response, nil
+}
+
+func (u *UsersServices) FindUsersOrders(ctx context.Context, r repository.PaginatedOrdersQuery, usrid int) ([]models.Order, error) {
+	orders, err := u.UsersStore.GetUsersOrders(ctx, r, usrid)
+	if err != nil {
+		return nil, errorService.New(ErrOrdersInternal, err)
+	}
+
+	return orders, nil
 }

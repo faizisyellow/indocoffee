@@ -142,6 +142,29 @@ func (app *Application) CheckOwnerCart(next http.Handler) http.HandlerFunc {
 	}
 }
 
+func (app *Application) OnlyActionByCustomer(next http.Handler) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		user, err := utils.GetContentFromContext[*models.User](r, UsrCtx)
+		if err != nil {
+			ResponseServerError(w, r, err, http.StatusInternalServerError)
+			return
+		}
+
+		allowed, err := app.checkRolePresedence(r.Context(), user, "customer", "customer_only")
+		if err != nil {
+			ResponseServerError(w, r, err, http.StatusBadRequest)
+			return
+		}
+
+		if !allowed {
+			ResponseClientError(w, r, ErrForbiddenAction, http.StatusForbidden)
+			return
+		}
+
+		next.ServeHTTP(w, r)
+	}
+}
+
 func (app *Application) CheckOwnerCartsToOrders(next http.Handler) http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -261,6 +284,8 @@ func (app *Application) CheckOwnerOrder(next http.Handler) http.HandlerFunc {
 			ResponseClientError(w, r, ErrForbiddenAction, http.StatusForbidden)
 			return
 		}
+
+		next.ServeHTTP(w, r)
 	}
 }
 

@@ -9,6 +9,7 @@ import (
 
 	"github.com/faizisyellow/indocoffee/internal/db"
 	"github.com/faizisyellow/indocoffee/internal/models"
+	"github.com/faizisyellow/indocoffee/internal/repository"
 	"github.com/faizisyellow/indocoffee/internal/repository/carts"
 	"github.com/faizisyellow/indocoffee/internal/repository/orders"
 	"github.com/faizisyellow/indocoffee/internal/service/dto"
@@ -281,9 +282,18 @@ func (o *OrdersService) CompleteOrder(ctx context.Context, orderId string) error
 		return errorService.New(ErrOrdersInvalidStatus, ErrOrdersInvalidStatus)
 	}
 
-	if err := o.OrderStore.UpdateOrdersStatus(ctx, orderId, orders.Shipped); err != nil {
+	if err := o.OrderStore.UpdateOrdersStatus(ctx, orderId, orders.Complete); err != nil {
 		return errorService.New(ErrOrdersInternal, err)
 	}
 
 	return nil
+}
+
+func (o *OrdersService) FindOrders(ctx context.Context, r repository.PaginatedOrdersQuery) ([]models.Order, error) {
+	orders, err := o.OrderStore.GetOrders(ctx, r)
+	if err != nil {
+		return nil, errorService.New(ErrOrdersInternal, err)
+	}
+
+	return orders, nil
 }
