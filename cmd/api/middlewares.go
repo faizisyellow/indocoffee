@@ -23,6 +23,18 @@ import (
 
 type Middleware func(http.Handler) http.HandlerFunc
 
+type roleState int
+
+const (
+	Customer roleState = iota
+	Admin
+	SuperAdmin
+)
+
+func (m roleState) String() string {
+	return []string{"customer", "admin", "super admin"}[m]
+}
+
 func NewHandlerFunc(mw ...Middleware) func(http.HandlerFunc) http.HandlerFunc {
 	return func(h http.HandlerFunc) http.HandlerFunc {
 		next := h
@@ -286,6 +298,49 @@ func (app *Application) CheckOwnerOrder(next http.Handler) http.HandlerFunc {
 		}
 
 		next.ServeHTTP(w, r)
+	}
+}
+
+func (app *Application) CheckAuthorization(rolaname string) func(next http.Handler) http.HandlerFunc {
+	return func(next http.Handler) http.HandlerFunc {
+		return func(w http.ResponseWriter, r *http.Request) {
+			if rolaname != Admin.String() && rolaname != Customer.String() && rolaname != SuperAdmin.String() {
+				ResponseServerError(w, r, errors.New("unknown user"), http.StatusBadRequest)
+				return
+			}
+
+			user, err := utils.GetContentFromContext[*models.User](r, UsrCtx)
+			if err != nil {
+				ResponseServerError(w, r, err, http.StatusInternalServerError)
+				return
+			}
+
+			ctx := r.Context()
+			role, err := app.Services.RolesService.FindByName(ctx, rolaname)
+			if err != nil {
+				ResponseServerError(w, r, err, http.StatusBadRequest)
+				return
+			}
+
+			userRole, err := app.Services.RolesService.FindById(ctx, user.RoleId)
+			if err != nil {
+				ResponseServerError(w, r, err, http.StatusBadRequest)
+				return
+			}
+
+			if role.Name == Customer.String() {
+				if userRole.Level >= role.Level {
+					ResponseClientError(w, r, ErrForbiddenAction, http.StatusForbidden)
+					return
+				}
+			} else {
+				if userRole.Level <= role.Level {
+					ResponseClientError(w, r, ErrForbiddenAction, http.StatusForbidden)
+					return
+				}
+			}
+			next.ServeHTTP(w, r)
+		}
 	}
 }
 

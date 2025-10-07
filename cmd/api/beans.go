@@ -15,9 +15,12 @@ import (
 // @Tags			Beans
 // @Accept			json
 // @Produce		json
+// @Security		JWT
 // @Param			payload	body		dto.CreateBeanRequest	true	"Payload create new bean"
 // @Success		201		{object}	main.Envelope{data=string,error=nil}
 // @Failure		400		{object}	main.Envelope{data=nil,error=string}
+// @Failure		401		{object}	main.Envelope{data=nil,error=string}
+// @Failure		403		{object}	main.Envelope{data=nil,error=string}
 // @Failure		409		{object}	main.Envelope{data=nil,error=string}
 // @Failure		500		{object}	main.Envelope{data=nil,error=string}
 // @Router			/beans [post]
@@ -77,9 +80,12 @@ func (app *Application) GetAllBeansHandler(w http.ResponseWriter, r *http.Reques
 // @Description	Get coffee bean by ID
 // @Tags			Beans
 // @Produce		json
+// @Security		JWT
 // @Param			id	path		int	true	"Id coffee bean"
 // @Success		200	{object}	main.Envelope{data=dto.BeanResponse,error=nil}
 // @Failure		400	{object}	main.Envelope{data=nil,error=string}
+// @Failure		401	{object}	main.Envelope{data=nil,error=string}
+// @Failure		403	{object}	main.Envelope{data=nil,error=string}
 // @Failure		404	{object}	main.Envelope{data=nil,error=string}
 // @Failure		500	{object}	main.Envelope{data=nil,error=string}
 // @Router			/beans/{id} [get]
@@ -119,10 +125,13 @@ func (app *Application) GetBeansHandler(w http.ResponseWriter, r *http.Request) 
 // @Tags			Beans
 // @Accept			json
 // @Produce		json
+// @Security		JWT
 // @Param			id		path		int						true	"Id coffee bean"
 // @Param			payload	body		dto.UpdateBeanRequest	true	"Payload Update bean"
 // @Success		200		{object}	main.Envelope{data=string,error=nil}
 // @Failure		400		{object}	main.Envelope{data=nil,error=string}
+// @Failure		401		{object}	main.Envelope{data=nil,error=string}
+// @Failure		403		{object}	main.Envelope{data=nil,error=string}
 // @Failure		404		{object}	main.Envelope{data=nil,error=string}
 // @Failure		409		{object}	main.Envelope{data=nil,error=string}
 // @Failure		500		{object}	main.Envelope{data=nil,error=string}
@@ -171,9 +180,12 @@ func (app *Application) UpdateBeansHandler(w http.ResponseWriter, r *http.Reques
 // @Tags			Beans
 // @Accept			json
 // @Produce		json
+// @Security		JWT
 // @Param			id	path	int	true	"Id coffee bean"
 // @Success		204
 // @Failure		400	{object}	main.Envelope{data=nil,error=string}
+// @Failure		401	{object}	main.Envelope{data=nil,error=string}
+// @Failure		403	{object}	main.Envelope{data=nil,error=string}
 // @Failure		404	{object}	main.Envelope{data=nil,error=string}
 // @Failure		500	{object}	main.Envelope{data=nil,error=string}
 // @Router			/beans/{id} [delete]
@@ -206,7 +218,10 @@ func (app *Application) DeleteBeansHandler(w http.ResponseWriter, r *http.Reques
 // @Summary		Delete coffee's beans
 // @Description	Delete all coffee's beans permanently
 // @Tags			Beans
+// @Security		JWT
 // @Success		204
+// @Failure		401	{object}	main.Envelope{data=nil,error=string}
+// @Failure		403	{object}	main.Envelope{data=nil,error=string}
 // @Failure		404	{object}	main.Envelope{data=nil,error=string}
 // @Failure		500	{object}	main.Envelope{data=nil,error=string}
 // @Router			/beans/trash [delete]

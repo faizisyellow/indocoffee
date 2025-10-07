@@ -599,6 +599,28 @@ paths:
                 error:
                   type: string
               type: object
+        "401":
+          description: Unauthorized
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+        "403":
+          description: Forbidden
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
         "409":
           description: Conflict
           schema:
@@ -621,6 +643,8 @@ paths:
                 error:
                   type: string
               type: object
+      security:
+      - JWT: []
       summary: Add Coffee bean
       tags:
       - Beans
@@ -642,6 +666,28 @@ paths:
           description: No Content
         "400":
           description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+        "403":
+          description: Forbidden
           schema:
             allOf:
             - $ref: '#/definitions/main.Envelope'
@@ -673,6 +719,8 @@ paths:
                 error:
                   type: string
               type: object
+      security:
+      - JWT: []
       summary: Delete coffee bean
       tags:
       - Beans
@@ -709,6 +757,28 @@ paths:
                 error:
                   type: string
               type: object
+        "401":
+          description: Unauthorized
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+        "403":
+          description: Forbidden
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
         "404":
           description: Not Found
           schema:
@@ -731,6 +801,8 @@ paths:
                 error:
                   type: string
               type: object
+      security:
+      - JWT: []
       summary: Get coffee bean
       tags:
       - Beans
@@ -775,6 +847,28 @@ paths:
                 error:
                   type: string
               type: object
+        "401":
+          description: Unauthorized
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+        "403":
+          description: Forbidden
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
         "404":
           description: Not Found
           schema:
@@ -808,6 +902,8 @@ paths:
                 error:
                   type: string
               type: object
+      security:
+      - JWT: []
       summary: Update coffee bean
       tags:
       - Beans
@@ -817,6 +913,28 @@ paths:
       responses:
         "204":
           description: No Content
+        "401":
+          description: Unauthorized
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+        "403":
+          description: Forbidden
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
         "404":
           description: Not Found
           schema:
@@ -839,6 +957,8 @@ paths:
                 error:
                   type: string
               type: object
+      security:
+      - JWT: []
       summary: Delete coffee's beans
       tags:
       - Beans
@@ -1243,6 +1363,28 @@ paths:
                 error:
                   type: string
               type: object
+        "401":
+          description: Unauthorized
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+        "403":
+          description: Forbidden
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
         "409":
           description: Conflict
           schema:
@@ -1265,6 +1407,8 @@ paths:
                 error:
                   type: string
               type: object
+      security:
+      - JWT: []
       summary: Create coffee's form
       tags:
       - Forms
@@ -1286,6 +1430,28 @@ paths:
           description: No Content
         "400":
           description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+        "403":
+          description: Forbidden
           schema:
             allOf:
             - $ref: '#/definitions/main.Envelope'
@@ -1317,6 +1483,8 @@ paths:
                 error:
                   type: string
               type: object
+      security:
+      - JWT: []
       summary: Delete coffee's form
       tags:
       - Forms
@@ -1353,6 +1521,28 @@ paths:
                 error:
                   type: string
               type: object
+        "401":
+          description: Unauthorized
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+        "403":
+          description: Forbidden
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
         "404":
           description: Not Found
           schema:
@@ -1375,6 +1565,8 @@ paths:
                 error:
                   type: string
               type: object
+      security:
+      - JWT: []
       summary: Get coffee's form
       tags:
       - Forms
@@ -1419,6 +1611,28 @@ paths:
                 error:
                   type: string
               type: object
+        "401":
+          description: Unauthorized
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+        "403":
+          description: Forbidden
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
         "404":
           description: Not Found
           schema:
@@ -1452,6 +1666,8 @@ paths:
                 error:
                   type: string
               type: object
+      security:
+      - JWT: []
       summary: Update coffee's form
       tags:
       - Forms
@@ -1461,6 +1677,28 @@ paths:
       responses:
         "204":
           description: No Content
+        "401":
+          description: Unauthorized
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+        "403":
+          description: Forbidden
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
         "404":
           description: Not Found
           schema:
@@ -1483,6 +1721,8 @@ paths:
                 error:
                   type: string
               type: object
+      security:
+      - JWT: []
       summary: Delete coffee's forms
       tags:
       - Forms
@@ -2156,6 +2396,28 @@ paths:
                 error:
                   type: string
               type: object
+        "401":
+          description: Unauthorized
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+        "403":
+          description: Forbidden
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
         "409":
           description: Conflict
           schema:
@@ -2178,6 +2440,8 @@ paths:
                 error:
                   type: string
               type: object
+      security:
+      - JWT: []
       summary: Add new product
       tags:
       - Products
@@ -2199,6 +2463,28 @@ paths:
           description: No Content
         "400":
           description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+        "403":
+          description: Forbidden
           schema:
             allOf:
             - $ref: '#/definitions/main.Envelope'
@@ -2230,6 +2516,8 @@ paths:
                 error:
                   type: string
               type: object
+      security:
+      - JWT: []
       summary: Delete product
       tags:
       - Products
@@ -2338,6 +2626,28 @@ paths:
                 error:
                   type: string
               type: object
+        "401":
+          description: Unauthorized
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+        "403":
+          description: Forbidden
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
         "404":
           description: Not Found
           schema:
@@ -2371,6 +2681,8 @@ paths:
                 error:
                   type: string
               type: object
+      security:
+      - JWT: []
       summary: Edit product
       tags:
       - Products
@@ -2393,6 +2705,28 @@ paths:
                 error:
                   type: object
               type: object
+        "401":
+          description: Unauthorized
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+        "403":
+          description: Forbidden
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
         "500":
           description: Internal Server Error
           schema:
@@ -2404,6 +2738,8 @@ paths:
                 error:
                   type: string
               type: object
+      security:
+      - JWT: []
       summary: Get user roles
       tags:
       - Roles
@@ -2443,6 +2779,28 @@ paths:
                 error:
                   type: string
               type: object
+        "401":
+          description: Unauthorized
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+        "403":
+          description: Forbidden
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
         "409":
           description: Conflict
           schema:
@@ -2465,6 +2823,8 @@ paths:
                 error:
                   type: string
               type: object
+      security:
+      - JWT: []
       summary: Add user role
       tags:
       - Roles
@@ -2486,6 +2846,28 @@ paths:
           description: No Content
         "400":
           description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+        "403":
+          description: Forbidden
           schema:
             allOf:
             - $ref: '#/definitions/main.Envelope'
@@ -2517,6 +2899,8 @@ paths:
                 error:
                   type: string
               type: object
+      security:
+      - JWT: []
       summary: Delete user role
       tags:
       - Roles
@@ -2555,6 +2939,28 @@ paths:
                 error:
                   type: string
               type: object
+        "401":
+          description: Unauthorized
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+        "403":
+          description: Forbidden
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
         "404":
           description: Not Found
           schema:
@@ -2577,6 +2983,8 @@ paths:
                 error:
                   type: string
               type: object
+      security:
+      - JWT: []
       summary: Get user role
       tags:
       - Roles
@@ -2621,6 +3029,28 @@ paths:
                 error:
                   type: string
               type: object
+        "401":
+          description: Unauthorized
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+        "403":
+          description: Forbidden
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
         "404":
           description: Not Found
           schema:
@@ -2654,6 +3084,8 @@ paths:
                 error:
                   type: string
               type: object
+      security:
+      - JWT: []
       summary: Update user role
       tags:
       - Roles
@@ -2663,6 +3095,28 @@ paths:
       responses:
         "204":
           description: No Content
+        "401":
+          description: Unauthorized
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
+        "403":
+          description: Forbidden
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Envelope'
+            - properties:
+                data:
+                  type: object
+                error:
+                  type: string
+              type: object
         "404":
           description: Not Found
           schema:
@@ -2685,6 +3139,8 @@ paths:
                 error:
                   type: string
               type: object
+      security:
+      - JWT: []
       summary: Delete user roles
       tags:
       - Roles

@@ -9,6 +9,7 @@ import (
 
 func (app *Application) Mux() http.Handler {
 
+	adminRole := Admin.String()
 	r := chi.NewRouter()
 
 	r.Route("/v1", func(r chi.Router) {
@@ -41,38 +42,38 @@ func (app *Application) Mux() http.Handler {
 		})
 
 		r.Route("/roles", func(r chi.Router) {
-			r.Post("/", app.CreateRolesHandler)
-			r.Get("/", app.GetAllRolesHandler)
-			r.Get("/{id}", app.GetRolesHandler)
-			r.Patch("/{id}", app.UpdateRolesHandler)
-			r.Delete("/{id}", app.DeleteRolesHandler)
-			r.Delete("/trash", app.TrashRolesHandler)
+			r.Post("/", NewHandlerFunc(app.AuthMiddleware, app.CheckAuthorization(adminRole))(app.CreateRolesHandler))
+			r.Get("/", NewHandlerFunc(app.AuthMiddleware, app.CheckAuthorization(adminRole))(app.GetAllRolesHandler))
+			r.Get("/{id}", NewHandlerFunc(app.AuthMiddleware, app.CheckAuthorization(adminRole))(app.GetRolesHandler))
+			r.Patch("/{id}", NewHandlerFunc(app.AuthMiddleware, app.CheckAuthorization(adminRole))(app.UpdateRolesHandler))
+			r.Delete("/{id}", NewHandlerFunc(app.AuthMiddleware, app.CheckAuthorization(adminRole))(app.DeleteRolesHandler))
+			r.Delete("/trash", NewHandlerFunc(app.AuthMiddleware, app.CheckAuthorization(adminRole))(app.TrashRolesHandler))
 		})
 
 		r.Route("/beans", func(r chi.Router) {
-			r.Post("/", app.CreateBeansHandler)
 			r.Get("/", app.GetAllBeansHandler)
-			r.Get("/{id}", app.GetBeansHandler)
-			r.Patch("/{id}", app.UpdateBeansHandler)
-			r.Delete("/{id}", app.DeleteBeansHandler)
-			r.Delete("/trash", app.TrashBeansHandler)
+			r.Post("/", NewHandlerFunc(app.AuthMiddleware, app.CheckAuthorization(adminRole))(app.CreateBeansHandler))
+			r.Get("/{id}", NewHandlerFunc(app.AuthMiddleware, app.CheckAuthorization(adminRole))(app.GetBeansHandler))
+			r.Patch("/{id}", NewHandlerFunc(app.AuthMiddleware, app.CheckAuthorization(adminRole))(app.UpdateBeansHandler))
+			r.Delete("/{id}", NewHandlerFunc(app.AuthMiddleware, app.CheckAuthorization(adminRole))(app.DeleteBeansHandler))
+			r.Delete("/trash", NewHandlerFunc(app.AuthMiddleware, app.CheckAuthorization(adminRole))(app.TrashBeansHandler))
 		})
 
 		r.Route("/forms", func(r chi.Router) {
-			r.Post("/", app.CreateFormsHandler)
 			r.Get("/", app.GetAllFormsHandler)
-			r.Get("/{id}", app.GetFormsHandler)
-			r.Patch("/{id}", app.UpdateFormsHandler)
-			r.Delete("/{id}", app.DeleteFormsHandler)
-			r.Delete("/trash", app.TrashFormsHandler)
+			r.Post("/", NewHandlerFunc(app.AuthMiddleware, app.CheckAuthorization(adminRole))(app.CreateFormsHandler))
+			r.Get("/{id}", NewHandlerFunc(app.AuthMiddleware, app.CheckAuthorization(adminRole))(app.GetFormsHandler))
+			r.Patch("/{id}", NewHandlerFunc(app.AuthMiddleware, app.CheckAuthorization(adminRole))(app.UpdateFormsHandler))
+			r.Delete("/{id}", NewHandlerFunc(app.AuthMiddleware, app.CheckAuthorization(adminRole))(app.DeleteFormsHandler))
+			r.Delete("/trash", NewHandlerFunc(app.AuthMiddleware, app.CheckAuthorization(adminRole))(app.TrashFormsHandler))
 		})
 
 		r.Route("/products", func(r chi.Router) {
-			r.Post("/", app.CreateProductsHandler)
-			r.Get("/{id}", app.GetProductHandler)
 			r.Get("/", app.GetProductsHandler)
-			r.Patch("/{id}", app.UpdateProductHandler)
-			r.Delete("/{id}", app.DeleteProductHandler)
+			r.Get("/{id}", app.GetProductHandler)
+			r.Post("/", NewHandlerFunc(app.AuthMiddleware, app.CheckAuthorization(adminRole))(app.CreateProductsHandler))
+			r.Patch("/{id}", NewHandlerFunc(app.AuthMiddleware, app.CheckAuthorization(adminRole))(app.UpdateProductHandler))
+			r.Delete("/{id}", NewHandlerFunc(app.AuthMiddleware, app.CheckAuthorization(adminRole))(app.DeleteProductHandler))
 		})
 
 		r.Route("/carts", func(r chi.Router) {
