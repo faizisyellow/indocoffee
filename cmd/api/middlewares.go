@@ -223,6 +223,47 @@ func (app *Application) AuthorizeManageOrder(next http.Handler) http.HandlerFunc
 	}
 }
 
+func (app *Application) CheckOwnerCartsToCancel(next http.Handler) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		user, err := utils.GetContentFromContext[*models.User](r, UsrCtx)
+		if err != nil {
+			ResponseServerError(w, r, err, http.StatusInternalServerError)
+			return
+		}
+
+		ctx := r.Context()
+
+		order, err := app.Services.OrdersService.FindById(ctx, chi.URLParam(r, "id"))
+		if err != nil {
+			errService := errorService.GetError(err)
+			switch errService.E {
+			case service.ErrOrdersNotFound:
+				ResponseClientError(w, r, err, http.StatusNotFound)
+			default:
+				ResponseServerError(w, r, err, http.StatusInternalServerError)
+			}
+			return
+		}
+
+		if order.CustomerId == user.Id {
+			next.ServeHTTP(w, r)
+			return
+		}
+
+		allowed, err := app.checkRolePresedence(ctx, user, "admin", "")
+		if err != nil {
+			ResponseServerError(w, r, err, http.StatusBadRequest)
+			return
+		}
+
+		if !allowed {
+			ResponseClientError(w, r, ErrForbiddenAction, http.StatusForbidden)
+			return
+		}
+	}
+}
+
 func (app *Application) checkRolePresedence(ctx context.Context, user *models.User, rolename string, event string) (bool, error) {
 	role, err := app.Services.RolesService.FindByName(ctx, rolename)
 	if err != nil {

@@ -35,7 +35,7 @@ var (
 	ErrOrdersItemEmpty     = errors.New("orders: items empty")
 	ErrOrdersConflict      = errors.New("orders: already exist")
 	ErrOrdersQuantityIssue = errors.New("orders: one of the item is not available")
-	ErrOrdersInvalidStatus = errors.New("orders: has already been cancelled or is complete")
+	ErrOrdersInvalidStatus = errors.New("orders: has already been cancelled or is being proccess")
 )
 
 func (o *OrdersService) Create(ctx context.Context, idemKey string, req dto.CreateOrderRequest, usrId int) error {
@@ -181,4 +181,69 @@ func (o *OrdersService) ExecuteItems(ctx context.Context, orderId string) error 
 	}
 
 	return nil
+}
+
+func (o *OrdersService) FindById(ctx context.Context, orderId string) (models.Order, error) {
+	order, err := o.OrderStore.GetOrderById(ctx, orderId)
+	if err != nil {
+		switch err {
+		case sql.ErrNoRows:
+			return models.Order{}, errorService.New(ErrOrdersNotFound, err)
+		default:
+			return models.Order{}, errorService.New(ErrOrdersInternal, err)
+		}
+	}
+
+	return order, nil
+}
+
+func (o *OrdersService) CancelOrder(ctx context.Context, orderId string) error {
+	statusOrder, err := o.OrderStore.GetOrderStatusById(ctx, orderId)
+	if err != nil {
+		switch err {
+		case sql.ErrNoRows:
+			return errorService.New(ErrOrdersNotFound, err)
+		default:
+			return errorService.New(ErrOrdersInternal, err)
+		}
+	}
+
+	if statusOrder != orders.Confirm.String() && statusOrder != orders.Cancelled.String() {
+		return errorService.New(ErrOrdersInvalidStatus, ErrOrdersInvalidStatus)
+	}
+
+	return o.Transaction.WithTx(ctx, func(tx *sql.Tx) error {
+		if err := o.OrderStore.UpdateOrdersStatusWithTx(ctx, tx, orderId, orders.Cancelled); err != nil {
+			return errorService.New(ErrOrdersInternal, err)
+		}
+
+		orderWithItems, err := o.OrderStore.GetOrderById(ctx, orderId)
+		if err != nil {
+			switch err {
+			case sql.ErrNoRows:
+				return errorService.New(ErrOrdersNotFound, err)
+			default:
+				return errorService.New(ErrOrdersInternal, err)
+			}
+		}
+
+		for _, item := range orderWithItems.Items {
+			if err := o.ProductsService.IncreaseQuantityProduct(ctx, tx, item.Id, item.OrderQuantity); err != nil {
+				return err
+			}
+		}
+
+		for _, cartId := range orderWithItems.OrderIds {
+			if err := o.CartsStore.DeleteWithTx(ctx, tx, cartId); err != nil {
+				switch err {
+				case sql.ErrNoRows:
+					return errorService.New(ErrCartNotFound, err)
+				default:
+					return errorService.New(ErrOrdersInternal, err)
+				}
+			}
+		}
+
+		return nil
+	})
 }

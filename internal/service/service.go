@@ -78,6 +78,8 @@ type CartsServiceInterface interface {
 type OrdersServiceInterface interface {
 	Create(ctx context.Context, idempKey string, req dto.CreateOrderRequest, usrId int) error
 	ExecuteItems(ctx context.Context, orderId string) error
+	FindById(ctx context.Context, orderId string) (models.Order, error)
+	CancelOrder(ctx context.Context, orderId string) error
 }
 
 type Service struct {

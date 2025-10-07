@@ -18,6 +18,7 @@ type Order struct {
 	Street                 string      `json:"street"`
 	City                   string      `json:"city"`
 	CreatedAt              time.Time   `json:"created_at"`
+	OrderIds               []int       `json:"order_ids"`
 }
 
 type OrderItem struct {

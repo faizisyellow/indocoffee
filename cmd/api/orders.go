@@ -110,3 +110,33 @@ func (app *Application) ExecuteItemsHandler(w http.ResponseWriter, r *http.Reque
 
 	ResponseSuccess(w, r, "success update order to be roasting", http.StatusOK)
 }
+
+// @Summary		Cancel Order
+// @Description	Perform cancel for an order
+// @Tags			Orders
+// @Accept			json
+// @Produce		json
+// @Param			id	path	string	true	"Order id"
+// @Security		JWT
+// @Success		200	{object}	main.Envelope{data=string,error=nil}
+// @Failure		400	{object}	main.Envelope{data=nil,error=string}
+// @Failure		403	{object}	main.Envelope{data=nil,error=string}
+// @Failure		404	{object}	main.Envelope{data=nil,error=string}
+// @Failure		500	{object}	main.Envelope{data=nil,error=string}
+// @Router			/orders/{id}/cancel [patch]
+func (app *Application) CancelOrderHandler(w http.ResponseWriter, r *http.Request) {
+	if err := app.Services.OrdersService.CancelOrder(r.Context(), chi.URLParam(r, "id")); err != nil {
+		errValue := errorService.GetError(err)
+		switch errValue.E {
+		case service.ErrOrdersNotFound:
+			ResponseClientError(w, r, err, http.StatusNotFound)
+		case service.ErrOrdersInvalidStatus:
+			ResponseClientError(w, r, err, http.StatusBadRequest)
+		default:
+			ResponseServerError(w, r, err, http.StatusInternalServerError)
+		}
+		return
+	}
+
+	ResponseSuccess(w, r, "success update order to be cancelled", http.StatusOK)
+}

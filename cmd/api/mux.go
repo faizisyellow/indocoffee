@@ -84,6 +84,7 @@ func (app *Application) Mux() http.Handler {
 		r.Route("/orders", func(r chi.Router) {
 			r.Post("/", NewHandlerFunc(app.AuthMiddleware, app.CheckOwnerCartsToOrders)(app.CreateOrdersHandler))
 			r.Patch("/{id}/roast", NewHandlerFunc(app.AuthMiddleware, app.AuthorizeManageOrder)(app.ExecuteItemsHandler))
+			r.Patch("/{id}/cancel", NewHandlerFunc(app.AuthMiddleware, app.CheckOwnerCartsToCancel)(app.CancelOrderHandler))
 		})
 
 	})

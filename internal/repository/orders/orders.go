@@ -10,6 +10,21 @@ import (
 	"github.com/faizisyellow/indocoffee/internal/repository"
 )
 
+type OrderStatus int
+
+const (
+	Confirm OrderStatus = iota
+	Roasting
+	Shipped
+	Complete
+	Cancelled
+)
+
+func (o OrderStatus) String() string {
+
+	return []string{"confirm", "roasting", "shipped", "complete", "cancelled"}[o]
+}
+
 type OrdersRepository struct {
 	Db *sql.DB
 }
@@ -94,7 +109,7 @@ func (o *OrdersRepository) UpdateOrdersStatus(ctx context.Context, orderId strin
 	return err
 }
 
-func (o *OrdersRepository) UpdateOrdersStatusWithTx(ctx context.Context, tx *sql.Tx, orderId int, status OrderStatus) error {
+func (o *OrdersRepository) UpdateOrdersStatusWithTx(ctx context.Context, tx *sql.Tx, orderId string, status OrderStatus) error {
 	query := `UPDATE orders SET status  = ? WHERE id = ?`
 
 	ctx, cancel := context.WithTimeout(ctx, repository.QueryTimeout)
@@ -104,17 +119,59 @@ func (o *OrdersRepository) UpdateOrdersStatusWithTx(ctx context.Context, tx *sql
 	return err
 }
 
-type OrderStatus int
+func (o *OrdersRepository) GetOrderById(ctx context.Context, orderId string) (models.Order, error) {
+	query := `
+		SELECT
+			id,
+			idempotency_key,
+			customer_id,
+			customer_name,
+			customer_email,
+			status,
+			total_price,
+			phone_number,
+			alternative_phone_number,
+			street,
+			city,
+			created_at,
+			items
+		FROM
+		 orders where id = ?
+	`
 
-const (
-	Confirm OrderStatus = iota
-	Roasting
-	Shipped
-	Complete
-	Cancelled
-)
+	ctx, cancel := context.WithTimeout(ctx, repository.QueryTimeout)
+	defer cancel()
 
-func (o OrderStatus) String() string {
+	var order models.Order
+	var itemsJSON sql.NullString
 
-	return []string{"confirm", "roasting", "shipped", "complete", "cancelled"}[o]
+	err := o.Db.QueryRowContext(ctx, query, orderId).Scan(
+		&order.Id,
+		&order.IdempotencyKey,
+		&order.CustomerId,
+		&order.CustomerName,
+		&order.CustomerEmail,
+		&order.Status,
+		&order.TotalPrice,
+		&order.PhoneNumber,
+		&order.AlternativePhoneNumber,
+		&order.Street,
+		&order.City,
+		&order.CreatedAt,
+		&itemsJSON,
+	)
+
+	if err != nil {
+		return order, err
+	}
+
+	// Unmarshal only if not NULL
+	if itemsJSON.Valid && itemsJSON.String != "" {
+		err = json.Unmarshal([]byte(itemsJSON.String), &order.Items)
+		if err != nil {
+			return order, fmt.Errorf("failed to unmarshal items: %w", err)
+		}
+	}
+
+	return order, nil
 }
