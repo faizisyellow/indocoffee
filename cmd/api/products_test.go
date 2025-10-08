@@ -21,7 +21,6 @@ func TestProducts(t *testing.T) {
 
 		var (
 			app     = setupTestApplication(t)
-			handler = app.Mux()
 			request = dto.CreateProductMetadataRequest{
 				Roasted:  "light",
 				Price:    17.5,
@@ -69,12 +68,12 @@ func TestProducts(t *testing.T) {
 			t.Fatal(err)
 		}
 
+		handler := app.CreateProductsHandler
 		req, err := http.NewRequest("POST", "/v1/products", buf)
-
 		req.Header.Set("Content-Type", writer.FormDataContentType())
 
 		rr := httptest.NewRecorder()
-		handler.ServeHTTP(rr, req)
+		handler(rr, req)
 
 		if rr.Code != 201 {
 			t.Errorf("should be success, got: %v", rr.Code)
