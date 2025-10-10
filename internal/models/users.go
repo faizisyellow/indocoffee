@@ -8,14 +8,15 @@ import (
 )
 
 type User struct {
-	Id        int       `json:"id"`
-	Username  string    `json:"username"`
-	Email     string    `json:"email"`
-	Password  Hashed    `json:"-"`
-	IsActive  *bool     `json:"is_active"`
-	RoleId    int       `json:"role_id"`
-	CreatedAt time.Time `json:"created_at"`
-	Carts     []Cart    `json:"carts"`
+	Id        int         `json:"id"`
+	Username  string      `json:"username"`
+	Email     string      `json:"email"`
+	Password  Hashed      `json:"-"`
+	IsActive  *bool       `json:"is_active"`
+	RoleId    int         `json:"role_id"`
+	CreatedAt time.Time   `json:"created_at"`
+	Carts     []Cart      `json:"carts"`
+	Role      *RolesModel `json:"role"`
 }
 
 type Hashed struct {
