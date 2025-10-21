@@ -29,9 +29,7 @@ type JwtConfig struct {
 	SecretKey string
 	Iss       string
 	Sub       string
-
-	// Unix time
-	Exp int64
+	Exp       time.Duration
 }
 
 type Application struct {

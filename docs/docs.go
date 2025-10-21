@@ -2762,7 +2762,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "type": "string"
+                                            "$ref": "#/definitions/dto.CreateOrderResponse"
                                         },
                                         "error": {
                                             "type": "object"
@@ -5713,6 +5713,14 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.CreateOrderResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                }
+            }
+        },
         "dto.CreateRoleRequest": {
             "type": "object",
             "required": [
@@ -5894,7 +5902,7 @@ const docTemplate = `{
                 "email": {
                     "type": "string"
                 },
-                "int": {
+                "id": {
                     "type": "integer"
                 },
                 "is_active": {
@@ -5972,6 +5980,20 @@ const docTemplate = `{
             "properties": {
                 "token": {
                     "type": "string"
+                },
+                "user": {
+                    "type": "object",
+                    "properties": {
+                        "email": {
+                            "type": "string"
+                        },
+                        "id": {
+                            "type": "integer"
+                        },
+                        "role_name": {
+                            "type": "string"
+                        }
+                    }
                 }
             }
         },

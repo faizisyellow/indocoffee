@@ -39,19 +39,19 @@ var (
 	ErrOrdersInvalidStatus = errors.New("orders: has already been cancelled or is being proccess")
 )
 
-func (o *OrdersService) Create(ctx context.Context, idemKey string, req dto.CreateOrderRequest, usrId int) error {
+func (o *OrdersService) Create(ctx context.Context, idemKey string, req dto.CreateOrderRequest, usrId int) (string, error) {
 	idempotencyKeyExist, err := o.OrderStore.GetIdempotencyKey(ctx, idemKey)
 	if err != nil && err != sql.ErrNoRows {
-		return errorService.New(ErrOrdersInternal, err)
+		return "", errorService.New(ErrOrdersInternal, err)
 	}
 
 	if idempotencyKeyExist != "" {
-		return errorService.New(ErrOrdersConflict, ErrOrdersConflict)
+		return "", errorService.New(ErrOrdersConflict, ErrOrdersConflict)
 	}
 
 	customer, err := o.UsersService.FindUserById(ctx, usrId)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	var (
@@ -84,7 +84,7 @@ func (o *OrdersService) Create(ctx context.Context, idemKey string, req dto.Crea
 		}
 
 		if item.Quantity >= product.Quantity || product.Quantity <= 0 {
-			return ErrOrdersQuantityIssue
+			return "", ErrOrdersQuantityIssue
 		}
 
 		totalPrice += product.Price * float64(item.Quantity)
@@ -100,13 +100,13 @@ func (o *OrdersService) Create(ctx context.Context, idemKey string, req dto.Crea
 	}
 
 	if len(items) == 0 {
-		return errorService.New(ErrOrdersItemEmpty, ErrOrdersItemEmpty)
+		return "", errorService.New(ErrOrdersItemEmpty, ErrOrdersItemEmpty)
 	}
 
 	if req.AlternativePhoneNumber != nil {
 		cleantAlt, err := utils.ValidateAndFormatPhoneNumber(*req.AlternativePhoneNumber)
 		if err != nil {
-			return err
+			return "", err
 		}
 		alternativePhone = &cleantAlt
 	}
@@ -118,7 +118,7 @@ func (o *OrdersService) Create(ctx context.Context, idemKey string, req dto.Crea
 
 	req.PhoneNumber, err = utils.ValidateAndFormatPhoneNumber(req.PhoneNumber)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	newOrder := models.Order{
@@ -137,8 +137,11 @@ func (o *OrdersService) Create(ctx context.Context, idemKey string, req dto.Crea
 		CartIds:                req.CartIds,
 	}
 
-	return o.Transaction.WithTx(ctx, func(tx *sql.Tx) error {
-		if err := o.OrderStore.Create(ctx, tx, newOrder); err != nil {
+	var newOrderId string
+
+	return newOrderId, o.Transaction.WithTx(ctx, func(tx *sql.Tx) (err error) {
+		newOrderId, err = o.OrderStore.Create(ctx, tx, newOrder)
+		if err != nil {
 			return errorService.New(ErrOrdersInternal, err)
 		}
 
@@ -161,6 +164,7 @@ func (o *OrdersService) Create(ctx context.Context, idemKey string, req dto.Crea
 
 		return nil
 	})
+
 }
 
 func (o *OrdersService) ExecuteItems(ctx context.Context, orderId string) error {

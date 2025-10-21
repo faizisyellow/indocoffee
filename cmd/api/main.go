@@ -23,6 +23,7 @@ import (
 	"github.com/faizisyellow/indocoffee/internal/utils"
 	"github.com/google/uuid"
 	"github.com/joho/godotenv"
+	"github.com/oklog/ulid/v2"
 	"go.uber.org/zap"
 )
 
@@ -53,10 +54,10 @@ func main() {
 
 	dbConfig := DBConf{
 		Addr:            os.Getenv("DB_ADDR"),
-		MaxOpenConn:     30,
-		MaxIdleConn:     30,
-		MaxLifeTime:     "4m",
-		MaxIdleLifeTime: "4m",
+		MaxOpenConn:     10,
+		MaxIdleConn:     10,
+		MaxLifeTime:     "3m",
+		MaxIdleLifeTime: "3m",
 	}
 
 	dbs, err := db.New(
@@ -98,6 +99,7 @@ func main() {
 		upt,
 		&db.TransactionDB{Db: dbs},
 		ud,
+		utils.Ulid(ulid.Make().String),
 		&carts.CartsRepository{Db: dbs},
 		&orders.OrdersRepository{Db: dbs},
 	)
@@ -106,7 +108,7 @@ func main() {
 		SecretKey: os.Getenv("SECRET_KEY"),
 		Iss:       "authentication",
 		Sub:       "user",
-		Exp:       time.Now().Add(time.Hour * 24 * 3).Unix(),
+		Exp:       time.Hour * 24,
 	}
 
 	jwtAuthentication := auth.New(jwtTokenConfig.SecretKey, jwtTokenConfig.Iss, jwtTokenConfig.Sub)

@@ -14,22 +14,22 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-//	@Summary		Add new product
-//	@Description	Create new coffee  product
-//	@Tags			Products
-//	@Accept			mpfd
-//	@Produce		json
+// @Summary		Add new product
+// @Description	Create new coffee  product
+// @Tags			Products
+// @Accept			mpfd
+// @Produce		json
 //
-//	@Param			metadata	formData	string	true	"Create product JSON string"	example({"roasted":"light","price":10.2,"quantity":50,"bean":1,"form":1})
-//	@Security		JWT
-//	@Param			file	formData	file	true	"Image file"
-//	@Success		201		{object}	main.Envelope{data=string,error=nil}
-//	@Failure		400		{object}	main.Envelope{data=nil,error=string}
-//	@Failure		401		{object}	main.Envelope{data=nil,error=string}
-//	@Failure		403		{object}	main.Envelope{data=nil,error=string}
-//	@Failure		409		{object}	main.Envelope{data=nil,error=string}
-//	@Failure		500		{object}	main.Envelope{data=nil,error=string}
-//	@Router			/products [post]
+// @Param			metadata	formData	string	true	"Create product JSON string"	example({"roasted":"light","price":10.2,"quantity":50,"bean":1,"form":1})
+// @Security		JWT
+// @Param			file	formData	file	true	"Image file"
+// @Success		201		{object}	main.Envelope{data=string,error=nil}
+// @Failure		400		{object}	main.Envelope{data=nil,error=string}
+// @Failure		401		{object}	main.Envelope{data=nil,error=string}
+// @Failure		403		{object}	main.Envelope{data=nil,error=string}
+// @Failure		409		{object}	main.Envelope{data=nil,error=string}
+// @Failure		500		{object}	main.Envelope{data=nil,error=string}
+// @Router			/products [post]
 func (app *Application) CreateProductsHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Limit request body to 3 MB
@@ -60,6 +60,11 @@ func (app *Application) CreateProductsHandler(w http.ResponseWriter, r *http.Req
 
 	if handler.Size > 2<<20 {
 		ResponseClientError(w, r, errors.New("file too big"), http.StatusBadRequest)
+		return
+	}
+
+	if handler.Size < 512 {
+		ResponseClientError(w, r, errors.New("file too small or empty"), http.StatusBadRequest)
 		return
 	}
 
@@ -97,18 +102,18 @@ func (app *Application) CreateProductsHandler(w http.ResponseWriter, r *http.Req
 	ResponseSuccess(w, r, "success create new product", http.StatusCreated)
 }
 
-//	@Summary		Get product
-//	@Description	Get coffee  product by id
-//	@Tags			Products
-//	@Accept			json
-//	@Produce		json
+// @Summary		Get product
+// @Description	Get coffee  product by id
+// @Tags			Products
+// @Accept			json
+// @Produce		json
 //
-//	@Param			id	path		int	true	"product id"
-//	@Success		200	{object}	main.Envelope{data=dto.GetProductResponse,error=nil}
-//	@Failure		400	{object}	main.Envelope{data=nil,error=string}
-//	@Failure		404	{object}	main.Envelope{data=nil,error=string}
-//	@Failure		500	{object}	main.Envelope{data=nil,error=string}
-//	@Router			/products/{id} [get]
+// @Param			id	path		int	true	"product id"
+// @Success		200	{object}	main.Envelope{data=dto.GetProductResponse,error=nil}
+// @Failure		400	{object}	main.Envelope{data=nil,error=string}
+// @Failure		404	{object}	main.Envelope{data=nil,error=string}
+// @Failure		500	{object}	main.Envelope{data=nil,error=string}
+// @Router			/products/{id} [get]
 func (app *Application) GetProductHandler(w http.ResponseWriter, r *http.Request) {
 	idParam := chi.URLParam(r, "id")
 
@@ -145,21 +150,21 @@ func (app *Application) GetProductHandler(w http.ResponseWriter, r *http.Request
 	ResponseSuccess(w, r, response, http.StatusOK)
 }
 
-//	@Summary		Get products
-//	@Description	Get all coffee  products
-//	@Tags			Products
-//	@Accept			json
-//	@Produce		json
-//	@Param			limit	query		string	false	"limit each page"
-//	@Param			offset	query		string	false	"skip rows"
-//	@Param			sort	query		string	false	"sort product by alphabet"
-//	@Param			roast	query		string	false	"roasted coffee"
-//	@Param			form	query		string	false	"what kind of form of the coffee (form id)"
-//	@Param			bean	query		string	false	"what kind of bean of the coffee (bean id)"
-//	@Success		200		{object}	main.Envelope{data=[]dto.GetProductsResponse,error=nil}
-//	@Success		400		{object}	main.Envelope{data=nil,error=string}
-//	@Failure		500		{object}	main.Envelope{data=nil,error=string}
-//	@Router			/products [get]
+// @Summary		Get products
+// @Description	Get all coffee  products
+// @Tags			Products
+// @Accept			json
+// @Produce		json
+// @Param			limit	query		string	false	"limit each page"
+// @Param			offset	query		string	false	"skip rows"
+// @Param			sort	query		string	false	"sort product by price"
+// @Param			roast	query		string	false	"roasted coffee"
+// @Param			form	query		string	false	"what kind of form of the coffee (form id)"
+// @Param			bean	query		string	false	"what kind of bean of the coffee (bean id)"
+// @Success		200		{object}	main.Envelope{data=[]dto.GetProductsResponse,error=nil}
+// @Success		400		{object}	main.Envelope{data=nil,error=string}
+// @Failure		500		{object}	main.Envelope{data=nil,error=string}
+// @Router			/products [get]
 func (app *Application) GetProductsHandler(w http.ResponseWriter, r *http.Request) {
 	queryValue := r.URL.Query()
 	query := repository.QueryProducts{
@@ -208,25 +213,25 @@ func (app *Application) GetProductsHandler(w http.ResponseWriter, r *http.Reques
 	ResponseSuccess(w, r, response, http.StatusOK)
 }
 
-//	@Summary		Edit product
-//	@Description	Update spesific product
-//	@Tags			Products
-//	@Accept			mpfd
-//	@Produce		json
+// @Summary		Edit product
+// @Description	Update spesific product
+// @Tags			Products
+// @Accept			mpfd
+// @Produce		json
 //
-//	@Param			metadata	formData	string	true	"Update product JSON string"	example({"roasted":"medium","quantity":50})
-//	@Security		JWT
-//	@Param			file	formData	file	false	"Image file"
-//	@Param			id		path		int		true	"Product id"
-//	@Success		200		{object}	main.Envelope{data=string,error=nil}
-//	@Failure		400		{object}	main.Envelope{data=nil,error=string}
-//	@Failure		401		{object}	main.Envelope{data=nil,error=string}
-//	@Failure		403		{object}	main.Envelope{data=nil,error=string}
+// @Param			metadata	formData	string	true	"Update product JSON string"	example({"roasted":"medium","quantity":50})
+// @Security		JWT
+// @Param			file	formData	file	false	"Image file"
+// @Param			id		path		int		true	"Product id"
+// @Success		200		{object}	main.Envelope{data=string,error=nil}
+// @Failure		400		{object}	main.Envelope{data=nil,error=string}
+// @Failure		401		{object}	main.Envelope{data=nil,error=string}
+// @Failure		403		{object}	main.Envelope{data=nil,error=string}
 //
-//	@Failure		404		{object}	main.Envelope{data=nil,error=string}
-//	@Failure		409		{object}	main.Envelope{data=nil,error=string}
-//	@Failure		500		{object}	main.Envelope{data=nil,error=string}
-//	@Router			/products/{id} [patch]
+// @Failure		404		{object}	main.Envelope{data=nil,error=string}
+// @Failure		409		{object}	main.Envelope{data=nil,error=string}
+// @Failure		500		{object}	main.Envelope{data=nil,error=string}
+// @Router			/products/{id} [patch]
 func (app *Application) UpdateProductHandler(w http.ResponseWriter, r *http.Request) {
 
 	ctx := r.Context()
@@ -266,6 +271,11 @@ func (app *Application) UpdateProductHandler(w http.ResponseWriter, r *http.Requ
 			return
 		}
 
+		if handler.Size < 512 {
+			ResponseClientError(w, r, errors.New("file too small or empty"), http.StatusBadRequest)
+			return
+		}
+
 		limitedReader := io.LimitReader(file, 2<<20)
 		fileBytes, err := io.ReadAll(limitedReader)
 		if err != nil {
@@ -296,6 +306,10 @@ func (app *Application) UpdateProductHandler(w http.ResponseWriter, r *http.Requ
 			ResponseClientError(w, r, err, http.StatusConflict)
 		case service.ErrReferenceFailedProducts:
 			ResponseClientError(w, r, err, http.StatusBadRequest)
+		case service.ErrFileNotSupportedProducts:
+			ResponseClientError(w, r, err, http.StatusBadRequest)
+		case service.ErrFileTooBigProducts:
+			ResponseClientError(w, r, err, http.StatusBadRequest)
 		default:
 			ResponseServerError(w, r, err, http.StatusInternalServerError)
 		}
@@ -305,21 +319,21 @@ func (app *Application) UpdateProductHandler(w http.ResponseWriter, r *http.Requ
 	ResponseSuccess(w, r, "success update product", http.StatusOK)
 }
 
-//	@Summary		Delete product
-//	@Description	Delete product by id
-//	@Tags			Products
-//	@Accept			json
-//	@Produce		json
-//	@Security		JWT
-//	@Param			id	path	int	true	"Product id"
-//	@Success		204
-//	@Failure		400	{object}	main.Envelope{data=nil,error=string}
-//	@Failure		401	{object}	main.Envelope{data=nil,error=string}
-//	@Failure		403	{object}	main.Envelope{data=nil,error=string}
+// @Summary		Delete product
+// @Description	Delete product by id
+// @Tags			Products
+// @Accept			json
+// @Produce		json
+// @Security		JWT
+// @Param			id	path	int	true	"Product id"
+// @Success		204
+// @Failure		400	{object}	main.Envelope{data=nil,error=string}
+// @Failure		401	{object}	main.Envelope{data=nil,error=string}
+// @Failure		403	{object}	main.Envelope{data=nil,error=string}
 //
-//	@Failure		404	{object}	main.Envelope{data=nil,error=string}
-//	@Failure		500	{object}	main.Envelope{data=nil,error=string}
-//	@Router			/products/{id} [delete]
+// @Failure		404	{object}	main.Envelope{data=nil,error=string}
+// @Failure		500	{object}	main.Envelope{data=nil,error=string}
+// @Router			/products/{id} [delete]
 func (app *Application) DeleteProductHandler(w http.ResponseWriter, r *http.Request) {
 	idParam := chi.URLParam(r, "id")
 

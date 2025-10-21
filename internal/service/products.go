@@ -133,6 +133,14 @@ func (p *ProductsService) Update(ctx context.Context, id int, req dto.UpdateProd
 	var existingImage = product.Image
 
 	if len(file.Content) != 0 {
+		if file.Size > 2<<20 {
+			return errorService.New(ErrFileTooBigProducts, ErrFileTooBigProducts)
+		}
+
+		if !strings.Contains(file.MimeType, FILE_SUPPORTED_MAIN) && !strings.Contains(file.MimeType, FILE_SUPPORTED_SECOND) {
+			return errorService.New(ErrFileNotSupportedProducts, ErrFileNotSupportedProducts)
+		}
+
 		filename, err := p.Uploader.UploadFile(ctx, file)
 		if err != nil {
 			return errorService.New(ErrUploadImageProducts, err)

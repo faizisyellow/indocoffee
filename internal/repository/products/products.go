@@ -121,7 +121,7 @@ func (p *ProductRepository) GetAll(ctx context.Context, qry repository.Paginated
 
 	// close subquery
 	query += `
-			ORDER BY beans.name ` + qry.Sort + `
+			ORDER BY products.price ` + qry.Sort + `
 		) AS p
 	`
 

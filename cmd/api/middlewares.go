@@ -74,7 +74,6 @@ func (app *Application) AuthMiddleware(next http.Handler) http.HandlerFunc {
 			ResponseClientError(w, r, fmt.Errorf("authorization is malformed: authentication use Bearer"), http.StatusBadRequest)
 			return
 		}
-
 		token := parts[1]
 
 		jwtToken, err := app.Authentication.VerifyToken(token)

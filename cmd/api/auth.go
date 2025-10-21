@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/faizisyellow/indocoffee/internal/service"
 	errorService "github.com/faizisyellow/indocoffee/internal/service/error"
@@ -93,6 +94,11 @@ func (app *Application) ActivateAccountHandler(w http.ResponseWriter, r *http.Re
 
 type LoginResponse struct {
 	Token string `json:"token"`
+	User  struct {
+		Id       int    `json:"id"`
+		Email    string `json:"email"`
+		Rolename string `json:"role_name"`
+	} `json:"user"`
 }
 
 // @Summary		Sign in Account
@@ -136,11 +142,13 @@ func (app *Application) SignInHandler(w http.ResponseWriter, r *http.Request) {
 
 		return
 	}
+	now := time.Now()
 
 	claims := jwt.MapClaims{
 		"iss": app.JwtAuth.Iss,
 		"sub": app.JwtAuth.Sub,
-		"exp": app.JwtAuth.Exp,
+		"iat": now.Unix(),
+		"exp": now.Add(app.JwtAuth.Exp).Unix(),
 		"id":  user.Id,
 	}
 
@@ -150,5 +158,16 @@ func (app *Application) SignInHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ResponseSuccess(w, r, LoginResponse{Token: token}, http.StatusOK)
+	ResponseSuccess(w, r, LoginResponse{
+		Token: token,
+		User: struct {
+			Id       int    `json:"id"`
+			Email    string `json:"email"`
+			Rolename string `json:"role_name"`
+		}{
+			Id:       user.Id,
+			Email:    user.Email,
+			Rolename: user.Role.Name,
+		},
+	}, http.StatusOK)
 }

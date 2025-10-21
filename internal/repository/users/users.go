@@ -72,9 +72,19 @@ func (u *UsersRepository) GetById(ctx context.Context, id int) (models.User, err
 // Returns a User and nil on success or empty User and an error on failure.
 func (u *UsersRepository) GetByEmail(ctx context.Context, email string) (models.User, error) {
 
-	var user models.User
+	user := models.User{}
+	user.Role = &models.RolesModel{}
 
-	query := `SELECT id,username,email,password,is_active FROM users WHERE email = ?`
+	query := `
+		SELECT
+			users.id,
+			username,
+			email,
+			password,
+			is_active,
+			roles.name
+		FROM users JOIN roles ON users.role_id = roles.id
+	 	WHERE email = ?`
 
 	ctx, cancel := context.WithTimeout(ctx, repository.QueryTimeout)
 	defer cancel()
@@ -85,6 +95,7 @@ func (u *UsersRepository) GetByEmail(ctx context.Context, email string) (models.
 		&user.Email,
 		&user.Password.HashedText,
 		&user.IsActive,
+		&user.Role.Name,
 	)
 	if err != nil {
 		return user, err

@@ -77,7 +77,7 @@ type CartsServiceInterface interface {
 }
 
 type OrdersServiceInterface interface {
-	Create(ctx context.Context, idempKey string, req dto.CreateOrderRequest, usrId int) error
+	Create(ctx context.Context, idempKey string, req dto.CreateOrderRequest, usrId int) (string, error)
 	ExecuteItems(ctx context.Context, orderId string) error
 	FindById(ctx context.Context, orderId string) (models.Order, error)
 	CancelOrder(ctx context.Context, orderId string) error
@@ -111,6 +111,7 @@ func New(
 	uploadService uploader.Uploader,
 	tx db.Transactioner,
 	uuid utils.Token,
+	ulid utils.Token,
 	cartsStore carts.Carts,
 	ordersStore orders.Orders,
 ) *Service {
@@ -144,7 +145,7 @@ func New(
 			UsersService:    usersService,
 			OrderStore:      ordersStore,
 			Transaction:     tx,
-			Uuid:            uuid,
+			Uuid:            ulid,
 		},
 	}
 }

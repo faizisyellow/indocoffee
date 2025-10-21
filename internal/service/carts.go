@@ -25,6 +25,7 @@ var (
 	ErrCartNotFound         = errors.New("carts: cart not found")
 	ErrCartOverflowQuantity = errors.New("carts: item quantity max is 50")
 	ErrCartMinQuantity      = errors.New("carts: item quantity min is 1")
+	conflictOpenCartCode    = "Error 1644"
 )
 
 func (c *CartsService) Create(ctx context.Context, req dto.CreateCartRequest, usrId int) error {
@@ -37,7 +38,7 @@ func (c *CartsService) Create(ctx context.Context, req dto.CreateCartRequest, us
 		ProductId: prd.Id,
 		UserId:    usrId,
 	}); err != nil {
-		if strings.Contains(err.Error(), CONFLICT_CODE) {
+		if strings.Contains(err.Error(), conflictOpenCartCode) {
 			return errorService.New(ErrConflictItemCart, err)
 		}
 		return errorService.New(ErrInternalCart, err)
@@ -95,7 +96,7 @@ func (c *CartsService) DecrementItem(ctx context.Context, cartId int) error {
 
 	if err := c.CartsStore.DecrementQuantity(ctx, cart.Id); err != nil {
 		if strings.Contains(err.Error(), CHECK_CONSTRAINT_CART_QUANTITY_CODE) {
-			return errorService.New(ErrCartOverflowQuantity, err)
+			return errorService.New(ErrCartMinQuantity, err)
 		}
 		return errorService.New(ErrInternalCart, err)
 	}
