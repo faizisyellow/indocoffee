@@ -3,7 +3,7 @@ package dto
 import "time"
 
 type GetUsersProfileResponse struct {
-	Id        int       `json:"int"`
+	Id        int       `json:"id"`
 	Username  string    `json:"username"`
 	Email     string    `json:"email"`
 	IsActive  bool      `json:"is_active"`

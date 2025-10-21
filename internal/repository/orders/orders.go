@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"time"
 
 	"github.com/faizisyellow/indocoffee/internal/models"
 	"github.com/faizisyellow/indocoffee/internal/repository"
@@ -29,7 +30,7 @@ type OrdersRepository struct {
 	Db *sql.DB
 }
 
-func (o *OrdersRepository) Create(ctx context.Context, tx *sql.Tx, newOrder models.Order) error {
+func (o *OrdersRepository) Create(ctx context.Context, tx *sql.Tx, newOrder models.Order) (string, error) {
 	qry := `
 		INSERT INTO orders(
 			id,
@@ -43,18 +44,19 @@ func (o *OrdersRepository) Create(ctx context.Context, tx *sql.Tx, newOrder mode
 			alternative_phone_number,
 			street,
 			city,
-			cart_ids
-		) VALUES(?,?,?,?,?,?,CAST(? AS JSON),?,?,?,?,?)
+			cart_ids,
+			created_at
+		) VALUES(?,?,?,?,?,?,CAST(? AS JSON),?,?,?,?,?,?)
 	`
 
 	itemsJSON, err := json.Marshal(newOrder.Items)
 	if err != nil {
-		return fmt.Errorf("failed to marshal items: %w", err)
+		return "", fmt.Errorf("failed to marshal items: %w", err)
 	}
 
 	cartIdsJSON, err := json.Marshal(newOrder.CartIds)
 	if err != nil {
-		return fmt.Errorf("failed to marshal items: %w", err)
+		return "", fmt.Errorf("failed to marshal items: %w", err)
 	}
 
 	ctx, cancel := context.WithTimeout(ctx, repository.QueryTimeout)
@@ -75,9 +77,13 @@ func (o *OrdersRepository) Create(ctx context.Context, tx *sql.Tx, newOrder mode
 		newOrder.Street,
 		newOrder.City,
 		string(cartIdsJSON),
+		time.Now().UTC(),
 	)
+	if err != nil {
+		return "", err
+	}
 
-	return err
+	return newOrder.Id, nil
 
 }
 
@@ -289,7 +295,6 @@ func (o *OrdersRepository) GetOrders(ctx context.Context, qry repository.Paginat
 		}
 
 		orders = append(orders, order)
-
 	}
 
 	return orders, rowsResult.Err()

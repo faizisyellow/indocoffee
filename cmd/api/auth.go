@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/faizisyellow/indocoffee/internal/service"
 	errorService "github.com/faizisyellow/indocoffee/internal/service/error"
@@ -141,11 +142,13 @@ func (app *Application) SignInHandler(w http.ResponseWriter, r *http.Request) {
 
 		return
 	}
+	now := time.Now()
 
 	claims := jwt.MapClaims{
 		"iss": app.JwtAuth.Iss,
 		"sub": app.JwtAuth.Sub,
-		"exp": app.JwtAuth.Exp,
+		"iat": now.Unix(),
+		"exp": now.Add(app.JwtAuth.Exp).Unix(),
 		"id":  user.Id,
 	}
 

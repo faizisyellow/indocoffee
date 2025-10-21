@@ -38,7 +38,7 @@ func setupTestDB(t *testing.T) (*sql.DB, error) {
 	}
 
 	return db.New(
-		os.Getenv("DB_ADDR"),
+		os.Getenv("DB_TEST_ADDR"),
 		5,
 		5,
 		"1m",

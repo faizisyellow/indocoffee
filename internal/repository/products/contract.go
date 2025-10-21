@@ -99,23 +99,21 @@ func (u Contract) Test(t *testing.T) {
 					Sort: "asc",
 				},
 				expected: []models.Product{
-					// Arabica
 					{Roasted: "light", Price: 10.5, Quantity: 50, Image: "light_arabica_grounded.jpeg", BeanId: 1, FormId: 1,
 						BeansModel: models.BeansModel{Name: "arabica"}, FormsModel: models.FormsModel{Name: "grounded"}},
 					{Roasted: "medium", Price: 12.0, Quantity: 70, Image: "medium_arabica_grounded.jpeg", BeanId: 1, FormId: 1,
 						BeansModel: models.BeansModel{Name: "arabica"}, FormsModel: models.FormsModel{Name: "grounded"}},
 					{Roasted: "dark", Price: 14.8, Quantity: 30, Image: "dark_arabica_whole.jpeg", BeanId: 1, FormId: 2,
 						BeansModel: models.BeansModel{Name: "arabica"}, FormsModel: models.FormsModel{Name: "whole coffee beans"}},
+					{Roasted: "light", Price: 15.2, Quantity: 120, Image: "light_robusta_grounded.jpeg", BeanId: 2, FormId: 1,
+						BeansModel: models.BeansModel{Name: "robusta"}, FormsModel: models.FormsModel{Name: "grounded"}},
+					{Roasted: "medium", Price: 18.0, Quantity: 90, Image: "medium_robusta_grounded.jpeg", BeanId: 2, FormId: 1,
+						BeansModel: models.BeansModel{Name: "robusta"}, FormsModel: models.FormsModel{Name: "grounded"}},
+					{Roasted: "dark", Price: 20.0, Quantity: 40, Image: "dark_robusta_whole.jpeg", BeanId: 2, FormId: 2,
+						BeansModel: models.BeansModel{Name: "robusta"}, FormsModel: models.FormsModel{Name: "whole coffee beans"}},
 					{Roasted: "light", Price: 25.5, Quantity: 200, Image: "light_arabica_whole_premium.jpeg", BeanId: 1, FormId: 2,
 						BeansModel: models.BeansModel{Name: "arabica"}, FormsModel: models.FormsModel{Name: "whole coffee beans"}},
-					// Robusta
-					{Roasted: "light", Price: 15.2, Quantity: 120, Image: "light_robusta_grounded.jpeg", BeanId: 6, FormId: 1,
-						BeansModel: models.BeansModel{Name: "robusta"}, FormsModel: models.FormsModel{Name: "grounded"}},
-					{Roasted: "medium", Price: 18.0, Quantity: 90, Image: "medium_robusta_grounded.jpeg", BeanId: 6, FormId: 1,
-						BeansModel: models.BeansModel{Name: "robusta"}, FormsModel: models.FormsModel{Name: "grounded"}},
-					{Roasted: "dark", Price: 20.0, Quantity: 40, Image: "dark_robusta_whole.jpeg", BeanId: 6, FormId: 2,
-						BeansModel: models.BeansModel{Name: "robusta"}, FormsModel: models.FormsModel{Name: "whole coffee beans"}},
-					{Roasted: "dark", Price: 30.0, Quantity: 10, Image: "dark_robusta_grounded_limited.jpeg", BeanId: 6, FormId: 1,
+					{Roasted: "dark", Price: 30.0, Quantity: 10, Image: "dark_robusta_grounded_limited.jpeg", BeanId: 2, FormId: 1,
 						BeansModel: models.BeansModel{Name: "robusta"}, FormsModel: models.FormsModel{Name: "grounded"}},
 				},
 			},
@@ -128,7 +126,7 @@ func (u Contract) Test(t *testing.T) {
 				expected: []models.Product{
 					{Roasted: "medium", Price: 12.0, Quantity: 70, Image: "medium_arabica_grounded.jpeg", BeanId: 1, FormId: 1,
 						BeansModel: models.BeansModel{Name: "arabica"}, FormsModel: models.FormsModel{Name: "grounded"}},
-					{Roasted: "medium", Price: 18.0, Quantity: 90, Image: "medium_robusta_grounded.jpeg", BeanId: 6, FormId: 1,
+					{Roasted: "medium", Price: 18.0, Quantity: 90, Image: "medium_robusta_grounded.jpeg", BeanId: 2, FormId: 1,
 						BeansModel: models.BeansModel{Name: "robusta"}, FormsModel: models.FormsModel{Name: "grounded"}},
 				},
 			},
@@ -142,7 +140,7 @@ func (u Contract) Test(t *testing.T) {
 				expected: []models.Product{
 					{Roasted: "light", Price: 10.5, Quantity: 50, Image: "light_arabica_grounded.jpeg", BeanId: 1, FormId: 1,
 						BeansModel: models.BeansModel{Name: "arabica"}, FormsModel: models.FormsModel{Name: "grounded"}},
-					{Roasted: "light", Price: 15.2, Quantity: 120, Image: "light_robusta_grounded.jpeg", BeanId: 6, FormId: 1,
+					{Roasted: "light", Price: 15.2, Quantity: 120, Image: "light_robusta_grounded.jpeg", BeanId: 2, FormId: 1,
 						BeansModel: models.BeansModel{Name: "robusta"}, FormsModel: models.FormsModel{Name: "grounded"}},
 				},
 			},
@@ -150,7 +148,7 @@ func (u Contract) Test(t *testing.T) {
 				name: "get first page of all products",
 				query: repository.PaginatedProductsQuery{
 					Sort:   "asc",
-					Limit:  5,
+					Limit:  3,
 					Offset: 0,
 				},
 				expected: []models.Product{
@@ -160,10 +158,6 @@ func (u Contract) Test(t *testing.T) {
 						BeansModel: models.BeansModel{Name: "arabica"}, FormsModel: models.FormsModel{Name: "grounded"}},
 					{Roasted: "dark", Price: 14.8, Quantity: 30, Image: "dark_arabica_whole.jpeg", BeanId: 1, FormId: 2,
 						BeansModel: models.BeansModel{Name: "arabica"}, FormsModel: models.FormsModel{Name: "whole coffee beans"}},
-					{Roasted: "light", Price: 25.5, Quantity: 200, Image: "light_arabica_whole_premium.jpeg", BeanId: 1, FormId: 2,
-						BeansModel: models.BeansModel{Name: "arabica"}, FormsModel: models.FormsModel{Name: "whole coffee beans"}},
-					{Roasted: "light", Price: 15.2, Quantity: 120, Image: "light_robusta_grounded.jpeg", BeanId: 6, FormId: 1,
-						BeansModel: models.BeansModel{Name: "robusta"}, FormsModel: models.FormsModel{Name: "grounded"}},
 				},
 			},
 			{
@@ -177,8 +171,25 @@ func (u Contract) Test(t *testing.T) {
 				expected: []models.Product{
 					{Roasted: "medium", Price: 12.0, Quantity: 70, Image: "medium_arabica_grounded.jpeg", BeanId: 1, FormId: 1,
 						BeansModel: models.BeansModel{Name: "arabica"}, FormsModel: models.FormsModel{Name: "grounded"}},
-					{Roasted: "medium", Price: 18.0, Quantity: 90, Image: "medium_robusta_grounded.jpeg", BeanId: 6, FormId: 1,
+					{Roasted: "medium", Price: 18.0, Quantity: 90, Image: "medium_robusta_grounded.jpeg", BeanId: 2, FormId: 1,
 						BeansModel: models.BeansModel{Name: "robusta"}, FormsModel: models.FormsModel{Name: "grounded"}},
+				},
+			},
+			{
+				name: "get products only robusta",
+				query: repository.PaginatedProductsQuery{
+					Sort: "asc",
+					Bean: 1,
+				},
+				expected: []models.Product{
+					{Roasted: "light", Price: 10.5, Quantity: 50, Image: "light_arabica_grounded.jpeg", BeanId: 1, FormId: 1,
+						BeansModel: models.BeansModel{Name: "arabica"}, FormsModel: models.FormsModel{Name: "grounded"}},
+					{Roasted: "medium", Price: 12.0, Quantity: 70, Image: "medium_arabica_grounded.jpeg", BeanId: 1, FormId: 1,
+						BeansModel: models.BeansModel{Name: "arabica"}, FormsModel: models.FormsModel{Name: "grounded"}},
+					{Roasted: "dark", Price: 14.8, Quantity: 30, Image: "dark_arabica_whole.jpeg", BeanId: 1, FormId: 2,
+						BeansModel: models.BeansModel{Name: "arabica"}, FormsModel: models.FormsModel{Name: "whole coffee beans"}},
+					{Roasted: "light", Price: 25.5, Quantity: 200, Image: "light_arabica_whole_premium.jpeg", BeanId: 1, FormId: 2,
+						BeansModel: models.BeansModel{Name: "arabica"}, FormsModel: models.FormsModel{Name: "whole coffee beans"}},
 				},
 			},
 		}
@@ -224,15 +235,15 @@ func createTestProduct(t *testing.T, p Products) error {
 			{Roasted: "dark", Price: 14.8, Quantity: 30, Image: "dark_arabica_whole.jpeg", BeanId: 1, FormId: 2},
 
 			// Robusta, grounded
-			{Roasted: "light", Price: 15.2, Quantity: 120, Image: "light_robusta_grounded.jpeg", BeanId: 6, FormId: 1},
-			{Roasted: "medium", Price: 18.0, Quantity: 90, Image: "medium_robusta_grounded.jpeg", BeanId: 6, FormId: 1},
+			{Roasted: "light", Price: 15.2, Quantity: 120, Image: "light_robusta_grounded.jpeg", BeanId: 2, FormId: 1},
+			{Roasted: "medium", Price: 18.0, Quantity: 90, Image: "medium_robusta_grounded.jpeg", BeanId: 2, FormId: 1},
 
 			// Robusta, whole beans
-			{Roasted: "dark", Price: 20.0, Quantity: 40, Image: "dark_robusta_whole.jpeg", BeanId: 6, FormId: 2},
+			{Roasted: "dark", Price: 20.0, Quantity: 40, Image: "dark_robusta_whole.jpeg", BeanId: 2, FormId: 2},
 
 			// Extra variations for testing price/quantity ranges
 			{Roasted: "light", Price: 25.5, Quantity: 200, Image: "light_arabica_whole_premium.jpeg", BeanId: 1, FormId: 2},
-			{Roasted: "dark", Price: 30.0, Quantity: 10, Image: "dark_robusta_grounded_limited.jpeg", BeanId: 6, FormId: 1},
+			{Roasted: "dark", Price: 30.0, Quantity: 10, Image: "dark_robusta_grounded_limited.jpeg", BeanId: 2, FormId: 1},
 		},
 	}
 

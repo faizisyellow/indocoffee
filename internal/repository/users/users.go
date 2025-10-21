@@ -72,7 +72,8 @@ func (u *UsersRepository) GetById(ctx context.Context, id int) (models.User, err
 // Returns a User and nil on success or empty User and an error on failure.
 func (u *UsersRepository) GetByEmail(ctx context.Context, email string) (models.User, error) {
 
-	var user models.User
+	user := models.User{}
+	user.Role = &models.RolesModel{}
 
 	query := `
 		SELECT

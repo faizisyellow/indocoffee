@@ -66,7 +66,7 @@ func (p PaginatedProductsQuery) Parse(r QueryProducts) (PaginatedProductsQuery, 
 		if err != nil {
 			return p, err
 		}
-		p.Form = b
+		p.Bean = b
 	}
 
 	return p, nil

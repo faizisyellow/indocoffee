@@ -23,6 +23,7 @@ import (
 	"github.com/faizisyellow/indocoffee/internal/utils"
 	"github.com/google/uuid"
 	"github.com/joho/godotenv"
+	"github.com/oklog/ulid/v2"
 	"go.uber.org/zap"
 )
 
@@ -98,6 +99,7 @@ func main() {
 		upt,
 		&db.TransactionDB{Db: dbs},
 		ud,
+		utils.Ulid(ulid.Make().String),
 		&carts.CartsRepository{Db: dbs},
 		&orders.OrdersRepository{Db: dbs},
 	)
@@ -106,7 +108,7 @@ func main() {
 		SecretKey: os.Getenv("SECRET_KEY"),
 		Iss:       "authentication",
 		Sub:       "user",
-		Exp:       time.Now().Add(time.Hour * 24 * 3).Unix(),
+		Exp:       time.Hour * 24,
 	}
 
 	jwtAuthentication := auth.New(jwtTokenConfig.SecretKey, jwtTokenConfig.Iss, jwtTokenConfig.Sub)

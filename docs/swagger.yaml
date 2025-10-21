@@ -107,6 +107,11 @@ definitions:
     - phone_number
     - street
     type: object
+  dto.CreateOrderResponse:
+    properties:
+      id:
+        type: string
+    type: object
   dto.CreateRoleRequest:
     properties:
       level:
@@ -226,7 +231,7 @@ definitions:
         type: string
       email:
         type: string
-      int:
+      id:
         type: integer
       is_active:
         type: boolean
@@ -280,6 +285,15 @@ definitions:
     properties:
       token:
         type: string
+      user:
+        properties:
+          email:
+            type: string
+          id:
+            type: integer
+          role_name:
+            type: string
+        type: object
     type: object
   models.OrderItem:
     properties:
@@ -1839,7 +1853,7 @@ paths:
             - $ref: '#/definitions/main.Envelope'
             - properties:
                 data:
-                  type: string
+                  $ref: '#/definitions/dto.CreateOrderResponse'
                 error:
                   type: object
               type: object

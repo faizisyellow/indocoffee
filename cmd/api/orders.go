@@ -14,21 +14,21 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-//	@Summary		Create new order
-//	@Description	Create new order
-//	@Tags			Orders
-//	@Accept			json
-//	@Produce		json
-//	@Param			X-Idempotency-Key	header	string					true	"unique identifier each order"
-//	@Param			payload				body	dto.CreateOrderRequest	true	"Payload create new order"
-//	@Security		JWT
-//	@Success		201	{object}	main.Envelope{data=string,error=nil}
-//	@Failure		400	{object}	main.Envelope{data=nil,error=string}
-//	@Failure		403	{object}	main.Envelope{data=nil,error=string}
-//	@Failure		404	{object}	main.Envelope{data=nil,error=string}
-//	@Failure		409	{object}	main.Envelope{data=nil,error=string}
-//	@Failure		500	{object}	main.Envelope{data=nil,error=string}
-//	@Router			/orders [post]
+// @Summary		Create new order
+// @Description	Create new order
+// @Tags			Orders
+// @Accept			json
+// @Produce		json
+// @Param			X-Idempotency-Key	header	string					true	"unique identifier each order"
+// @Param			payload				body	dto.CreateOrderRequest	true	"Payload create new order"
+// @Security		JWT
+// @Success		201	{object}	main.Envelope{data=dto.CreateOrderResponse,error=nil}
+// @Failure		400	{object}	main.Envelope{data=nil,error=string}
+// @Failure		403	{object}	main.Envelope{data=nil,error=string}
+// @Failure		404	{object}	main.Envelope{data=nil,error=string}
+// @Failure		409	{object}	main.Envelope{data=nil,error=string}
+// @Failure		500	{object}	main.Envelope{data=nil,error=string}
+// @Router			/orders [post]
 func (app *Application) CreateOrdersHandler(w http.ResponseWriter, r *http.Request) {
 	var req dto.CreateOrderRequest
 	if err := ReadHttpJson(w, r, &req); err != nil {
@@ -58,7 +58,8 @@ func (app *Application) CreateOrdersHandler(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	if err := app.Services.OrdersService.Create(r.Context(), idempotencyHeader, req, user.Id); err != nil {
+	newOrderId, err := app.Services.OrdersService.Create(r.Context(), idempotencyHeader, req, user.Id)
+	if err != nil {
 		if strings.Contains(err.Error(), "phone validation") {
 			ResponseClientError(w, r, err, http.StatusBadRequest)
 			return
@@ -80,22 +81,22 @@ func (app *Application) CreateOrdersHandler(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	ResponseSuccess(w, r, "create order success", http.StatusCreated)
+	ResponseSuccess(w, r, dto.CreateOrderResponse{Id: newOrderId}, http.StatusCreated)
 }
 
-//	@Summary		Roast Order
-//	@Description	Perform the roasting process for an order
-//	@Tags			Orders
-//	@Accept			json
-//	@Produce		json
-//	@Param			id	path	string	true	"Order id"
-//	@Security		JWT
-//	@Success		200	{object}	main.Envelope{data=string,error=nil}
-//	@Failure		400	{object}	main.Envelope{data=nil,error=string}
-//	@Failure		403	{object}	main.Envelope{data=nil,error=string}
-//	@Failure		404	{object}	main.Envelope{data=nil,error=string}
-//	@Failure		500	{object}	main.Envelope{data=nil,error=string}
-//	@Router			/orders/{id}/roast [patch]
+// @Summary		Roast Order
+// @Description	Perform the roasting process for an order
+// @Tags			Orders
+// @Accept			json
+// @Produce		json
+// @Param			id	path	string	true	"Order id"
+// @Security		JWT
+// @Success		200	{object}	main.Envelope{data=string,error=nil}
+// @Failure		400	{object}	main.Envelope{data=nil,error=string}
+// @Failure		403	{object}	main.Envelope{data=nil,error=string}
+// @Failure		404	{object}	main.Envelope{data=nil,error=string}
+// @Failure		500	{object}	main.Envelope{data=nil,error=string}
+// @Router			/orders/{id}/roast [patch]
 func (app *Application) ExecuteItemsHandler(w http.ResponseWriter, r *http.Request) {
 
 	if err := app.Services.OrdersService.ExecuteItems(r.Context(), chi.URLParam(r, "id")); err != nil {
@@ -114,19 +115,19 @@ func (app *Application) ExecuteItemsHandler(w http.ResponseWriter, r *http.Reque
 	ResponseSuccess(w, r, "success update order to be roasting", http.StatusOK)
 }
 
-//	@Summary		Cancel Order
-//	@Description	Perform cancel for an order
-//	@Tags			Orders
-//	@Accept			json
-//	@Produce		json
-//	@Param			id	path	string	true	"Order id"
-//	@Security		JWT
-//	@Success		200	{object}	main.Envelope{data=string,error=nil}
-//	@Failure		400	{object}	main.Envelope{data=nil,error=string}
-//	@Failure		403	{object}	main.Envelope{data=nil,error=string}
-//	@Failure		404	{object}	main.Envelope{data=nil,error=string}
-//	@Failure		500	{object}	main.Envelope{data=nil,error=string}
-//	@Router			/orders/{id}/cancel [patch]
+// @Summary		Cancel Order
+// @Description	Perform cancel for an order
+// @Tags			Orders
+// @Accept			json
+// @Produce		json
+// @Param			id	path	string	true	"Order id"
+// @Security		JWT
+// @Success		200	{object}	main.Envelope{data=string,error=nil}
+// @Failure		400	{object}	main.Envelope{data=nil,error=string}
+// @Failure		403	{object}	main.Envelope{data=nil,error=string}
+// @Failure		404	{object}	main.Envelope{data=nil,error=string}
+// @Failure		500	{object}	main.Envelope{data=nil,error=string}
+// @Router			/orders/{id}/cancel [patch]
 func (app *Application) CancelOrderHandler(w http.ResponseWriter, r *http.Request) {
 	if err := app.Services.OrdersService.CancelOrder(r.Context(), chi.URLParam(r, "id")); err != nil {
 		errValue := errorService.GetError(err)
@@ -144,19 +145,19 @@ func (app *Application) CancelOrderHandler(w http.ResponseWriter, r *http.Reques
 	ResponseSuccess(w, r, "success update order to be cancelled", http.StatusOK)
 }
 
-//	@Summary		Ship Order
-//	@Description	Perform ship for an order
-//	@Tags			Orders
-//	@Accept			json
-//	@Produce		json
-//	@Param			id	path	string	true	"Order id"
-//	@Security		JWT
-//	@Success		200	{object}	main.Envelope{data=string,error=nil}
-//	@Failure		400	{object}	main.Envelope{data=nil,error=string}
-//	@Failure		403	{object}	main.Envelope{data=nil,error=string}
-//	@Failure		404	{object}	main.Envelope{data=nil,error=string}
-//	@Failure		500	{object}	main.Envelope{data=nil,error=string}
-//	@Router			/orders/{id}/ship [patch]
+// @Summary		Ship Order
+// @Description	Perform ship for an order
+// @Tags			Orders
+// @Accept			json
+// @Produce		json
+// @Param			id	path	string	true	"Order id"
+// @Security		JWT
+// @Success		200	{object}	main.Envelope{data=string,error=nil}
+// @Failure		400	{object}	main.Envelope{data=nil,error=string}
+// @Failure		403	{object}	main.Envelope{data=nil,error=string}
+// @Failure		404	{object}	main.Envelope{data=nil,error=string}
+// @Failure		500	{object}	main.Envelope{data=nil,error=string}
+// @Router			/orders/{id}/ship [patch]
 func (app *Application) ShipOrderHandler(w http.ResponseWriter, r *http.Request) {
 	if err := app.Services.OrdersService.ShipOrder(r.Context(), chi.URLParam(r, "id")); err != nil {
 		errValue := errorService.GetError(err)
@@ -174,19 +175,19 @@ func (app *Application) ShipOrderHandler(w http.ResponseWriter, r *http.Request)
 	ResponseSuccess(w, r, "success update order to be shipped", http.StatusOK)
 }
 
-//	@Summary		Complete Order
-//	@Description	Perform complete for an order
-//	@Tags			Orders
-//	@Accept			json
-//	@Produce		json
-//	@Param			id	path	string	true	"Order id"
-//	@Security		JWT
-//	@Success		200	{object}	main.Envelope{data=string,error=nil}
-//	@Failure		400	{object}	main.Envelope{data=nil,error=string}
-//	@Failure		403	{object}	main.Envelope{data=nil,error=string}
-//	@Failure		404	{object}	main.Envelope{data=nil,error=string}
-//	@Failure		500	{object}	main.Envelope{data=nil,error=string}
-//	@Router			/orders/{id}/complete [patch]
+// @Summary		Complete Order
+// @Description	Perform complete for an order
+// @Tags			Orders
+// @Accept			json
+// @Produce		json
+// @Param			id	path	string	true	"Order id"
+// @Security		JWT
+// @Success		200	{object}	main.Envelope{data=string,error=nil}
+// @Failure		400	{object}	main.Envelope{data=nil,error=string}
+// @Failure		403	{object}	main.Envelope{data=nil,error=string}
+// @Failure		404	{object}	main.Envelope{data=nil,error=string}
+// @Failure		500	{object}	main.Envelope{data=nil,error=string}
+// @Router			/orders/{id}/complete [patch]
 func (app *Application) CompleteOrderHandler(w http.ResponseWriter, r *http.Request) {
 	if err := app.Services.OrdersService.CompleteOrder(r.Context(), chi.URLParam(r, "id")); err != nil {
 		errValue := errorService.GetError(err)
@@ -204,20 +205,20 @@ func (app *Application) CompleteOrderHandler(w http.ResponseWriter, r *http.Requ
 	ResponseSuccess(w, r, "success order complete", http.StatusOK)
 }
 
-//	@Summary		Get Order
-//	@Description	Get Order by id
-//	@Tags			Orders
-//	@Accept			json
-//	@Produce		json
-//	@Param			id	path	string	true	"Order id"
-//	@Security		JWT
-//	@Success		200	{object}	main.Envelope{data=dto.GetOrderResponse,error=nil}
-//	@Failure		400	{object}	main.Envelope{data=nil,error=string}
-//	@Failure		401	{object}	main.Envelope{data=nil,error=string}
-//	@Failure		403	{object}	main.Envelope{data=nil,error=string}
-//	@Failure		404	{object}	main.Envelope{data=nil,error=string}
-//	@Failure		500	{object}	main.Envelope{data=nil,error=string}
-//	@Router			/orders/{id} [get]
+// @Summary		Get Order
+// @Description	Get Order by id
+// @Tags			Orders
+// @Accept			json
+// @Produce		json
+// @Param			id	path	string	true	"Order id"
+// @Security		JWT
+// @Success		200	{object}	main.Envelope{data=dto.GetOrderResponse,error=nil}
+// @Failure		400	{object}	main.Envelope{data=nil,error=string}
+// @Failure		401	{object}	main.Envelope{data=nil,error=string}
+// @Failure		403	{object}	main.Envelope{data=nil,error=string}
+// @Failure		404	{object}	main.Envelope{data=nil,error=string}
+// @Failure		500	{object}	main.Envelope{data=nil,error=string}
+// @Router			/orders/{id} [get]
 func (app *Application) GetOrderHandler(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	if id == "" {
@@ -251,22 +252,22 @@ func (app *Application) GetOrderHandler(w http.ResponseWriter, r *http.Request) 
 	}, http.StatusOK)
 }
 
-//	@Summary		Get Orders
-//	@Description	Get All Orders
-//	@Tags			Orders
-//	@Accept			json
-//	@Produce		json
-//	@Security		JWT
-//	@Param			status	query		string	false	"status order"
-//	@Param			sort	query		string	false	"sort order by created asc(oldest) | desc(latest)"
-//	@Param			limit	query		string	false	"limit each page"
-//	@Param			offset	query		string	false	"skip rows"
-//	@Success		200		{object}	main.Envelope{data=[]dto.GetOrderResponse,error=nil}
-//	@Failure		400		{object}	main.Envelope{data=nil,error=string}
-//	@Failure		401		{object}	main.Envelope{data=nil,error=string}
-//	@Failure		403		{object}	main.Envelope{data=nil,error=string}
-//	@Failure		500		{object}	main.Envelope{data=nil,error=string}
-//	@Router			/orders [get]
+// @Summary		Get Orders
+// @Description	Get All Orders
+// @Tags			Orders
+// @Accept			json
+// @Produce		json
+// @Security		JWT
+// @Param			status	query		string	false	"status order"
+// @Param			sort	query		string	false	"sort order by created asc(oldest) | desc(latest)"
+// @Param			limit	query		string	false	"limit each page"
+// @Param			offset	query		string	false	"skip rows"
+// @Success		200		{object}	main.Envelope{data=[]dto.GetOrderResponse,error=nil}
+// @Failure		400		{object}	main.Envelope{data=nil,error=string}
+// @Failure		401		{object}	main.Envelope{data=nil,error=string}
+// @Failure		403		{object}	main.Envelope{data=nil,error=string}
+// @Failure		500		{object}	main.Envelope{data=nil,error=string}
+// @Router			/orders [get]
 func (app *Application) GetOrdersHandler(w http.ResponseWriter, r *http.Request) {
 	requestQuery := repository.QueryOrders{
 		Limit:  r.URL.Query().Get("limit"),

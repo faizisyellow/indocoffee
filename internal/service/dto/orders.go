@@ -29,3 +29,7 @@ type GetOrderResponse struct {
 	City                   string             `json:"city"`
 	CreatedAt              time.Time          `json:"created_at"`
 }
+
+type CreateOrderResponse = struct {
+	Id string `json:"id"`
+}
