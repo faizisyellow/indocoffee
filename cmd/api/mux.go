@@ -30,6 +30,8 @@ func (app *Application) Mux() http.Handler {
 	}))
 	r.Use(middleware.Timeout(60 * time.Second))
 
+	r.Use(app.RestrictAdminActionMiddleware)
+
 	r.Route("/v1", func(r chi.Router) {
 		r.Route("/health", func(r chi.Router) {
 			r.Get("/", app.HealthHandler)
