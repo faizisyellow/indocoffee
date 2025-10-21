@@ -54,10 +54,10 @@ func main() {
 
 	dbConfig := DBConf{
 		Addr:            os.Getenv("DB_ADDR"),
-		MaxOpenConn:     30,
-		MaxIdleConn:     30,
-		MaxLifeTime:     "4m",
-		MaxIdleLifeTime: "4m",
+		MaxOpenConn:     10,
+		MaxIdleConn:     10,
+		MaxLifeTime:     "3m",
+		MaxIdleLifeTime: "3m",
 	}
 
 	dbs, err := db.New(
