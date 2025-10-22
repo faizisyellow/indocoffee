@@ -37,7 +37,7 @@ func (u UserServiceTest) Test(t *testing.T) {
 		var (
 			ctx                             = context.Background()
 			usr, invt, tkn, tranx, teardown = u.CreateDependencies()
-			sut                             = service.UsersServices{usr, invt, tkn, tranx}
+			sut                             = service.UsersServices{usr, invt, tkn, tranx, nil}
 			request                         = service.RegisterRequest{
 				Username: "lizzy",
 				Email:    "lizzymcalpine@test.test",
@@ -56,7 +56,7 @@ func (u UserServiceTest) Test(t *testing.T) {
 		var (
 			ctx                             = context.Background()
 			usr, invt, tkn, tranx, teardown = u.CreateDependencies()
-			sut                             = service.UsersServices{usr, invt, tkn, tranx}
+			sut                             = service.UsersServices{usr, invt, tkn, tranx, nil}
 			request                         = service.ActivatedRequest{
 				Token: "lizzy is the goddess of sadness",
 			}
@@ -82,7 +82,7 @@ func (u UserServiceTest) Test(t *testing.T) {
 		var (
 			ctx                             = context.Background()
 			usr, invt, tkn, tranx, teardown = u.CreateDependencies()
-			sut                             = service.UsersServices{usr, invt, tkn, tranx}
+			sut                             = service.UsersServices{usr, invt, tkn, tranx, nil}
 			request                         = service.LoginRequest{
 				Email:    "elizabeth@test.test",
 				Password: "Lizzy2442$",
@@ -114,7 +114,7 @@ func (u UserServiceTest) Test(t *testing.T) {
 		var (
 			ctx                             = context.Background()
 			usr, invt, tkn, tranx, teardown = u.CreateDependencies()
-			sut                             = service.UsersServices{usr, invt, tkn, tranx}
+			sut                             = service.UsersServices{usr, invt, tkn, tranx, nil}
 		)
 		t.Cleanup(teardown)
 
@@ -129,7 +129,7 @@ func (u UserServiceTest) Test(t *testing.T) {
 		var (
 			ctx                             = context.Background()
 			usr, invt, tkn, tranx, teardown = u.CreateDependencies()
-			sut                             = service.UsersServices{usr, invt, tkn, tranx}
+			sut                             = service.UsersServices{usr, invt, tkn, tranx, nil}
 		)
 		t.Cleanup(teardown)
 		err := sut.DeleteAccount(ctx, 2)

@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/faizisyellow/indocoffee/internal/db"
+	loginLimiter "github.com/faizisyellow/indocoffee/internal/limiter/login"
 	"github.com/faizisyellow/indocoffee/internal/models"
 	"github.com/faizisyellow/indocoffee/internal/repository"
 	"github.com/faizisyellow/indocoffee/internal/repository/invitations"
@@ -22,6 +23,7 @@ type UsersServices struct {
 	InvitationsStore invitations.Invitations
 	Token            utils.Token
 	Transaction      db.Transactioner
+	LoginLimiter     loginLimiter.LoginLimiter
 }
 
 type RegisterRequest struct {
@@ -37,6 +39,7 @@ type RegisterResponse struct {
 type LoginRequest struct {
 	Email    string `json:"email" validate:"required,email"`
 	Password string `json:"password" validate:"required"`
+	Ip       string `json:"-"`
 }
 
 type ActivatedRequest struct {
@@ -50,6 +53,7 @@ var (
 	ErrUserNotActivated        = errors.New("user not activated, please activate first")
 	ErrUserAlreadyExist        = errors.New("this user already exists")
 	ErrUserInternal            = errors.New("server incounter internal error")
+	ErrUserLimited             = errors.New("too many login attempts, please try again later")
 )
 
 const CUSTOMER_ROLE = 1
@@ -148,8 +152,20 @@ func (us *UsersServices) Login(ctx context.Context, req LoginRequest) (*models.U
 		return nil, errorService.New(ErrUserNotActivated, ErrUserNotActivated)
 	}
 
+	canLogin, err := us.LoginLimiter.CanLogin(ctx, req.Ip, req.Email)
+	if err != nil {
+		return nil, errorService.New(ErrUserInternal, err)
+	}
+
+	if !canLogin {
+		return nil, errorService.New(ErrUserLimited, ErrUserLimited)
+	}
+
 	err = user.Password.ComparePassword(req.Password)
 	if err != nil {
+		if err := us.LoginLimiter.SetAttemptLogin(ctx, req.Ip, req.Email, 2); err != nil {
+			return nil, errorService.New(ErrUserInternal, err)
+		}
 		return nil, errorService.New(err, err)
 	}
 
