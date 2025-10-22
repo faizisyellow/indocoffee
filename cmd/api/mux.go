@@ -8,6 +8,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
+	"github.com/go-chi/httprate"
 	_ "github.com/joho/godotenv"
 	httpSwagger "github.com/swaggo/http-swagger"
 )
@@ -18,8 +19,13 @@ func (app *Application) Mux() http.Handler {
 	r := chi.NewRouter()
 
 	r.Use(middleware.RequestID)
-	r.Use(middleware.RealIP)
 	r.Use(middleware.Recoverer)
+	r.Use(middleware.RealIP)
+	r.Use(httprate.Limit(
+		200,
+		10*time.Minute,
+		httprate.WithKeyFuncs(httprate.KeyByIP, httprate.KeyByEndpoint),
+	))
 	r.Use(cors.Handler(cors.Options{
 		AllowedOrigins:   []string{os.Getenv("CLIENT")},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"},
@@ -33,17 +39,6 @@ func (app *Application) Mux() http.Handler {
 	r.Use(app.RestrictAdminActionMiddleware)
 
 	r.Route("/v1", func(r chi.Router) {
-		r.Route("/health", func(r chi.Router) {
-			r.Get("/", app.HealthHandler)
-		})
-
-		r.Route("/uploadthing", func(r chi.Router) {
-			// for callback upload before upload file
-			r.Post("/", func(w http.ResponseWriter, r *http.Request) {
-				w.WriteHeader(http.StatusOK)
-				w.Write([]byte("done"))
-			})
-		})
 
 		r.Route("/users", func(r chi.Router) {
 			r.Get("/profile", NewHandlerFunc(app.AuthMiddleware)(app.GetUserProfileHandler))
