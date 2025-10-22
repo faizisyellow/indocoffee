@@ -126,6 +126,8 @@ func (app *Application) SignInHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	req.Ip = r.RemoteAddr
+
 	user, err := app.Services.UsersService.Login(r.Context(), req)
 	if err != nil {
 		errorValue := errorService.GetError(err)
@@ -134,6 +136,8 @@ func (app *Application) SignInHandler(w http.ResponseWriter, r *http.Request) {
 			ResponseClientError(w, r, err, http.StatusNotFound)
 		case service.ErrUserNotActivated:
 			ResponseClientError(w, r, err, http.StatusBadRequest)
+		case service.ErrUserLimited:
+			ResponseClientError(w, r, err, http.StatusTooManyRequests)
 		case bcrypt.ErrMismatchedHashAndPassword:
 			ResponseClientError(w, r, fmt.Errorf("email or password incorrect"), http.StatusBadRequest)
 		default:
