@@ -21,11 +21,6 @@ func (app *Application) Mux() http.Handler {
 	r.Use(middleware.RequestID)
 	r.Use(middleware.Recoverer)
 	r.Use(middleware.RealIP)
-	r.Use(httprate.Limit(
-		120,
-		10*time.Minute,
-		httprate.WithKeyFuncs(httprate.KeyByIP, httprate.KeyByEndpoint),
-	))
 	r.Use(cors.Handler(cors.Options{
 		AllowedOrigins:   []string{os.Getenv("CLIENT")},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"},
@@ -35,6 +30,11 @@ func (app *Application) Mux() http.Handler {
 		MaxAge:           300, // Maximum value not ignored by any of major browsers
 	}))
 	r.Use(middleware.Timeout(60 * time.Second))
+	r.Use(httprate.Limit(
+		100,
+		10*time.Minute,
+		httprate.WithKeyFuncs(httprate.KeyByIP, httprate.KeyByEndpoint),
+	))
 
 	r.Use(app.RestrictAdminActionMiddleware)
 
