@@ -299,3 +299,15 @@ func (o *OrdersRepository) GetOrders(ctx context.Context, qry repository.Paginat
 
 	return orders, rowsResult.Err()
 }
+
+func (o *OrdersRepository) GetTotalUsersOrders(ctx context.Context, usrId int) (int, error) {
+	qry := `SELECT COUNT(*) FROM orders WHERE customer_id = ?"`
+
+	ctx, cancel := context.WithTimeout(ctx, repository.QueryTimeout)
+	defer cancel()
+
+	var total int
+
+	err := o.Db.QueryRowContext(ctx, qry, usrId).Scan(&total)
+	return total, err
+}

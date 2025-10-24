@@ -115,3 +115,15 @@ func (c *CartsRepository) GetCartStatus(ctx context.Context, cartId int) (string
 
 	return status, err
 }
+
+func (c *CartsRepository) GetTotalUsersCarts(ctx context.Context, usrId int) (int, error) {
+	qry := `SELECT COUNT(*) FROM cart_items WHERE user_id = ?  AND status ="open"`
+
+	ctx, cancel := context.WithTimeout(ctx, repository.QueryTimeout)
+	defer cancel()
+
+	var total int
+
+	err := c.Db.QueryRowContext(ctx, qry, usrId).Scan(&total)
+	return total, err
+}

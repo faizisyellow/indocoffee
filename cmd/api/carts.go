@@ -51,6 +51,8 @@ func (app *Application) CreateCartsHandler(w http.ResponseWriter, r *http.Reques
 			ResponseClientError(w, r, err, http.StatusNotFound)
 		case service.ErrConflictItemCart:
 			ResponseClientError(w, r, err, http.StatusConflict)
+		case service.ErrCartLimitReached:
+			ResponseClientError(w, r, err, http.StatusTooManyRequests)
 		default:
 			ResponseServerError(w, r, err, http.StatusInternalServerError)
 		}

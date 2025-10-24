@@ -17,6 +17,7 @@ type Carts interface {
 	DeleteWithTx(ctx context.Context, tx *sql.Tx, cartId int) error
 	UpdateCartStatus(ctx context.Context, tx *sql.Tx, cartId int, state CartStatus) error
 	GetCartStatus(ctx context.Context, cartId int) (string, error)
+	GetTotalUsersCarts(ctx context.Context, usrId int) (int, error)
 }
 
 type Contract struct {

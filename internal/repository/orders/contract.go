@@ -17,6 +17,7 @@ type Orders interface {
 	GetOrderStatusById(ctx context.Context, orderId string) (string, error)
 	GetOrderById(ctx context.Context, orderId string) (models.Order, error)
 	GetOrders(ctx context.Context, r repository.PaginatedOrdersQuery) ([]models.Order, error)
+	GetTotalUsersOrders(ctx context.Context, usrId int) (int, error)
 }
 
 type Contract struct {

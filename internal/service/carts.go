@@ -25,10 +25,20 @@ var (
 	ErrCartNotFound         = errors.New("carts: cart not found")
 	ErrCartOverflowQuantity = errors.New("carts: item quantity max is 50")
 	ErrCartMinQuantity      = errors.New("carts: item quantity min is 1")
+	ErrCartLimitReached     = errors.New("carts: maximum number of carts reached (2)")
 	conflictOpenCartCode    = "Error 1644"
 )
 
 func (c *CartsService) Create(ctx context.Context, req dto.CreateCartRequest, usrId int) error {
+	totalCarts, err := c.CartsStore.GetTotalUsersCarts(ctx, usrId)
+	if err != nil {
+		return errorService.New(ErrInternalCart, err)
+	}
+
+	if totalCarts >= 2 {
+		return errorService.New(ErrCartLimitReached, nil)
+	}
+
 	prd, err := c.ProductsService.FindById(ctx, req.ProductId)
 	if err != nil {
 		return err
