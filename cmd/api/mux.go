@@ -31,8 +31,8 @@ func (app *Application) Mux() http.Handler {
 	}))
 	r.Use(middleware.Timeout(60 * time.Second))
 	r.Use(httprate.Limit(
-		100,
-		10*time.Minute,
+		99,
+		30*time.Minute,
 		httprate.WithKeyFuncs(httprate.KeyByIP, httprate.KeyByEndpoint),
 	))
 
