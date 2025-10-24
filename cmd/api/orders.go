@@ -75,6 +75,8 @@ func (app *Application) CreateOrdersHandler(w http.ResponseWriter, r *http.Reque
 			ResponseClientError(w, r, err, http.StatusBadRequest)
 		case service.ErrOrdersConflict:
 			ResponseClientError(w, r, err, http.StatusConflict)
+		case service.ErrOrderLimit:
+			ResponseClientError(w, r, err, http.StatusTooManyRequests)
 		default:
 			ResponseServerError(w, r, err, http.StatusInternalServerError)
 		}

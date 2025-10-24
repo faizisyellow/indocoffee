@@ -37,9 +37,24 @@ var (
 	ErrOrdersConflict      = errors.New("orders: already exist")
 	ErrOrdersQuantityIssue = errors.New("orders: one of the item is not available")
 	ErrOrdersInvalidStatus = errors.New("orders: has already been cancelled or is being proccess")
+	ErrOrderLimit          = errors.New("orders: maximum number of orders reached (2)")
 )
 
 func (o *OrdersService) Create(ctx context.Context, idemKey string, req dto.CreateOrderRequest, usrId int) (string, error) {
+	customer, err := o.UsersService.FindUserById(ctx, usrId)
+	if err != nil {
+		return "", err
+	}
+
+	totalOrders, err := o.OrderStore.GetTotalUsersOrders(ctx, customer.Id)
+	if err != nil {
+		return "", errorService.New(ErrOrdersInternal, err)
+	}
+
+	if totalOrders >= 2 {
+		return "", errorService.New(ErrOrderLimit, err)
+	}
+
 	idempotencyKeyExist, err := o.OrderStore.GetIdempotencyKey(ctx, idemKey)
 	if err != nil && err != sql.ErrNoRows {
 		return "", errorService.New(ErrOrdersInternal, err)
@@ -47,11 +62,6 @@ func (o *OrdersService) Create(ctx context.Context, idemKey string, req dto.Crea
 
 	if idempotencyKeyExist != "" {
 		return "", errorService.New(ErrOrdersConflict, ErrOrdersConflict)
-	}
-
-	customer, err := o.UsersService.FindUserById(ctx, usrId)
-	if err != nil {
-		return "", err
 	}
 
 	var (
