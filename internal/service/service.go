@@ -5,6 +5,7 @@ import (
 	"database/sql"
 
 	"github.com/faizisyellow/indocoffee/internal/db"
+	loginLimiter "github.com/faizisyellow/indocoffee/internal/limiter/login"
 	"github.com/faizisyellow/indocoffee/internal/models"
 	"github.com/faizisyellow/indocoffee/internal/repository"
 	"github.com/faizisyellow/indocoffee/internal/repository/beans"
@@ -102,6 +103,7 @@ var (
 )
 
 func New(
+	loginLimiter loginLimiter.LoginLimiter,
 	usersStore users.Users,
 	invitationsStore invitations.Invitations,
 	beansStore beans.Beans,
@@ -130,6 +132,7 @@ func New(
 		InvitationsStore: invitationsStore,
 		Token:            uuid,
 		Transaction:      tx,
+		LoginLimiter:     loginLimiter,
 	}
 
 	return &Service{

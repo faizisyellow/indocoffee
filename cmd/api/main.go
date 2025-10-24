@@ -4,11 +4,13 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"strconv"
 	"time"
 
 	_ "github.com/faizisyellow/indocoffee/docs"
 	"github.com/faizisyellow/indocoffee/internal/auth"
 	"github.com/faizisyellow/indocoffee/internal/db"
+	loginLimiter "github.com/faizisyellow/indocoffee/internal/limiter/login"
 	"github.com/faizisyellow/indocoffee/internal/logger"
 	"github.com/faizisyellow/indocoffee/internal/repository/beans"
 	"github.com/faizisyellow/indocoffee/internal/repository/carts"
@@ -24,6 +26,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/joho/godotenv"
 	"github.com/oklog/ulid/v2"
+	"github.com/redis/go-redis/v9"
 	"go.uber.org/zap"
 )
 
@@ -89,7 +92,28 @@ func main() {
 		os.Getenv("UPLOADTHING_APP_ID"),
 	)
 
+	rdbname, err := strconv.Atoi(os.Getenv("REDIS_DB"))
+	if err != nil {
+		logger.Logger.Fatalw("error loading .env file", zap.Error(err))
+	}
+
+	rdb := redis.NewClient(&redis.Options{
+		Addr:     os.Getenv("REDIS_ADDR"),
+		Username: os.Getenv("REDIS_USERNAME"),
+		Password: os.Getenv("REDIS_PW"),
+		DB:       rdbname,
+	})
+
+	defer rdb.Close()
+
+	loginRateLimiter := loginLimiter.RedisLoginLimiter{
+		Rdb:      rdb,
+		Limit:    12,
+		Duration: time.Hour,
+	}
+
 	services := service.New(
+		&loginRateLimiter,
 		&users.UsersRepository{Db: dbs},
 		&invitations.InvitationRepository{Db: dbs},
 		&beans.BeansRepository{Db: dbs},
