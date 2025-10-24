@@ -22,7 +22,7 @@ func (app *Application) Mux() http.Handler {
 	r.Use(middleware.Recoverer)
 	r.Use(middleware.RealIP)
 	r.Use(httprate.Limit(
-		200,
+		120,
 		10*time.Minute,
 		httprate.WithKeyFuncs(httprate.KeyByIP, httprate.KeyByEndpoint),
 	))
