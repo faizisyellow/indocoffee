@@ -104,6 +104,8 @@ func main() {
 		DB:       rdbname,
 	})
 
+	defer rdb.Close()
+
 	loginRateLimiter := loginLimiter.RedisLoginLimiter{
 		Rdb:      rdb,
 		Limit:    12,
