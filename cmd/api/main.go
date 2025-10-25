@@ -57,8 +57,8 @@ func main() {
 
 	dbConfig := DBConf{
 		Addr:            os.Getenv("DB_ADDR"),
-		MaxOpenConn:     10,
-		MaxIdleConn:     10,
+		MaxOpenConn:     5,
+		MaxIdleConn:     5,
 		MaxLifeTime:     "3m",
 		MaxIdleLifeTime: "3m",
 	}
@@ -108,8 +108,8 @@ func main() {
 
 	loginRateLimiter := loginLimiter.RedisLoginLimiter{
 		Rdb:      rdb,
-		Limit:    12,
-		Duration: time.Hour,
+		Limit:    2, // start from 0
+		Duration: 12 * time.Hour,
 	}
 
 	services := service.New(
@@ -132,7 +132,7 @@ func main() {
 		SecretKey: os.Getenv("SECRET_KEY"),
 		Iss:       "authentication",
 		Sub:       "user",
-		Exp:       time.Hour * 24,
+		Exp:       24 * time.Hour,
 	}
 
 	jwtAuthentication := auth.New(jwtTokenConfig.SecretKey, jwtTokenConfig.Iss, jwtTokenConfig.Sub)
