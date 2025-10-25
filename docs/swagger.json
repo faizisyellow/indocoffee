@@ -19,7 +19,6 @@
         },
         "version": "1.0"
     },
-    "host": "localhost:8080",
     "basePath": "/v1",
     "paths": {
         "/authentication/activation/{token}": {
@@ -3607,7 +3606,7 @@
                     },
                     {
                         "type": "string",
-                        "description": "sort product by alphabet",
+                        "description": "sort product by price",
                         "name": "sort",
                         "in": "query"
                     },

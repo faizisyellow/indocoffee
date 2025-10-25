@@ -345,7 +345,6 @@ definitions:
       token:
         type: string
     type: object
-host: localhost:8080
 info:
   contact:
     email: support@swagger.io
@@ -2312,7 +2311,7 @@ paths:
         in: query
         name: offset
         type: string
-      - description: sort product by alphabet
+      - description: sort product by price
         in: query
         name: sort
         type: string
