@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"time"
 
-	_ "github.com/faizisyellow/indocoffee/docs"
+	"github.com/faizisyellow/indocoffee/docs"
 	"github.com/faizisyellow/indocoffee/internal/auth"
 	"github.com/faizisyellow/indocoffee/internal/db"
 	loginLimiter "github.com/faizisyellow/indocoffee/internal/limiter/login"
@@ -47,13 +47,14 @@ import (
 //	@name						Authorization
 
 // @schemes	http https
-// @host		localhost:8080
 // @BasePath	/v1
 func main() {
 	err := godotenv.Load()
 	if err != nil {
 		logger.Logger.Fatalw("error loading .env file", zap.Error(err))
 	}
+
+	docs.SwaggerInfo.Host = net.JoinHostPort(os.Getenv("HOST"), os.Getenv("PORT"))
 
 	dbConfig := DBConf{
 		Addr:            os.Getenv("DB_ADDR"),
