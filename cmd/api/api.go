@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"errors"
-	"net"
 	"net/http"
 	"os"
 	"os/signal"
@@ -47,7 +46,7 @@ type Application struct {
 func (app *Application) Run(mux http.Handler) error {
 
 	srv := http.Server{
-		Addr:         net.JoinHostPort(app.Host, app.Port),
+		Addr:         ":" + app.Port,
 		Handler:      mux,
 		WriteTimeout: time.Second * 30,
 		ReadTimeout:  time.Second * 10,

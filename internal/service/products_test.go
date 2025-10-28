@@ -12,7 +12,6 @@ import (
 	"github.com/faizisyellow/indocoffee/internal/uploader"
 	"github.com/faizisyellow/indocoffee/internal/uploader/local"
 	"github.com/faizisyellow/indocoffee/internal/uploader/uploadthing"
-	"github.com/joho/godotenv"
 )
 
 func TestProductsService(t *testing.T) {
@@ -135,11 +134,6 @@ func (p ProductsServiceTest) Test(t *testing.T) {
 func SetupUploadthing(t *testing.T) (*uploadthing.Uploadthing, error) {
 	t.Helper()
 
-	err := loadEnv()
-	if err != nil {
-		return nil, err
-	}
-
 	upt := uploadthing.New(
 		os.Getenv("UPLOADTHING_API_KEY"),
 		os.Getenv("UPLOADTHING_PRESIGNED_URL"),
@@ -154,26 +148,4 @@ func SetupUploadthing(t *testing.T) (*uploadthing.Uploadthing, error) {
 	)
 
 	return upt, nil
-}
-
-func loadEnv() error {
-	dir, err := os.Getwd()
-	if err != nil {
-		return err
-	}
-
-	for {
-		envPath := filepath.Join(dir, ".env")
-		if _, err := os.Stat(envPath); err == nil {
-			return godotenv.Load(envPath)
-		}
-
-		parent := filepath.Dir(dir)
-		if parent == dir {
-			break
-		}
-		dir = parent
-	}
-
-	return nil
 }

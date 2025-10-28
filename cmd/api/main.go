@@ -24,7 +24,6 @@ import (
 	"github.com/faizisyellow/indocoffee/internal/uploader/uploadthing"
 	"github.com/faizisyellow/indocoffee/internal/utils"
 	"github.com/google/uuid"
-	"github.com/joho/godotenv"
 	"github.com/oklog/ulid/v2"
 	"github.com/redis/go-redis/v9"
 	"go.uber.org/zap"
@@ -49,10 +48,6 @@ import (
 // @schemes	http https
 // @BasePath	/v1
 func main() {
-	err := godotenv.Load()
-	if err != nil {
-		logger.Logger.Fatalw("error loading .env file", zap.Error(err))
-	}
 
 	docs.SwaggerInfo.Host = net.JoinHostPort(os.Getenv("HOST"), os.Getenv("PORT"))
 
@@ -140,7 +135,6 @@ func main() {
 
 	application := Application{
 		Port:           os.Getenv("PORT"),
-		Host:           os.Getenv("HOST"),
 		Env:            os.Getenv("ENV"),
 		DbConfig:       dbConfig,
 		Services:       *services,

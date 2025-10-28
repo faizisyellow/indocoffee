@@ -9,7 +9,6 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
 	"github.com/go-chi/httprate"
-	_ "github.com/joho/godotenv"
 	httpSwagger "github.com/swaggo/http-swagger"
 )
 
@@ -37,7 +36,6 @@ func (app *Application) Mux() http.Handler {
 	))
 
 	r.Route("/v1", func(r chi.Router) {
-
 		r.Route("/users", func(r chi.Router) {
 			r.Get("/profile", NewHandlerFunc(app.AuthMiddleware)(app.GetUserProfileHandler))
 			r.Get("/cart", NewHandlerFunc(app.AuthMiddleware)(app.FindUsersCartHandler))
