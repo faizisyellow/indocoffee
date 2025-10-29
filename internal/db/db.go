@@ -2,18 +2,49 @@ package db
 
 import (
 	"context"
+	"crypto/tls"
+	"crypto/x509"
 	"database/sql"
 	"fmt"
+	"log"
+	"os"
 	"time"
 
-	_ "github.com/go-sql-driver/mysql"
+	"github.com/go-sql-driver/mysql"
 )
 
 type TransFnc func(db *sql.DB, ctx context.Context, operation func(*sql.Tx) error) error
 
-func New(dsn string, maxOpenConn, maxIdleConn int, maxIdleTime, maxLifeTime string) (*sql.DB, error) {
+func New(dsn string, maxOpenConn, maxIdleConn int, maxIdleTime, maxLifeTime string, usr, passwd, dbname string) (*sql.DB, error) {
+	rootCertPool := x509.NewCertPool()
+	pem, err := os.ReadFile("ca.pem")
+	if err != nil {
+		log.Fatal("Failed to read CA file:", err)
+	}
 
-	db, err := sql.Open("mysql", dsn)
+	if ok := rootCertPool.AppendCertsFromPEM(pem); !ok {
+		log.Fatal("Failed to append CA cert")
+	}
+
+	err = mysql.RegisterTLSConfig("aiven", &tls.Config{
+		RootCAs: rootCertPool,
+	})
+	if err != nil {
+		log.Fatal("Failed to register TLS config:", err)
+	}
+
+	cfg := mysql.Config{
+		User:                 usr,
+		Passwd:               passwd,
+		Net:                  "tcp",
+		Addr:                 dsn,
+		DBName:               dbname,
+		TLSConfig:            "aiven",
+		ParseTime:            true,
+		AllowNativePasswords: true,
+	}
+
+	db, err := sql.Open("mysql", cfg.FormatDSN())
 	if err != nil {
 		return nil, fmt.Errorf("error open db=%v", err)
 	}

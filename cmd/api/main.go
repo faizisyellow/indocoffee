@@ -70,6 +70,9 @@ func main() {
 		dbConfig.MaxIdleConn,
 		dbConfig.MaxIdleLifeTime,
 		dbConfig.MaxLifeTime,
+		os.Getenv("DB_USER"),
+		os.Getenv("DB_PASSWORD"),
+		os.Getenv("DB_NAME"),
 	)
 	if err != nil {
 		logger.Logger.Fatalw("error connecting to database", zap.Error(err))

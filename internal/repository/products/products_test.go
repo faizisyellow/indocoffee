@@ -43,6 +43,9 @@ func setupTestDB(t *testing.T) (*sql.DB, error) {
 		5,
 		"1m",
 		"1m",
+		"",
+		"",
+		"",
 	)
 }
 
