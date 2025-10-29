@@ -35,7 +35,7 @@ func (c *CartsRepository) Insert(ctx context.Context, cart models.Cart) error {
 }
 
 func (c *CartsRepository) GetById(ctx context.Context, cartid int) (models.Cart, error) {
-	query := `SELECT id,user_id,product_id,quantity,created_at FROM cart_items WHERE id = ? AND status = "open"`
+	query := `SELECT id,user_id,product_id,quantity,created_at FROM cart_items WHERE id = ? AND status = 'open'`
 
 	ctx, cancel := context.WithTimeout(ctx, repository.QueryTimeout)
 	defer cancel()
@@ -117,7 +117,7 @@ func (c *CartsRepository) GetCartStatus(ctx context.Context, cartId int) (string
 }
 
 func (c *CartsRepository) GetTotalUsersCarts(ctx context.Context, usrId int) (int, error) {
-	qry := `SELECT COUNT(*) FROM cart_items WHERE user_id = ?  AND status ="open"`
+	qry := `SELECT COUNT(*) FROM cart_items WHERE user_id = ?  AND status ='open'`
 
 	ctx, cancel := context.WithTimeout(ctx, repository.QueryTimeout)
 	defer cancel()

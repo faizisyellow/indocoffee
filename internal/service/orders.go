@@ -2,10 +2,14 @@ package service
 
 import (
 	"context"
+	"crypto/rand"
 	"database/sql"
+	"encoding/hex"
 	"errors"
+	"fmt"
 	"log"
 	"strings"
+	"time"
 
 	"github.com/faizisyellow/indocoffee/internal/db"
 	"github.com/faizisyellow/indocoffee/internal/models"
@@ -121,10 +125,14 @@ func (o *OrdersService) Create(ctx context.Context, idemKey string, req dto.Crea
 		alternativePhone = &cleantAlt
 	}
 
-	id := strings.Builder{}
+	var b [4]byte
+	rand.Read(b[:])
+	timestamp := time.Now().UnixMilli()
+	var id strings.Builder
 	id.WriteString(ORDER_ID_PREFIX)
 	id.WriteString("-")
-	id.WriteString(o.Uuid.Generate())
+	id.WriteString(fmt.Sprintf("%x", timestamp))
+	id.WriteString(hex.EncodeToString(b[:]))
 
 	req.PhoneNumber, err = utils.ValidateAndFormatPhoneNumber(req.PhoneNumber)
 	if err != nil {

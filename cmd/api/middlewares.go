@@ -345,7 +345,7 @@ func (app *Application) CheckAuthorization(rolaname string) func(next http.Handl
 					return
 				}
 			} else {
-				if userRole.Level <= role.Level {
+				if userRole.Level < role.Level {
 					ResponseClientError(w, r, ErrForbiddenAction, http.StatusForbidden)
 					return
 				}

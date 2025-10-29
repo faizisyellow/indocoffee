@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"net"
 	"os"
@@ -101,12 +102,32 @@ func main() {
 		logger.Logger.Fatalw("error loading .env file", zap.Error(err))
 	}
 
-	rdb := redis.NewClient(&redis.Options{
-		Addr:     os.Getenv("REDIS_ADDR"),
-		Username: os.Getenv("REDIS_USERNAME"),
-		Password: os.Getenv("REDIS_PW"),
-		DB:       rdbname,
-	})
+	var rdb *redis.Client
+
+	for i := 0; i < 2; i++ {
+		rdb = redis.NewClient(&redis.Options{
+			Addr:     os.Getenv("REDIS_ADDR"),
+			Username: os.Getenv("REDIS_USERNAME"),
+			Password: os.Getenv("REDIS_PW"),
+			DB:       rdbname,
+		})
+
+		_, err := rdb.Ping(context.Background()).Result()
+		if err != nil {
+			rdb.Close()
+			time.Sleep(1 * time.Second)
+			continue
+		}
+
+		logger.Logger.Info("connected to Redis successfully")
+
+		break
+	}
+
+	if rdb == nil {
+		logger.Logger.Error("failed to connect to Redis after 2 attempts")
+		return
+	}
 
 	defer rdb.Close()
 

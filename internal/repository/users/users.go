@@ -159,7 +159,7 @@ func (u *UsersRepository) GetUsersCart(ctx context.Context, id int) (models.User
 	LEFT JOIN products ON products.id = cart_items.product_id
 	LEFT JOIN beans ON beans.id = products.bean_id
 	LEFT JOIN forms ON forms.id = products.form_id
-	WHERE users.id = ? AND cart_items.status="open";
+	WHERE users.id = ? AND cart_items.status='open';
 	`
 
 	ctx, cancel := context.WithTimeout(ctx, repository.QueryTimeout)
@@ -265,7 +265,7 @@ func (o *UsersRepository) GetUsersOrders(ctx context.Context, qry repository.Pag
 				items,
 				cart_ids
 			FROM orders
-			WHERE status LIKE concat("%",?,"%") AND customer_id = ?
+			WHERE status LIKE concat('%',?,'%') AND customer_id = ?
 		) AS filtered_orders
 		ORDER BY created_at ` + qry.Sort + `
 		LIMIT ?

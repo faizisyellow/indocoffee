@@ -235,7 +235,7 @@ func (o *OrdersRepository) GetOrders(ctx context.Context, qry repository.Paginat
 				items,
 				cart_ids
 			FROM orders
-			WHERE status LIKE concat("%",?,"%")
+			WHERE status LIKE concat('%',?,'%')
 		) AS filtered_orders
 		ORDER BY created_at ` + qry.Sort + `
 		LIMIT ?
