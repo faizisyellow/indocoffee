@@ -9,7 +9,6 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
 	"github.com/go-chi/httprate"
-	_ "github.com/joho/godotenv"
 	httpSwagger "github.com/swaggo/http-swagger"
 )
 

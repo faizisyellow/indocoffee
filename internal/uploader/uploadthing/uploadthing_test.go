@@ -3,11 +3,9 @@ package uploadthing
 import (
 	"context"
 	"os"
-	"path/filepath"
 	"testing"
 
 	"github.com/faizisyellow/indocoffee/internal/uploader"
-	"github.com/joho/godotenv"
 )
 
 func TestUploadThing(t *testing.T) {
@@ -178,11 +176,6 @@ func TestUploadThing(t *testing.T) {
 func SetupUploadthing(t *testing.T) (*Uploadthing, error) {
 	t.Helper()
 
-	err := loadEnv()
-	if err != nil {
-		return nil, err
-	}
-
 	upt := New(
 		os.Getenv("UPLOADTHING_API_KEY"),
 		os.Getenv("UPLOADTHING_PRESIGNED_URL"),
@@ -197,26 +190,4 @@ func SetupUploadthing(t *testing.T) (*Uploadthing, error) {
 	)
 
 	return upt, nil
-}
-
-func loadEnv() error {
-	dir, err := os.Getwd()
-	if err != nil {
-		return err
-	}
-
-	for {
-		envPath := filepath.Join(dir, ".env")
-		if _, err := os.Stat(envPath); err == nil {
-			return godotenv.Load(envPath)
-		}
-
-		parent := filepath.Dir(dir)
-		if parent == dir {
-			break
-		}
-		dir = parent
-	}
-
-	return nil
 }
