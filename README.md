@@ -10,7 +10,7 @@ Requirements:
   - mysql
   - redis
 
-## To run the application
+## To run the application in local
  - Install all packages
    ``` Go mod download ```
  - Add .env file
