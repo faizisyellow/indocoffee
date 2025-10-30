@@ -7,6 +7,8 @@ Requirements:
   - Swaggo
   - golang-migrate
   - air live reload 
+  - mysql
+  - redis
 
 ## To run the application
  - Install all packages
@@ -16,11 +18,12 @@ Requirements:
    ``` make migrate-up ```
  - Run air live reload
   ``` air ```
-- To see the api documentation you can go [visit](http://localhost:8080/v1/swagger/index.html)
+- To see the api documentation you can go to [visit](http://localhost:8080/v1/swagger/index.html)
 
-## To run with docker image
- - run ```docker compose --build```
- - To see the api documentation you can go [visit](http://localhost:8080/v1/swagger/index.html)
+## To run with docker
+ - Set environment variables in .env file 
+ - Run ```docker compose --build```
+ - To see the api documentation you can go to [visit](http://localhost:8080/v1/swagger/index.html)
 
 ## Web applications demo version
  - client website to buy coffee:
